@@ -20,6 +20,7 @@ the server workspace on 2026-07-01.
 | `docs/GIT_AND_COLLABORATION.md` | `cfy2yue/StockHome` | `https://github.com/cfy2yue/StockHome/blob/main/docs/GIT_AND_COLLABORATION.md` | Git and ownership rules | yes | Created for collaboration. |
 | `docs/GITHUB_FILE_MAP.md` | `cfy2yue/StockHome` | `https://github.com/cfy2yue/StockHome/blob/main/docs/GITHUB_FILE_MAP.md` | File URL map | yes | This file. |
 | `docs/LOCAL_CODEX_DRY_RUN.md` | `cfy2yue/StockHome` | `https://github.com/cfy2yue/StockHome/blob/main/docs/LOCAL_CODEX_DRY_RUN.md` | Local Codex dry-run notes | yes | Supports workflow testing before normal CC flow. |
+| `docs/CC_CODEX_COOPERATION_PROTOCOL.md` | `cfy2yue/StockHome` | `https://github.com/cfy2yue/StockHome/blob/main/docs/CC_CODEX_COOPERATION_PROTOCOL.md` | CC/local and remote Codex operating protocol | yes | Read before parallel local/remote work. |
 | `docs/USER_GUIDE.md` | `cfy2yue/StockHome` | `https://github.com/cfy2yue/StockHome/blob/main/docs/USER_GUIDE.md` | User guide | yes | User-facing docs. |
 | `docs/RESPONSE_PROTOCOL.md` | `cfy2yue/StockHome` | `https://github.com/cfy2yue/StockHome/blob/main/docs/RESPONSE_PROTOCOL.md` | Answer protocol | yes | Must match `AGENTS.md`. |
 | `docs/DATA_SOURCE_POLICY.md` | `cfy2yue/StockHome` | `https://github.com/cfy2yue/StockHome/blob/main/docs/DATA_SOURCE_POLICY.md` | Data-source and credential policy | yes | No tokens. |

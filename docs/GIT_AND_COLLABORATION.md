@@ -54,6 +54,9 @@ Record ownership in `docs/HANDOFF.md`, `goal.md`, or a dated doc section before
 parallel work. Avoid editing the same code file at the same time. Markdown can
 be parallelized when dated append sections are used.
 
+For the engineered local/remote workflow, read
+`docs/CC_CODEX_COOPERATION_PROTOCOL.md` before starting parallel work.
+
 ## Git Hygiene
 
 Track candidates:
