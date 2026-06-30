@@ -8,10 +8,11 @@
 2. `AGENTS.md`：stock agent 的硬规则。
 3. `docs/GIT_AND_COLLABORATION.md`：Git、CC、Codex 协作和文件所有权规则。
 4. `docs/GITHUB_FILE_MAP.md`：高信号文件和 GitHub URL 映射。
-5. `docs/USER_GUIDE.md`：给真实用户看的简版说明。
-6. `docs/PROJECT_ENTRY.md`：给后续 agent/工程师的短入口，含目标、当前状态、恢复顺序。
-7. `docs/DIRECTORY_MAP.md`：目录地图，区分源码、配置、数据、报告、memory 和缓存。
-8. `docs/HANDOFF.md`：给后续 agent 或工程师的交接说明。
+5. `docs/LOCAL_CODEX_DRY_RUN.md`：本地 Codex dry-run 与远程协作试跑说明。
+6. `docs/USER_GUIDE.md`：给真实用户看的简版说明。
+7. `docs/PROJECT_ENTRY.md`：给后续 agent/工程师的短入口，含目标、当前状态、恢复顺序。
+8. `docs/DIRECTORY_MAP.md`：目录地图，区分源码、配置、数据、报告、memory 和缓存。
+9. `docs/HANDOFF.md`：给后续 agent 或工程师的交接说明。
 
 服务器本地证据在 `reports/`、`runs/`、`memory/` 和 `docs/local_archive/` 中，
 这些目录默认不进入 GitHub。CC 本地 clone 后如果需要看这些证据，应通过

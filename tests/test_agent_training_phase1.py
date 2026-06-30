@@ -898,7 +898,23 @@ hard_guards:
         encoding="utf-8",
     )
     (root / ".gitignore").write_text(
-        "\n".join([".env", ".env.*", "secrets/", "*api_key*", "*secret*", "ds_api.txt", "tushare_token.txt", "*.key", "*.pem"]),
+        "\n".join(
+            [
+                ".env",
+                ".env.*",
+                "secrets/",
+                "*api_key*",
+                "*secret*",
+                "tokens/",
+                "token.txt",
+                "*.token",
+                "*_token.txt",
+                "ds_api.txt",
+                "tushare_token.txt",
+                "*.key",
+                "*.pem",
+            ]
+        ),
         encoding="utf-8",
     )
     report = run_preflight(root)

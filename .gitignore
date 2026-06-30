@@ -18,6 +18,10 @@ output/
 secrets/
 *api_key*
 *secret*
+tokens/
+token.txt
+*.token
+*_token.txt
 ds_api.txt
 tushare_token.txt
 *.key
