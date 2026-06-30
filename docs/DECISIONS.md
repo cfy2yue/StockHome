@@ -8,6 +8,22 @@ The full pre-slim chronological decision log is preserved server-local at:
 docs/local_archive/20260630_pre_slim/DECISIONS.md
 ```
 
+## 2026-07-01: CC Audit — Validate Frozen P0/P1 On Latest Data; Mark Stale Docs
+
+Decision: after a clean three-way sync (local = GitHub = server at `4743391`),
+hand remote Codex one bounded goal — re-validate the frozen P0/P1 workflows on
+the latest as-of data block with a leakage + coverage audit (H2026 regime). Mark
+`PROJECT_BRIEF.md` and `MEMORY.md` SUPERSEDED where their output boundary
+contradicts the current `AGENTS.md`/`RESPONSE_PROTOCOL.md`.
+
+Reason: the project's largest risk is rolling data refresh / regime drift;
+validating it is the highest-value bounded step and the gate for any promotion.
+The two legacy docs still stated "do not output definite buy/sell", which no
+longer matches the approved action-advice protocol.
+
+Consequence: see `docs/CC_AUDIT_AND_HANDOFF_20260701.md` for the full goal +
+ownership. CC owns goal/decision/handoff docs; Codex owns code/runs/RUN_STATUS.
+
 ## 2026-07-01: Initialize StockHome As Its Own Repo
 
 Decision: initialize `/data/cyx/1030/stock` as the local repository for

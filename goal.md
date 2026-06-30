@@ -67,6 +67,19 @@ counter-evidence, position/risk limits, triggers, and review conditions.
 4. Avoid simultaneous edits to the same code file; append dated Markdown notes
    for parallel doc work when possible.
 
+## CC Audit + Active Handoff (2026-07-01)
+
+- Three-way sync verified: local = GitHub = server, all at `4743391`, clean.
+- Audit verdict: goal + direction reasonable; keep P0/P1 focus. Biggest risk =
+  rolling data refresh / regime drift.
+- Active Codex goal: re-validate frozen P0/P1 on the latest as-of block with a
+  leakage + coverage audit (H2026 regime). Details + ownership in
+  `docs/CC_AUDIT_AND_HANDOFF_20260701.md`.
+- Doc hygiene: `PROJECT_BRIEF.md` and `MEMORY.md` marked SUPERSEDED (old output
+  boundary contradicted current `AGENTS.md`).
+- Ownership: CC owns goal/decision/handoff docs; Codex owns src/scripts/runs/
+  reports/memory/RUN_STATUS.
+
 ## Read First
 
 ```text

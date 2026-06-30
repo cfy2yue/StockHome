@@ -1,3 +1,7 @@
+> **SUPERSEDED (2026-07-01)**：本文件为早期 memory，部分输出边界（如“不输出确定买入/卖出”）
+> 已被当前协议取代。当前权威输出与安全边界以 `AGENTS.md`、`goal.md`、
+> `docs/RESPONSE_PROTOCOL.md` 为准。本文件仅作历史参考，不作为当前行为依据。
+
 # 项目 Memory
 
 ## 用户长期要求
