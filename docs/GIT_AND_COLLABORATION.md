@@ -13,8 +13,8 @@ Updated: 2026-07-01
 Current audit note: `/data/cyx/1030/stock` is now a local Git worktree on branch
 `main` with origin `https://github.com/cfy2yue/StockHome.git`. Project-level
 `.gitignore` exists and excludes raw data, caches, reports, runs, secrets,
-logs, `.conda/`, and token files. A local initialization commit exists, but
-push is pending user confirmation.
+logs, `.conda/`, and token files. Remote `main` was initialized from this
+server workspace on 2026-07-01.
 
 ## Codex Alone
 

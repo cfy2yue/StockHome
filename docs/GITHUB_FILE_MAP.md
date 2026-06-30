@@ -6,8 +6,8 @@ GitHub target: `https://github.com/cfy2yue/StockHome`
 
 URL notes: URLs below use `main` as the intended publication branch. The local
 `/data/cyx/1030/stock` directory is initialized as a Git worktree with origin
-`https://github.com/cfy2yue/StockHome.git`. A local initialization commit
-exists; push is intentionally pending user confirmation.
+`https://github.com/cfy2yue/StockHome.git`. Remote `main` was initialized from
+the server workspace on 2026-07-01.
 
 | Local path | Git repo | GitHub URL | Purpose | Track in git? | Notes |
 |---|---|---|---|---|---|
