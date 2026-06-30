@@ -1,0 +1,306 @@
+news_deepseek_questionnaire_version: news_semantic_questionnaire_v1
+updated_at: "2026-06-25"
+research_only: true
+no_investment_instruction: true
+purpose: "让 DeepSeek 先阅读时间安全的新闻/公告材料，按固定问卷输出可回测、可消融、可迭代的语义量化结果。"
+
+time_safety:
+  leakage_guard: "只允许使用 available_at <= decision_time 的新闻、公告、政策和同行材料。"
+  decision_time_default: "15:00:00"
+  date_only_policy: "只有日期、无具体时间的材料不得乐观使用；默认标记为 date_only_close_assumed，并在保守实验中顺延到下一交易日。"
+  future_forbidden:
+    - future_return_5d
+    - future_return_10d
+    - future_return_20d
+    - gt_status
+    - future_news
+
+input_pack_policy:
+  max_self_events: 12
+  max_peer_events: 20
+  max_policy_events: 10
+  max_region_events: 8
+  max_chars_per_event: 220
+  required_source_fields:
+    - available_at
+    - source_type
+    - source_name
+    - event_source
+    - event_type
+    - title
+    - content_excerpt
+    - url
+  missing_source_policy: "缺来源、缺时间、缺正文时必须降低 evidence_quality 和 confidence，不能脑补。"
+
+mainline_first_pass:
+  required: true
+  purpose: "DeepSeek 必须先把最近新闻/公告归纳成可审计主线，再回答 32 维问卷，避免只按关键词机械打分。"
+  internal_steps:
+    - "区分材料来源：官方公告、公开新闻、行业/政策、地域、同行/相关股票。"
+    - "提炼 0-3 条主线：自身经营变化、风险/反证、同行/政策/地域背景、市场叙事拥挤。"
+    - "标记主线强度：是否有官方确认、是否有金额/客户/披露日/政策对象、是否能传导到目标公司。"
+    - "标记常规低信息量材料：年报披露、例行提示、重复转载、无明确经营影响的公告不得自动给高机会分。"
+    - "只在主线清晰、决策相关、且有跨通道确认时，才允许 opportunity/net 字段作为正向候选证据。"
+  mainline_quality_gate:
+    high_quality: "ds_news_mainline_clarity >= 0.6 and ds_news_decision_relevance >= 0.6 and ds_news_quality_score >= 0.5"
+    weak_or_routine: "ds_news_mainline_clarity < 0.5 or ds_news_decision_relevance < 0.5 or ds_news_repetition_lag >= 0.6"
+    action: "weak_or_routine 时，机会分只能作背景说明，不得提升研究分级；风险、不确定性仍可作为反证。"
+
+score_scale:
+  signed_relevance:
+    range: "-2..2"
+    meaning:
+      "-2": "明确负面或强反证"
+      "-1": "偏负面或弱反证"
+      "0": "中性、不相关、证据不足"
+      "1": "偏正面或弱支持"
+      "2": "明确正面或强支持"
+  probability_like:
+    range: "0..1"
+    meaning:
+      "0": "无证据或完全不支持"
+      "0.5": "证据中等或不确定"
+      "1": "证据强且来源可靠"
+  confidence:
+    range: "0..1"
+    meaning:
+      "0": "无法判断"
+      "1": "来源、时间、语义一致性都很强"
+
+required_output_schema:
+  type: news_semantic_questionnaire_result
+  required_fields:
+    - type
+    - questionnaire_version
+    - code
+    - decision_date
+    - decision_time
+    - source_coverage
+    - mainline_summary
+    - answers
+    - derived_scores
+    - missing_or_conflict_notes
+    - no_investment_instruction
+  derived_scores:
+    ds_news_risk_score: "0..1，风险/反证综合分"
+    ds_news_opportunity_score: "0..1，机会/主线支持综合分"
+    ds_news_peer_support_score: "-1..1，同行/相关股票是否支持目标股"
+    ds_news_policy_support_score: "-1..1，政策/宏观/产业背景净支持"
+    ds_news_region_support_score: "-1..1，地域背景净支持"
+    ds_news_uncertainty_score: "0..1，缺失、冲突、滞后、来源弱导致的不确定性"
+    ds_news_quality_score: "0..1，来源质量、时间戳质量、材料覆盖度"
+    ds_news_net_score: "-1..1，机会 - 风险 - 不确定性惩罚后的新闻净分"
+  formula_guidance:
+    ds_news_risk_score: "clip01(监管法律 + 财务经营恶化 + 股东资本风险 + 同行风险扩散 + 冲突强度 + 拥挤反证)"
+    ds_news_opportunity_score: "clip01(订单产品 + 业绩改善 + 政策顺风 + 同行扩散支持 + 官方确认 + 新颖性)"
+    ds_news_uncertainty_score: "clip01(新闻缺失 + 来源弱 + 时间戳差 + 正负冲突 + 重复滞后)"
+    ds_news_net_score: "clip11(ds_news_opportunity_score - ds_news_risk_score - 0.5 * ds_news_uncertainty_score)"
+
+questions:
+  - id: Q01
+    output_field: ds_news_mainline_clarity
+    category: evidence_quality
+    score_type: probability_like
+    question: "最近新闻/公告是否形成清晰主线，而不是零散噪声？"
+    scoring_hint: "主线清楚且多来源一致接近 1；标题零散或无法归纳接近 0。"
+  - id: Q02
+    output_field: ds_news_source_coverage
+    category: evidence_quality
+    score_type: probability_like
+    question: "自身、同行、政策/行业、地域四类材料覆盖是否足够？"
+    scoring_hint: "四类基本齐全接近 1；只有少量自身标题或完全缺失接近 0。"
+  - id: Q03
+    output_field: ds_news_official_support
+    category: evidence_quality
+    score_type: probability_like
+    question: "核心结论是否由官方公告或高可信来源支持？"
+    scoring_hint: "交易所/公司公告/权威媒体明确支持为高；公开聚合转载或未证实为低。"
+  - id: Q04
+    output_field: ds_news_timestamp_confidence
+    category: evidence_quality
+    score_type: probability_like
+    question: "材料时间戳是否足以安全进入当前决策点？"
+    scoring_hint: "精确到分钟且早于决策时间为高；只有日期或来源时间不明为低。"
+  - id: Q05
+    output_field: ds_news_self_material_event
+    category: self_stock
+    score_type: signed_relevance
+    question: "目标公司自身是否有足以改变研究判断的重大事件？"
+    scoring_hint: "重大订单/业绩/获批为正；处罚/诉讼/经营恶化为负；无重大事件为 0。"
+  - id: Q06
+    output_field: ds_news_self_earnings_change
+    category: self_stock
+    score_type: signed_relevance
+    question: "自身业绩、订单、收入或利润预期是否出现方向性变化？"
+    scoring_hint: "明确改善为正，明确恶化为负，无法判断为 0。"
+  - id: Q07
+    output_field: ds_news_self_order_product
+    category: self_stock
+    score_type: signed_relevance
+    question: "订单、中标、产品、技术、产能投放是否对未来经营有可验证影响？"
+    scoring_hint: "有金额/客户/产能/进度且来源可靠为高正；概念性宣传降权。"
+  - id: Q08
+    output_field: ds_news_self_capital_financing
+    category: self_stock
+    score_type: signed_relevance
+    question: "融资、定增、担保、质押、债务或现金流新闻是否构成支持或风险？"
+    scoring_hint: "改善资本结构为正；高质押、债务压力、担保风险为负。"
+  - id: Q09
+    output_field: ds_news_self_holder_change
+    category: self_stock
+    score_type: signed_relevance
+    question: "增减持、回购、股权激励或重要股东变化是否影响研究判断？"
+    scoring_hint: "回购/增持需看规模和价格；减持/被动减持通常偏负。"
+  - id: Q10
+    output_field: ds_news_self_regulatory_legal
+    category: self_stock
+    score_type: signed_relevance
+    question: "监管、问询、处罚、诉讼、审计意见等是否构成明确反证？"
+    scoring_hint: "明确监管法律风险为 -2；一般问询或无实质影响为 -1 到 0。"
+  - id: Q11
+    output_field: ds_news_self_supply_chain_position
+    category: self_stock
+    score_type: signed_relevance
+    question: "供应链位置、客户、原材料或价格变化是否对目标公司有直接影响？"
+    scoring_hint: "影响需要说明传导链，无法定位产业链位置则给 0 并标不确定。"
+  - id: Q12
+    output_field: ds_news_peer_industry_heat
+    category: peer_industry
+    score_type: signed_relevance
+    question: "同行/同概念股票是否共同出现行业主线升温或降温？"
+    scoring_hint: "多只同行同时出现同向高质量事件为强；单一孤立新闻为弱。"
+  - id: Q13
+    output_field: ds_news_peer_relative_support
+    category: peer_industry
+    score_type: signed_relevance
+    question: "目标股相对同行是被主线支持、落后补涨、还是被边缘化？"
+    scoring_hint: "目标也有证据且同行扩散为正；同行活跃但目标沉默偏负。"
+  - id: Q14
+    output_field: ds_news_peer_risk_diffusion
+    category: peer_industry
+    score_type: probability_like
+    question: "同行风险是否可能扩散到目标公司？"
+    scoring_hint: "同产业链、同客户、同监管问题越强，分数越高。"
+  - id: Q15
+    output_field: ds_news_peer_opportunity_diffusion
+    category: peer_industry
+    score_type: probability_like
+    question: "同行机会是否可能传导到目标公司？"
+    scoring_hint: "共同产业链、同产品价格、同政策受益越明确，分数越高。"
+  - id: Q16
+    output_field: ds_news_peer_silent_gap
+    category: peer_industry
+    score_type: probability_like
+    question: "是否存在同行被频繁提及而目标股缺席的沉默缺口？"
+    scoring_hint: "同行多点活跃且目标无相关证据时高；全行业都沉默时低。"
+  - id: Q17
+    output_field: ds_news_cross_stock_confirmation
+    category: peer_industry
+    score_type: probability_like
+    question: "相关新闻是否得到相关股票价格、公告或行业数据的交叉确认？"
+    scoring_hint: "多通道相互验证为高；只有单条新闻为低。"
+  - id: Q18
+    output_field: ds_news_policy_tailwind
+    category: policy_macro
+    score_type: probability_like
+    question: "政策、产业规划、补贴、审批或价格机制是否形成顺风？"
+    scoring_hint: "政策对象、行业位置、执行时间都清楚为高。"
+  - id: Q19
+    output_field: ds_news_policy_headwind
+    category: policy_macro
+    score_type: probability_like
+    question: "政策、监管、贸易、价格机制是否形成逆风？"
+    scoring_hint: "监管收紧、补贴退坡、出口限制、价格管制等按影响强度打分。"
+  - id: Q20
+    output_field: ds_news_cycle_demand_signal
+    category: policy_macro
+    score_type: signed_relevance
+    question: "需求周期、产品价格、库存或景气度是否对目标股形成净影响？"
+    scoring_hint: "必须说明对应产品/行业；泛泛景气新闻不能高分。"
+  - id: Q21
+    output_field: ds_news_macro_liquidity_signal
+    category: policy_macro
+    score_type: signed_relevance
+    question: "利率、流动性、汇率、大宗价格等宏观因素是否影响估值或利润？"
+    scoring_hint: "成长股利率敏感、出口股汇率敏感、材料股价格敏感，需写传导。"
+  - id: Q22
+    output_field: ds_news_external_trade_fx_signal
+    category: policy_macro
+    score_type: signed_relevance
+    question: "关税、出口管制、海外需求或汇率新闻是否影响目标股？"
+    scoring_hint: "有海外收入/原材料/客户链条才给非零；否则标不相关。"
+  - id: Q23
+    output_field: ds_news_region_policy_support
+    category: region
+    score_type: signed_relevance
+    question: "公司所在地域是否有产业政策、项目落地或区域扶持信息？"
+    scoring_hint: "地域政策必须和公司主业相关；无地域字段时给 0。"
+  - id: Q24
+    output_field: ds_news_region_risk
+    category: region
+    score_type: probability_like
+    question: "地域灾害、环保、安全生产、地方监管是否构成风险？"
+    scoring_hint: "有明确地区和业务暴露才给高分。"
+  - id: Q25
+    output_field: ds_news_region_cluster_confirmation
+    category: region
+    score_type: probability_like
+    question: "同地域产业集群或上市公司是否共同验证该主线？"
+    scoring_hint: "同地域同产业多家公司同步为高；孤立地区报道为低。"
+  - id: Q26
+    output_field: ds_news_conflict_intensity
+    category: conflict_crowding
+    score_type: probability_like
+    question: "新闻材料之间是否存在正负冲突、来源冲突或时间冲突？"
+    scoring_hint: "冲突越强越高；冲突高时必须提高不确定性。"
+  - id: Q27
+    output_field: ds_news_consensus_crowding
+    category: conflict_crowding
+    score_type: probability_like
+    question: "是否存在市场关注过热、叙事拥挤或滞后追热点风险？"
+    scoring_hint: "高新闻热度叠加高涨幅/高 RSI/重复转载为高。"
+  - id: Q28
+    output_field: ds_news_novelty
+    category: conflict_crowding
+    score_type: probability_like
+    question: "新闻是否提供新增信息，而不是旧闻重复或已被价格充分反映？"
+    scoring_hint: "新公告、新订单、新监管为高；重复转载、旧闻重发为低。"
+  - id: Q29
+    output_field: ds_news_repetition_lag
+    category: conflict_crowding
+    score_type: probability_like
+    question: "新闻是否主要是重复转载、滞后报道或低信息量内容？"
+    scoring_hint: "重复/滞后越强越高，高分会提高不确定性或降权。"
+  - id: Q30
+    output_field: ds_news_bookskill_alignment
+    category: cross_channel
+    score_type: signed_relevance
+    question: "新闻主线与当前触发的 Book Skill 适用/失效条件是否一致？"
+    scoring_hint: "符合已验证 skill 为正；触发失效条件为负；无 skill 给 0。"
+  - id: Q31
+    output_field: ds_news_python_gate_alignment
+    category: cross_channel
+    score_type: signed_relevance
+    question: "新闻主线与 Python gate、趋势、同行强弱是否相互支持？"
+    scoring_hint: "新闻和量价同行同向为正；新闻好但量价弱或过热为冲突。"
+  - id: Q32
+    output_field: ds_news_decision_relevance
+    category: cross_channel
+    score_type: probability_like
+    question: "本轮新闻是否足以影响研究分级，而不是仅作背景噪声？"
+    scoring_hint: "能明确改变继续深挖/观察/剔除/信息不足判断时高。"
+
+round_optimization_policy:
+  accepted_condition: "某字段在跨时间块、跨 sample 的 full_news 相对 no_news 指标稳定提升，且失败样本可解释。"
+  rejected_condition: "字段只在近期窗口有效、导致弱块变差、或缺失被误当低风险。"
+  ledger_required_fields:
+    - questionnaire_version
+    - question_id
+    - train_blocks
+    - validation_block
+    - task_mode
+    - metric_before
+    - metric_after
+    - accepted_rejected_observe
+    - failure_condition
+    - next_action

@@ -1,0 +1,17 @@
+﻿registry_version: python_gate_registry_v0
+purpose: "Python 定量 Gate 注册表；仅作为 Agent 证据层"
+gates:
+  locked_pool_deep_drawdown:
+    formula: "pool_avg_prior_return_20d <= -3.1587"
+    role: "市场环境证据，不是最终决策"
+    status: "baseline"
+  low_market_breadth_q80:
+    formula: "pool_positive_breadth_20d <= train_quantile(0.80)"
+    role: "低市场广度防守证据"
+    status: "candidate_with_counterexamples"
+    warning: "H2024_1/H2024_2 raw 暴露口径退化，不能直接升级默认策略"
+  low_vol_trend:
+    formula: "rank(close_above_ma200)*0.30 + rank(ma200_slope20)*0.25 - rank(atr20_pct)*0.25 - rank(news_risk_event_score_30d)*0.20"
+    role: "低波动趋势证据"
+    status: "candidate_with_counterexamples"
+selection_boundary: "不得根据 test 或下一时间块反向调阈值"

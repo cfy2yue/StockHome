@@ -1,0 +1,148 @@
+news_feature_schema_version: news_world_model_v2
+updated_at: '2026-06-28'
+leakage_guard: Only use news/announcement records with available_at <= decision_time.
+semantic_questionnaire:
+  enabled: true
+  config: config/news_deepseek_questionnaire.yaml
+  feature_cache: data/date_generalization_cache/market_5000/news_questionnaire_features.csv.gz
+  feature_cache_report: reports/date_generalization/news_questionnaire_feature_cache_after_h2025_2_backfill_panel_v1.md
+  version: news_semantic_questionnaire_v1
+  role: DeepSeek reads time-safe news materials and answers 32 fixed questions; derived fields can enter evidence pack after leakage checks.
+  default_use: risk_uncertainty_explanation_not_positive_alpha
+  positive_alpha_policy: ds_news_opportunity_score and ds_news_net_score are not accepted default promotion gates.
+  current_coverage_exact_stock_date: 0.000944
+  current_rows: 147
+  current_unique_stocks: 95
+  latest_panel_report: reports/date_generalization/news_backfill_and_questionnaire_findings_v1.md
+  latest_panel_policy: use_as_risk_uncertainty_explanation_not_positive_alpha
+  derived_fields:
+  - ds_news_risk_score
+  - ds_news_opportunity_score
+  - ds_news_peer_support_score
+  - ds_news_policy_support_score
+  - ds_news_region_support_score
+  - ds_news_uncertainty_score
+  - ds_news_quality_score
+  - ds_news_net_score
+event_feature_cache:
+  combined_event_table: data/date_generalization_cache/market_5000/combined_news_event_table.csv
+  combined_feature_table: data/date_generalization_cache/market_5000/combined_news_world_model_event_features.csv
+  latest_coverage_report: reports/date_generalization/news_h2023_1_backfill_findings_v1.md
+  combined_event_rows: 864253
+  combined_feature_rows: 242196
+  joined_gt_matched_rate: 0.350992
+  news_missing_rate_mean: 0.649008
+  row_cap_policy: row-cap partitions are partial coverage and must be exposed as uncertainty, not neutral or positive evidence.
+features:
+- feature_name: self_news_intensity
+  description: 股票自身新闻/公告强度
+  range: 0-1
+  calculation: min(1, log1p(self_count_30d)/log1p(20))
+  missing_policy: missing -> 0 and raise news_missing_rate
+  enter_evidence_pack: true
+  leakage_guard: available_at <= decision_time
+- feature_name: peer_news_intensity
+  description: 同行新闻/公告强度
+  range: 0-1
+  calculation: min(1, peer_group_news_count_avg/10)
+  missing_policy: missing -> peer_unknown
+  enter_evidence_pack: true
+  leakage_guard: available_at <= decision_time
+- feature_name: policy_background_score
+  description: 政策背景
+  range: -1..1
+  calculation: industry_policy materiality normalized
+  missing_policy: missing -> 0 but lower evidence quality
+  enter_evidence_pack: true
+  leakage_guard: available_at <= decision_time
+- feature_name: region_background_score
+  description: 地域背景
+  range: -1..1
+  calculation: region event score, capped unless self event exists
+  missing_policy: missing -> 0
+  enter_evidence_pack: true
+  leakage_guard: available_at <= decision_time
+- feature_name: self_vs_peer_attention_gap
+  description: 自身相对同行关注差
+  range: -1..1
+  calculation: self_news_intensity - peer_news_intensity
+  missing_policy: missing peer -> 0 and flag
+  enter_evidence_pack: true
+  leakage_guard: available_at <= decision_time
+- feature_name: peer_active_self_silent_flag
+  description: 同行活跃但自身沉默
+  range: 0/1
+  calculation: peer_news_intensity high and self_news_intensity low
+  missing_policy: missing -> 0 with warning
+  enter_evidence_pack: true
+  leakage_guard: available_at <= decision_time
+- feature_name: news_warning_score
+  description: 风险预警
+  range: 0-1
+  calculation: risk/regulatory/financing/holding-change materiality
+  missing_policy: missing -> 0 with missing-rate penalty
+  enter_evidence_pack: true
+  leakage_guard: available_at <= decision_time
+- feature_name: news_opportunity_score
+  description: 机会信号
+  range: 0-1
+  calculation: order/capacity/product/policy opportunity materiality
+  missing_policy: missing -> 0
+  enter_evidence_pack: true
+  leakage_guard: available_at <= decision_time
+- feature_name: news_evidence_quality
+  description: 证据质量
+  range: 0-1
+  calculation: official source ratio + timestamp quality
+  missing_policy: missing -> low quality
+  enter_evidence_pack: true
+  leakage_guard: available_at <= decision_time
+- feature_name: news_missing_rate
+  description: 新闻缺失率
+  range: 0-1
+  calculation: missing expected source slots / expected slots
+  missing_policy: missing -> 1
+  enter_evidence_pack: true
+  leakage_guard: available_at <= decision_time
+- feature_name: news_timestamp_quality
+  description: 时间戳质量
+  range: 0-1
+  calculation: available_at completeness and <= decision_time
+  missing_policy: missing -> 0
+  enter_evidence_pack: true
+  leakage_guard: available_at <= decision_time
+- feature_name: news_peer_diffusion_score
+  description: 同行新闻扩散
+  range: -1..1
+  calculation: peer risk/opportunity co-occurrence around target
+  missing_policy: missing -> 0
+  enter_evidence_pack: true
+  leakage_guard: available_at <= decision_time
+- feature_name: official_confirmation_score
+  description: 官方确认度
+  range: 0-1
+  calculation: official_count/(official_count+public_count)
+  missing_policy: missing -> 0
+  enter_evidence_pack: true
+  leakage_guard: available_at <= decision_time
+- feature_name: community_attention_score
+  description: 社区关注度
+  range: 0-1
+  calculation: public/community count zscore capped
+  missing_policy: missing -> 0
+  enter_evidence_pack: false
+  leakage_guard: available_at <= decision_time
+- feature_name: community_crowding_risk
+  description: 社区拥挤反证
+  range: 0-1
+  calculation: high positive crowding + high RSI/overheat
+  missing_policy: missing -> 0
+  enter_evidence_pack: true
+  leakage_guard: available_at <= decision_time
+- feature_name: announcement_materiality_score
+  description: 公告重要性
+  range: 0-1
+  calculation: max official announcement materiality
+  missing_policy: missing -> 0
+  enter_evidence_pack: true
+  leakage_guard: available_at <= decision_time

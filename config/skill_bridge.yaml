@@ -1,0 +1,53 @@
+# Skill Bridge 配置
+# 本配置控制是否自动调用 Kimi Work 内置 stock-assistant 系列 skill 作为补充数据源。
+# 用户无需感知 skill 存在，系统会在后台自动尝试调用，失败时静默回退到现有数据源。
+# 所有设置默认开启，可在需要时关闭以加速流程或避免网络调用。
+
+enabled: true
+
+enhancements:
+  # 单股技术分析增强：通过 stock_atom.py bundle technical 获取 MA/RSI/MACD 等指标
+  # 补充现有 AKShare 日线数据，提供更完整的技术面数据
+  technical_indicators:
+    enabled: true
+    description: "单股分析时自动获取 MA/RSI/MACD 等技术指标作为补充数据流"
+    indicators: "ma:20,ma:60,ma:120,rsi:14,macd"
+    interval: "1d"
+    limit: 300
+
+  # 多股比较增强：在多股横向比较时，尝试获取可比公司估值数据
+  # 补充现有评分体系，增加同业相对估值视角
+  peer_comparison:
+    enabled: true
+    description: "多股比较时自动获取可比公司估值数据"
+    max_peers: 5
+
+  # 基本面深度增强：通过同花顺 F10 抓取更详细的财务和股东数据
+  # 补充现有 AKShare 财务摘要，提供股东结构、机构持仓等深度数据
+  fundamental_deep_dive:
+    enabled: true
+    description: "单股分析时自动抓取同花顺 F10 深度基本面数据"
+    pages: ["company", "finance", "holder", "worth", "equity", "capital", "news"]
+
+  # 舆情分析增强：通过 Kimi Search/Fetch 获取最新新闻和舆情倾向
+  # 补充现有 world_model 新闻模块，提供更结构化的舆情分析
+  sentiment_analysis:
+    enabled: true
+    description: "分析时自动获取最新舆情和新闻摘要"
+    news_limit: 5
+
+# 降级策略：skill 调用失败时的行为
+fallback_policy:
+  # 失败时是否记录到 data_status.md
+  log_failures: true
+  # 失败时是否弹出提示给用户（false = 静默降级，符合小白用户体验）
+  notify_user: false
+
+# 性能配置
+performance:
+  # skill 调用超时（秒）
+  timeout_seconds: 20
+  # 是否缓存 skill 结果
+  cache_enabled: true
+  # 缓存有效期（小时）
+  cache_ttl_hours: 6

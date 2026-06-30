@@ -1,0 +1,24 @@
+single_stock_analysis:
+  description: "单只股票系统性分析"
+  modules: [data, financial_quality, valuation, trend, world_model, book_strategy_match, counterevidence, final_rating]
+multi_stock_comparison:
+  description: "多只候选股横向比较"
+  modules: [data, financial_quality, valuation, trend, world_model, scoring, comparison, final_ranking]
+news_update:
+  description: "候选股新闻和公告更新"
+  modules: [world_model, event_classifier, logic_update]
+financial_red_flag:
+  description: "财务排雷专项分析"
+  modules: [data, financial_quality, counterevidence]
+strategy_check:
+  description: "用书籍策略检查股票"
+  modules: [data, trend, candlestick, strategy_matcher, source_annotation]
+backtest_strategy:
+  description: "轻量历史验证"
+  modules: [data, strategy_matcher, backtest_simple]
+trend_analysis:
+  description: "趋势/技术结构专项分析"
+  modules: [data, trend, candlestick, counterevidence]
+world_model_analysis:
+  description: "市场环境与行业 world model 分析"
+  modules: [world_model, market_regime, sector_events]

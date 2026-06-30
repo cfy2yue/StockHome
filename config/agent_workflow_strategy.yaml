@@ -1,0 +1,2779 @@
+strategy_workflow_version: agent_workflow_strategy_v1
+updated_at: "2026-06-28"
+research_only: true
+no_broker: true
+no_auto_trade: true
+allow_actionable_research_suggestions: true
+no_auto_execution_or_guaranteed_return: true
+default_portfolio_ranker: rev_plus_chip_core
+
+default_single_stock_workflow:
+  workflow_id: single_stock_watch_v2_risk_peer_bookskill_auditor
+  priority: P0
+  default_role: "DeepSeek Agent Auditor reads risk review, peer/industry, BookSkill, news branch, financial as-of and chip context first; opportunity tools are grey reference unless cross-channel confirmation is present."
+  promoted_components:
+    - branch_aware_risk_review
+    - news_branch_case_context
+    - peer_context_review
+    - grounded_bookskill_review
+  diagnostic_components:
+    - single_stock_opportunity_scorer_v2
+    - single_stock_kline_frequency_tool_v1
+  offline_diagnostic_components:
+    - nonprice_risk_overlay_v1
+  component_boundaries:
+    opportunity_tool: "grey reference only after p0_acceptance paired diagnostics; do not use as P0 default grade/exposure raiser because it hurt H2026 and produced lowered_positive/raised_negative cost."
+    kline_frequency_tool: "fixed rev_chip_core can be used as observation/risk checklist and recheck-frequency context; learned short/long/cycle/peer/multiscale K-line variants failed H2026 and must not independently upgrade research grade."
+    nonprice_risk_overlay: "Not default-visible for P0 single_stock. 3-panel Flash on/off rejected broad overlay for P0 because single_stock delta=-2.049474 with raised_negative=4 and lowered_positive=2. Keep only as offline diagnostic or explicit research test; CLI defaults this overlay to portfolio_pool only. For P1/P2 it may remain a conflict checklist, never alpha or grade raiser."
+    risk_review_queue: "review/no-raise context, not hard filter and not alpha."
+    news_branch_case_context: "checklist for explicit negative event vs reversible reversal friction; not a standalone positive threshold."
+    peer_context_review: "strong P0 audit component in paired diagnostics, but latest-block results still require rolling confirmation."
+    grounded_bookskill_review: "use grounded strategy IDs as audit/checklist material; never use ungrounded BookSkill as standalone positive alpha."
+    financial_report_context: "as-of safety/hygiene and variance review only until fresh panels prove alpha."
+  latest_component_diagnostic:
+    report: reports/date_generalization/p0_component_paired_diagnostics_v1.md
+    decision: "Default P0 should prioritize risk/peer/BookSkill/news-branch audit; demote single_stock_opportunity_scorer_v2 to diagnostic/grey reference until false-veto and bad-raise costs improve."
+  latest_kline_frequency_diagnostic:
+    report: reports/date_generalization/single_stock_kline_frequency_tool_v1.md
+    decision: "Keep K-line/related-stock K-line as checklist only; do not promote learned multiscale K-line alpha. Fixed rev_chip_core is allowed as weak observe/risk context."
+  latest_nonprice_risk_overlay_diagnostic:
+    report: reports/date_generalization/nonprice_risk_overlay_v1.md
+    flash_smoke_report: reports/date_generalization/nonprice_risk_overlay_flash_smoke_v1_findings.md
+    paired_report: reports/date_generalization/nonprice_risk_overlay_flash_smoke_v1_paired.md
+    three_panel_report: reports/date_generalization/nonprice_risk_overlay_3panel_flash_v1_findings.md
+    three_panel_paired_report: reports/date_generalization/nonprice_risk_overlay_3panel_flash_v1_paired.md
+    agent_preview: reports/date_generalization/nonprice_risk_overlay_v1_agent_preview.jsonl
+    decision: "Supersedes the 24-card smoke: broad overlay is rejected as P0 default because 3-panel single_stock paired delta was negative across all panels. Keep portfolio_pool-only CLI default and use P0 only for explicit offline diagnosis."
+
+default_candidate_comparison_workflow:
+  workflow_id: candidate_comparison_ranker_anchor_v2
+  priority: P1
+  same_sector_anchor: rev_chip_core
+  cross_sector_anchor: rank_avg_rev_watch
+  cross_sector_anchor_formula: "z_within_candidate_group(rev_chip_core) + z_within_candidate_group(single_watch_proxy)"
+  default_agent_protocol: ranker_anchor_agent
+  default_output_policy: "Give Top1/Top2 research priority and per-candidate grade; cross-sector must not claim a single certain winner."
+  free_agent_sorting_status: research_control_only
+  evidence_policy:
+    - "default_ranked_candidates is a ranking anchor, never a future label."
+    - "Agent can override only with explicit hard counter-evidence and must write rank_override_audit."
+    - "User-facing grades remain limited to allowed_user_grades."
+
+allowed_user_grades:
+  - 继续深挖
+  - 放入观察
+  - 暂时剔除
+  - 信息不足
+
+allowed_internal_actions:
+  - 增加研究暴露
+  - 降低研究暴露
+  - 保持观察
+  - 转入现金
+  - 信息不足不动作
+
+allowed_user_operations:
+  - 试探买入
+  - 加仓
+  - 持有
+  - 减仓
+  - 卖出/不买
+  - 等待不买
+  - 补数据后再定
+
+model_policy:
+  training_rounds: deepseek-v4-flash
+  ablation_and_error_reflection: deepseek-v4-flash
+  formal_user_inference: deepseek-v4-pro
+  final_acceptance: deepseek-v4-pro
+  max_workers_auto: true
+  concurrency_policy:
+    default_max_workers_arg: 0
+    effective_workers_formula: "min(evidence_pack_count, model_concurrency_limit[model]) when max_workers <= 0"
+    deepseek-v4-flash_limit: 2500
+    deepseek-v4-pro_limit: 500
+    use_high_concurrency_for_training_search: true
+    reduce_next_shard_on_429_or_timeout: true
+
+training_paradigm:
+  status: supervised_ranker_agent_auditor_mainline
+  core_loop: "future-label evaluation -> train/calibrate date_regime_gate and supervised rankers -> emit compact tool summaries, feature contributions, uncertainty and rule_outcomes -> DeepSeek Agent audits conflicts and writes research-only decision cards -> backtest and update tool/policy versions"
+  rationale: "Natural-language reflection, prompt changes and rule grids have not produced stable alpha. Experience must be converted into time-safe labels, calibrated rankers, hard guards, or explicit rule_outcomes before it can improve the next round."
+  cursor_handoff_20260627:
+    accepted_default_portfolio_ranker: rev_plus_chip_core
+    default_ranker_status: default_combo_ranker_yellow
+    supporting_reports:
+      - reports/date_generalization/chip_augmented_ranker_v1.md
+      - reports/date_generalization/behavioral_chip_ic_audit.md
+      - reports/date_generalization/supervised_ranker_experiment_v2.md
+      - reports/date_generalization/multi_horizon_signal_scan_h2026.md
+      - reports/date_generalization/single_stock_product_mvp_v1.md
+    production_sync:
+      chip_core_cache: data/date_generalization_cache/market_5000/tushare_chip_core_features.csv.gz
+      dual_mode_default_preset: rev_plus_chip_core
+      quant_tool_id: portfolio_rev_chip_core_ranker
+      evidence_fields:
+        - chip_signal_summary
+        - chip_features
+        - quant_tool_summaries
+    honest_boundary: "rev+chip_core is a no-harm default ranker that preserves 2023-2025 evidence and reduces H2026 loss, but H2026 cost-adjusted combo still is not green; Agent must audit news/bookskill/peer/financial conflicts and may abstain."
+  rev_chip_sampler_update_20260627:
+    structured_veto_report: reports/date_generalization/rev_chip_agent_veto_reason_diagnostics.md
+    positive_confirmation_report: reports/date_generalization/positive_confirmation_sampler_findings_v1.md
+    default_portfolio_ranker: rev_plus_chip_core
+    default_row_gate: none
+    observe_only_row_gates:
+      - cross_channel_min2
+      - positive_confirmation_min2
+    rejected_row_gates:
+      - positive_confirmation_min1_no_hard
+      - positive_confirmation_min2_no_hard
+    key_result: "positive_confirmation_min2 only slightly improved mean avg20 but lowered pos20 and did not improve H2026 pos20; no_hard variants degraded sharply."
+    next_focus: "Do not mechanically filter all conflicts. Build conflict-quality labels and improve news/announcement, financial-report, peer, and funding channels so Agent can distinguish acceptable reversal friction from real veto risk."
+  conflict_quality_update_20260627:
+    report: reports/date_generalization/conflict_quality_labels_v1.md
+    detail: reports/date_generalization/conflict_quality_labels_v1_detail.csv
+    single_conflict_summary: reports/date_generalization/conflict_quality_labels_v1_label_summary.csv
+    combo_summary: reports/date_generalization/conflict_quality_labels_v1_combo_summary.csv
+    offline_rule_draft: reports/date_generalization/conflict_quality_labels_v1_agent_rules.json
+    candidate_rows: 28074
+    scope: "rev_plus_chip_core score_quantile>=0.80"
+    key_findings:
+      - "kline_risk_conflict is acceptable_reversal_friction in high ranker candidates: avg20=9.3512, pos20=0.6752, pool_excess=2.6942."
+      - "news_missing, financial_no_recent_event, bookskill_missing_or_weak, and chip_overhang are mostly downweight/veto signals unless strong cross-channel catalyst exists."
+      - "no_hard_conflict and positive_confirmation_ge2 are not automatically good; simple safety filters do not create alpha."
+    leakage_policy: "This v1 used all available blocks and must not be inserted into same-block DS evidence. Agent evidence may only use conflict_quality_context generated from walk-forward prior blocks and stripped of future-return metrics."
+  conflict_quality_prior_context_20260627:
+    module: src/agent_training/conflict_quality_context.py
+    dual_mode_entry: scripts/run_deepseek_dual_mode_round.py
+    full_channel_entry: scripts/run_full_channel_ablation_round.py
+    default_mode: walkforward_prior
+    audit_script: scripts/audit_conflict_quality_context.py
+    dryrun_reports:
+      - reports/date_generalization/conflict_quality_prior_dryrun_v1_conflict_quality_context_audit.md
+      - reports/date_generalization/conflict_quality_ablation_isolation_dryrun_v1_conflict_quality_context_audit.md
+    leakage_policy: "conflict_quality_context may expose only prior-block rule_status and agent_use. It must not expose return_20d, avg20, pos20, pool_excess, loss_gt5, gt_status, or same-block labels."
+    ablation_policy: "no_memory, python_only, and quant_tool_summary_only hide conflict_quality_context."
+    flash_smoke_v1:
+      report: reports/date_generalization/conflict_quality_prior_flash_smoke_v1_analysis.md
+      evidence_pack: reports/date_generalization/conflict_quality_prior_flash_smoke_v1_evidence_pack.jsonl
+      decision_ledger: reports/date_generalization/conflict_quality_prior_flash_smoke_v1_decision_ledger.jsonl
+      context_audit: reports/date_generalization/conflict_quality_prior_flash_smoke_v1_conflict_quality_context_audit.md
+      auditor_diagnostics: reports/date_generalization/conflict_quality_prior_flash_smoke_v1_agent_auditor_diagnostics.md
+      model: deepseek-v4-flash
+      cards: 12
+      invalid_outputs: 0
+      future_leak_count: 0
+      total_tokens: 122413
+      conclusion: "Safe and useful as defensive conflict-audit context, but not alpha proof: all variants had exposure_cards=0 and full_agent became more conservative than no_memory on 4 matched samples."
+    next_experiment: "Do not scale another veto-only round. Build prior-only promote/neutral/downweight conditions that can justify nonzero active exposure only when news/financial/peer/chip/BookSkill confirmations align, then run a 24-48 card Flash comparison with active-exposure and bad-exposure gates."
+  promote_gate_update_20260627:
+    report: reports/date_generalization/promote_gate_and_pro_smoke_findings_v1.md
+    local_search:
+      script: scripts/analyze_promote_gate_candidates.py
+      report: reports/date_generalization/promote_gate_candidate_search_v1.md
+      detail: reports/date_generalization/promote_gate_candidate_search_v1_detail.csv
+      aggregate: reports/date_generalization/promote_gate_candidate_search_v1_aggregate.csv
+      rulebook: reports/date_generalization/promote_gate_candidate_search_v1_rulebook.json
+      conclusion: "No rule passed direct promotion. Generic positive_confirmation/news_available/BookSkill-present rules are not stable promote gates."
+    observe_only_row_gates:
+      kline_reversal_friction_confirmed:
+        status: observe_sampler_candidate
+        production_path_result: "avg20=7.7019 pos20=0.7875 rank_ic=0.1155 pool_excess=3.4504; H2026 rows=10 pos20=0.60 pool_excess=3.8255"
+        boundary: "Use only for DS sampling and review; do not default until promote_context and active-exposure tests pass."
+      financial_event_quality_pc2:
+        status: observe_thin_financial_probe
+        production_path_result: "avg20=7.2530 pos20=0.5997 pool_excess=7.6748 but H2026 unique stocks=2"
+        boundary: "Do not default because sample concentration is severe."
+    model_comparison:
+      flash_prefix: promote_kline_friction_flash_smoke_v1
+      pro_prefix: promote_kline_friction_pro_smoke_v1
+      flash_tokens: 127514
+      pro_tokens: 133083
+      result: "Both Flash and Pro had exposure_cards=0. Pro better recognized reversal-friction potential, but still kept candidates at observe/low weight because news/financial/peer/BookSkill confirmation was weak."
+    next_experiment: "Build prior-only promote_context analogous to conflict_quality_context; dry-run audit first, then 24-card Flash comparison. Do not scale Pro before the workflow has stronger cross-channel positive evidence."
+  promote_context_update_20260627:
+    implementation:
+      module: src/agent_training/promote_context.py
+      audit_script: scripts/audit_promote_context.py
+      evidence_field: promote_context
+      cli_flag: "--promote-context walkforward_prior"
+      prompt_boundary: "Only use walk-forward prior rule_status/agent_use as a hypothesis; never expose offline returns or labels to the Agent."
+    dryrun:
+      prefix: promote_context_dryrun_v1
+      packs: 24
+      promote_context_non_none: 6
+      future_leak_count: 0
+      isolation: "full_agent kept context; no_memory/python_only/quant_tool_summary_only hid context."
+    flash_smokes:
+      with_conflict_and_promote:
+        prefix: promote_context_flash_smoke_v1
+        model: deepseek-v4-flash
+        cards: 24
+        ok_cards: 22
+        invalid_outputs: 2
+        total_tokens: 190617
+        full_agent_schema_pass_rate: 1.0
+        full_agent_portfolio_active_exposure: 0.0667
+        exposure_cards: 0
+        future_leak_count: 0
+      promote_only:
+        prefix: promote_context_only_flash_smoke_v1
+        model: deepseek-v4-flash
+        cards: 24
+        ok_cards: 22
+        invalid_outputs: 2
+        total_tokens: 190375
+        full_agent_schema_pass_rate: 0.6667
+        full_agent_portfolio_active_exposure: 0.1
+        exposure_cards: 0
+        future_leak_count: 0
+    conclusion: "promote_context is safe and useful as a positive hypothesis, but it does not solve the active-exposure bottleneck. Conflict context improves schema stability; removing it did not create reliable alpha."
+    next_experiment: "Stop scaling kline-only promote prompts. Build a positive_evidence_scorer across announcements, true financial disclosure dates, source-quality news, peer/area/supply-chain relative strength, chip pressure/support, and grounded BookSkill conditions."
+  positive_evidence_scorer_update_20260627:
+    implementation:
+      script: scripts/run_positive_evidence_scorer_experiment.py
+      report: reports/date_generalization/positive_evidence_scorer_findings_v1.md
+      default_rule_outcome_policy: "Use per-output-prefix rule outcome files; do not overwrite global quant_tool_rule_outcomes.jsonl from exploratory runs."
+      restored_global_rule_outcomes_from: reports/date_generalization/portfolio_ranker_rule_outcomes.jsonl
+    runs:
+      top10_all:
+        prefix: positive_evidence_scorer_v1
+        candidate_rows: 30438
+        scored_rows: 28074
+        step_metrics: 60
+        model_family: manual_logistic_gbdt
+      top05_logistic:
+        prefix: positive_evidence_scorer_v1_top05_logistic
+        scored_rows: 28074
+        step_metrics: 42
+        model_family: manual_logistic
+      top20_logistic:
+        prefix: positive_evidence_scorer_v1_top20_logistic
+        scored_rows: 28074
+        step_metrics: 42
+        model_family: manual_logistic
+    result:
+      promotion_status: no_default_promotion
+      best_next_candidate: logistic_kline_peer_only
+      h2026_signal: "H2026 RankIC about 0.033; top5/top10 net after cost positive, but top20 fades."
+      prior_signal_gap: "prior RankIC about 0.017, below 0.03 gate, so not stable enough."
+      news_financial_gap: "financial positive fields non-null about 2.8%; news source-quality fields non-null about 12%; positive core is too thin for default promotion."
+      conclusion: "Kline/related-stock/peer/chip ML is the next promising tool branch; news/financial should remain risk/missing/counter-evidence until coverage and event standardization improve."
+    next_experiment: "Build regime-aware kline_peer_chip_scorer and test both portfolio_pool and single_stock at top5/top10/top20 before any DS ablation."
+  kline_peer_chip_regime_update_20260627:
+    implementation:
+      script: scripts/run_kline_peer_chip_regime_scorer.py
+      report: reports/date_generalization/kline_peer_chip_regime_scorer_findings_v1.md
+      outcome_policy: "Per-prefix rule outcomes only; all outcomes are observe-only unless accepted_candidate."
+    runs:
+      all_dates:
+        prefix: kline_peer_chip_regime_scorer_v1
+        rows: 151235
+        scored_rows: 167550
+        metrics: 144
+      every_2_weeks:
+        prefix: kline_peer_chip_regime_scorer_v1_biweekly
+        rows: 151235
+        scored_rows: 82046
+        metrics: 144
+      weekly_friday:
+        prefix: kline_peer_chip_regime_scorer_v1_weekly_friday
+        rows: 151235
+        scored_rows: 78618
+        metrics: 144
+      weekly_tuesday:
+        prefix: kline_peer_chip_regime_scorer_v1_weekly_tuesday
+        rows: 151235
+        scored_rows: 81439
+        metrics: 144
+    result:
+      promotion_status: no_default_promotion
+      best_candidate: "portfolio_pool logistic_kline_peer_chip_regime top5/top10"
+      strongest_frequency: "every_2_weeks has prior RankIC about 0.071 and H2026 RankIC about 0.071; weekly_tuesday has strongest H2026 net but weaker prior cost."
+      bottleneck: "RankIC generalizes, but fixed 1.5% cost leaves prior net negative. Requires real turnover/cost model before promotion."
+      single_stock_status: "observe only; single-stock needs separate opportunity/risk two-head scorer rather than portfolio topK reuse."
+    next_experiment: "Estimate realized turnover/cost for kline_peer_chip_regime portfolios; if true-cost prior and H2026 pass, run small DS Flash ablation. In parallel build single_stock opportunity/risk scorer."
+  kline_peer_chip_turnover_cost_update_20260627:
+    implementation:
+      script: scripts/audit_kline_peer_chip_turnover_cost.py
+      report: reports/date_generalization/kline_peer_chip_turnover_tool_flash_findings_v1.md
+      cost_report: reports/date_generalization/kline_peer_chip_turnover_cost_audit_v1.md
+      rule_outcomes: reports/date_generalization/kline_peer_chip_turnover_cost_audit_v1_rule_outcomes.jsonl
+    cost_recheck:
+      daily_rows: 8568
+      aggregate_rows: 48
+      accepted_candidates: 2
+      accepted_profile: "every_2_weeks logistic_kline_peer_chip top5/top10"
+      top5_prior_rank_ic: 0.037052
+      top5_h2026_rank_ic: 0.069452
+      top5_prior_net_after_turnover_cost: 0.072279
+      top5_h2026_net_after_turnover_cost: 1.15974
+      top5_prior_positive_20d_rate: 0.608
+      top5_h2026_positive_20d_rate: 0.611111
+      regime_version_status: "observe only; higher RankIC but prior net after turnover cost remains negative."
+    flash_smoke:
+      prefix: kline_peer_chip_turnover_tool_flash_smoke_v1
+      model: deepseek-v4-flash
+      cards: 12
+      invalid_outputs: 0
+      total_tokens: 92182
+      exact_future_key_leaks: 0
+      variants: "full_agent_with_quant_tools vs full_agent_without_quant_tools vs quant_tool_summary_only"
+      portfolio_with_quant_cash_adjusted_avg20: 1.3598
+      portfolio_without_quant_cash_adjusted_avg20: 0.9861
+      portfolio_quant_only_cash_adjusted_avg20: 0.9821
+      exposure_cards: 0
+    conclusion: "Real turnover cost turns non-regime kline_peer_chip biweekly top5/top10 into accepted_cost_recheck_candidate, but DS still keeps portfolio decisions at observe/info-insufficient because current news, financial, peer and BookSkill confirmations are weak."
+    next_experiment: "Before scaling DS, add explicit accepted_quant_tool_citation/adoption fields or requirements so Agent must name accepted tools and state which current counter-evidence overrides them."
+  decision_point_keyness_update_20260628:
+    purpose: "Control DS token spend and improve reflection density by separating scheduled dates from key decision points."
+    v1_manual_key_score:
+      script: scripts/audit_decision_point_keyness.py
+      report: reports/date_generalization/decision_point_keyness_v1.md
+      daily: reports/date_generalization/decision_point_keyness_v1_daily.csv
+      aggregate: reports/date_generalization/decision_point_keyness_v1_aggregate.csv
+      rule_outcomes: reports/date_generalization/decision_point_keyness_v1_rule_outcomes.jsonl
+      status: diagnostic_baseline_only
+      portfolio_20d_key_top20:
+        date_share: 0.2013
+        high_impact_capture_rate: 0.1946
+        high_impact_precision: 0.4531
+      decision: "Do not use manual key_score alone for DS sample mix; it is weaker than needed on portfolio 20d."
+    v2_walkforward_ml_keypoint:
+      script: scripts/audit_decision_point_keyness_ml.py
+      report: reports/date_generalization/decision_point_keyness_ml_v1.md
+      detail: reports/date_generalization/decision_point_keyness_ml_v1_detail.csv
+      scored_daily: reports/date_generalization/decision_point_keyness_ml_v1_scored_daily.csv
+      aggregate: reports/date_generalization/decision_point_keyness_ml_v1_aggregate.csv
+      feature_importance: reports/date_generalization/decision_point_keyness_ml_v1_feature_importance.csv
+      rule_outcomes: reports/date_generalization/decision_point_keyness_ml_v1_rule_outcomes.jsonl
+      status_by_mode:
+        portfolio_pool_10d: accepted_training_sampler_candidate
+        portfolio_pool_20d: observe_training_sampler_candidate
+        single_stock_5d_10d_20d: rejected_or_diagnostic_only
+      portfolio_10d:
+        prior_ml_precision: 0.6841
+        prior_heuristic_precision: 0.4568
+        h2026_ml_precision: 0.75
+        h2026_heuristic_precision: 0.625
+      portfolio_20d:
+        prior_ml_precision: 0.8523
+        prior_heuristic_precision: 0.4045
+        h2026_ml_precision: 0.875
+        h2026_heuristic_precision: 0.875
+      single_stock_20d:
+        h2026_ml_precision: 0.125
+        h2026_heuristic_precision: 0.5
+      top_portfolio_20d_features:
+        - news_conflict_pressure
+        - chip_support
+        - reversal_activity
+        - news_positive_context
+        - key_score_pct
+      leakage_policy: "The sampler may use only ex-ante daily features in evidence. return_5d/10d/20d are offline labels and must never enter Agent evidence."
+      decision: "Use ML keypoint sampler only for portfolio training sample allocation, not for user grades or direction. Keep ordinary controls. Do not use it as default single-stock sampler."
+    portfolio_keypoint_sample_plan_v1:
+      builder: scripts/build_portfolio_keypoint_sample_plan.py
+      sample_plan: reports/date_generalization/portfolio_keypoint_sample_plan_v1_sample_plan.csv
+      audit_detail: reports/date_generalization/portfolio_keypoint_sample_plan_v1_audit_detail.csv
+      report: reports/date_generalization/portfolio_keypoint_sample_plan_v1.md
+      valid_block: H2026_1
+      horizon: 20d
+      rows: 10
+      strata: "6 ml_keypoint_top20 + 4 ordinary_control_midkey"
+      safe_plan_forbidden_future_columns: 0
+    portfolio_keypoint_dryrun_v1:
+      prefix: portfolio_keypoint_dryrun_v1
+      sample_plan: reports/date_generalization/portfolio_keypoint_sample_plan_v1_sample_plan.csv
+      variants: "full_agent_with_quant_tools, full_agent_without_quant_tools, quant_tool_summary_only"
+      base_packs: 10
+      ablation_packs: 30
+      called_deepseek: false
+      future_key_hits: 0
+      secret_hits: 0
+      instruction_hits: 0
+      sampler_context_coverage: "30/30"
+      quant_tool_visibility: "with_quant=6 summaries per pack; quant_only=6; without_quant=0"
+      decision: "Safe for a small controlled Flash shard if we decide to spend tokens; not performance evidence."
+    portfolio_keypoint_flash_v1:
+      prefix: portfolio_keypoint_flash_v1
+      findings: reports/date_generalization/portfolio_keypoint_flash_v1_findings.md
+      model: deepseek-v4-flash
+      cards: 30
+      invalid_outputs: 0
+      total_tokens: 307756
+      effective_workers: 30
+      future_key_hits: 0
+      secret_hits: 0
+      instruction_hits: 0
+      metrics:
+        full_agent_with_quant_tools_cash_adjusted_avg20: 0.7907
+        full_agent_without_quant_tools_cash_adjusted_avg20: 0.4630
+        quant_tool_summary_only_cash_adjusted_avg20: 0.5847
+        exposure_cards_all_variants: 0
+      paired_with_vs_without_quant:
+        changed_rows: 7
+        sum_delta_cash: 3.3595
+        avg_delta_cash: 0.3360
+        raised_posterior_positive: 4
+        raised_posterior_negative: 2
+        lowered_posterior_negative: 1
+      keypoint_interpretation: "Keypoint rows are high-impact/high-disagreement training rows, not automatically positive opportunities."
+      decision: "Observe-path lift only. Expand only with bad-exposure, missed-positive, active-exposure and coverage reporting."
+    portfolio_keypoint_sample_plan_v2:
+      builder: scripts/build_portfolio_keypoint_sample_plan.py
+      sample_plan: reports/date_generalization/portfolio_keypoint_sample_plan_v2_sample_plan.csv
+      audit_detail: reports/date_generalization/portfolio_keypoint_sample_plan_v2_audit_detail.csv
+      report: reports/date_generalization/portfolio_keypoint_sample_plan_v2.md
+      valid_block: H2026_1
+      horizon: 20d
+      rows: 32
+      unique_codes: 32
+      strata: "16 ml_keypoint_top20 + 16 ordinary_control_midkey"
+      safe_plan_forbidden_future_columns: 0
+    portfolio_keypoint_dryrun_v2:
+      prefix: portfolio_keypoint_dryrun_v2
+      sample_plan: reports/date_generalization/portfolio_keypoint_sample_plan_v2_sample_plan.csv
+      variants: "full_agent_with_quant_tools, full_agent_without_quant_tools, quant_tool_summary_only"
+      base_packs: 32
+      ablation_packs: 96
+      called_deepseek: false
+      future_key_hits: 0
+      secret_hits: 0
+      instruction_hits: 0
+      sampler_context_coverage: "96/96"
+      quant_tool_visibility: "with_quant=6 summaries per pack; quant_only=6; without_quant=0"
+      decision: "Safe expanded shard; use only with post-decision pair diagnostics."
+    portfolio_keypoint_flash_v2:
+      prefix: portfolio_keypoint_flash_v2
+      findings: reports/date_generalization/portfolio_keypoint_flash_v2_findings.md
+      auto_analysis: reports/date_generalization/portfolio_keypoint_flash_v2_auto_analysis.md
+      model: deepseek-v4-flash
+      cards: 96
+      invalid_outputs: 0
+      total_tokens: 986677
+      effective_workers: 96
+      future_key_hits: 0
+      secret_hits: 0
+      instruction_hits: 0
+      metrics:
+        full_agent_with_quant_tools_cash_adjusted_avg20: 0.1558
+        full_agent_without_quant_tools_cash_adjusted_avg20: 0.1939
+        quant_tool_summary_only_cash_adjusted_avg20: 0.1035
+        with_quant_cash_adjusted_pos20: 0.6562
+        without_quant_cash_adjusted_pos20: 0.6875
+        exposure_cards_all_variants: 0
+        with_quant_bad_observe_weight_cards: 18
+        without_quant_bad_observe_weight_cards: 16
+      paired_with_vs_without_quant:
+        rows: 32
+        sum_delta_cash: -1.1091
+        avg_delta_cash: -0.0347
+        raised_posterior_positive: 7
+        raised_posterior_negative: 9
+        lowered_posterior_negative: 2
+        lowered_posterior_positive: 4
+        unchanged: 10
+      adoption_result:
+        full_agent_partially_adopted_cards: 16
+        full_agent_not_adopted_counter_evidence_cards: 16
+        partially_adopted_cash_adjusted_avg20: 0.0446
+        not_adopted_counter_evidence_cash_adjusted_avg20: 0.2669
+        top_override_reasons: "financial_gap; bookskill_gap; chip_overhang; data_missing; news_gap; peer_gap; memory_or_rag_counter; overheat_or_volatility"
+      decision: "V2 refutes direct quant-tool promotion. Keep ML keypoint sampler for portfolio training allocation, but accepted quant tools must remain candidate/explanation/counter-evidence inputs until adoption guards show reduced raised_negative and lowered_positive without all-observe collapse."
+      next_experiment: "Build adoption_guard_v1: ordinary controls and rows with unresolved news/financial/peer/BookSkill gaps may not raise observation weight from quant tool alone; keypoint rows must distinguish acceptable_reversal_friction from true hard counter-evidence. Retest on a fresh 24-64 stock-date panel only after dry-run isolation and leakage audit."
+    portfolio_keypoint_quant_adoption_guard_replay_v1:
+      script: scripts/replay_portfolio_quant_adoption_guard.py
+      report: reports/date_generalization/portfolio_keypoint_flash_v2_quant_adoption_guard_replay_v1.md
+      summary: reports/date_generalization/portfolio_keypoint_flash_v2_quant_adoption_guard_replay_v1_summary.csv
+      source_detail: reports/date_generalization/portfolio_keypoint_flash_v2_auto_analysis_detail.csv
+      scope: "offline post-decision replay; future returns only used for evaluation and must not enter evidence"
+      baseline_no_guard:
+        cash_adjusted_avg20: 0.1558
+        sum_delta_cash_vs_control: -1.1091
+        raised_positive: 7
+        raised_negative: 9
+        lowered_positive: 4
+      best_simple_policy:
+        policy: cap_gap_ge7_raises
+        cash_adjusted_avg20: 0.1784
+        sum_delta_cash_vs_control: -0.5075
+        raised_positive: 3
+        raised_negative: 3
+        lowered_positive: 4
+      ordinary_cap_policy:
+        policy: cap_ordinary_raises
+        cash_adjusted_avg20: 0.1631
+        sum_delta_cash_vs_control: -0.9931
+        raised_positive: 4
+        raised_negative: 3
+        lowered_positive: 4
+      decision: "Simple cap rules are rejected for default. They reduce raised_negative but still underperform without-quant control and do not fix lowered_positive. Next guard must be learned/branch-aware, not one-size-fits-all."
+    portfolio_quant_adoption_guard_context_update_20260628:
+      implementation:
+        cli_flag: "--portfolio-quant-adoption-guard"
+        source_scores: reports/date_generalization/portfolio_quant_adoption_guard_v1_top10_min05_scored_detail.csv
+        findings: reports/date_generalization/portfolio_quant_adoption_guard_context_findings_v1.md
+        row_tool_id: portfolio_quant_adoption_guard_v1_row_context
+        safety_policy: "loader reads only whitelisted current-row columns; return_20d, pool_excess_20d, gt fields never enter evidence"
+        accepted_quant_tool_ids_semantics: "Only tools actually adopted or partially adopted by the card are listed; not_adopted_counter_evidence uses none."
+      guard_rules:
+        - "Global accepted quant tool summaries cannot override row-level quant percentile for the current stock/date."
+        - "quant_score_pct_by_date < 0.25 neutralizes quant-driven raises; it is not a standalone negative veto."
+        - "ordinary_control_midkey rows treat quant as diagnostic only; require at least two non-quant positive confirmations before any quant adoption or weight raise."
+        - "ml_keypoint_top20 rows may use quant as an observation hypothesis, still audited by news, financial, peer, BookSkill, kline and chip context."
+      flash_v1_row_context:
+        prefix: portfolio_keypoint_guard_context_flash_v1
+        cards: 96
+        invalid_outputs: 0
+        total_tokens: 1129133
+        with_quant_cash_adjusted_avg20: 0.1973
+        without_quant_cash_adjusted_avg20: 0.2343
+        with_minus_without_avg20: -0.0370
+        decision: "Safe row-level context injection, but still below no-quant control."
+      flash_v2_neutralize_not_veto:
+        prefix: portfolio_keypoint_guard_context_flash_v2
+        cards: 96
+        invalid_outputs_after_resume: 0
+        total_tokens_including_invalid_attempt: 1148195
+        with_quant_cash_adjusted_avg20: 0.1703
+        without_quant_cash_adjusted_avg20: 0.1847
+        with_minus_without_avg20: -0.0144
+        with_minus_without_pos20: 0.0625
+        with_minus_without_bad_cards: 0
+        decision: "Neutralizing low row quant percentile instead of treating it as a hard negative reduced harm but did not beat no-quant."
+      flash_v3_ordinary_control_diagnostic_only:
+        prefix: portfolio_keypoint_guard_context_flash_v3
+        auto_analysis: reports/date_generalization/portfolio_keypoint_guard_context_flash_v3_auto_analysis.md
+        cards: 96
+        invalid_outputs: 0
+        total_tokens: 1143586
+        effective_workers: 96
+        future_key_hits: 0
+        secret_hits: 0
+        instruction_hits: 0
+        with_quant_cash_adjusted_avg20: 0.1897
+        without_quant_cash_adjusted_avg20: 0.1438
+        quant_tool_summary_only_cash_adjusted_avg20: 0.2194
+        with_minus_without_avg20: 0.0459
+        with_quant_pos20: 0.7188
+        without_quant_pos20: 0.7188
+        with_bad_observe_cards: 17
+        without_bad_observe_cards: 16
+        pair_sum_delta_cash: 1.4043
+        exposure_cards_all_variants: 0
+        decision: "First full 32-row keypoint panel where full+quant beats no-quant, but still observation-path only and not final default."
+      fresh_validation_v1:
+        report: reports/date_generalization/portfolio_quant_adoption_guard_fresh_validation_v1.md
+        stockdate_fresh16:
+          prefix: portfolio_keypoint_guard_fresh16_stockdate_flash_v1
+          cards: 48
+          invalid_outputs_after_resume: 0
+          total_tokens_including_invalid_attempt: 591502
+          with_quant_cash_adjusted_avg20: 0.3767
+          without_quant_cash_adjusted_avg20: 0.3474
+          quant_tool_summary_only_cash_adjusted_avg20: 0.3988
+          pair_sum_delta_cash: 0.5391
+          with_quant_pos20: 0.8125
+          without_quant_pos20: 0.8750
+          with_bad_observe_cards: 6
+          without_bad_observe_cards: 5
+          decision: "Only a small mean improvement; pos20 and bad observe worsened, so no promotion."
+        date_fresh8_v3:
+          prefix: portfolio_keypoint_guard_freshdate8_flash_v1
+          cards: 24
+          invalid_outputs: 0
+          total_tokens: 289837
+          with_quant_cash_adjusted_avg20: -0.2321
+          without_quant_cash_adjusted_avg20: 0.1973
+          quant_tool_summary_only_cash_adjusted_avg20: 0.2681
+          pair_sum_delta_cash: -3.2595
+          exposure_cards_with_quant: 1
+          failure_pattern: "partially_adopted over-raised ordinary-control fresh dates under soft-gap bundles."
+        date_fresh8_v4:
+          prefix: portfolio_keypoint_guard_freshdate8_v4_flash_v1
+          cards: 24
+          invalid_outputs: 0
+          total_tokens: 287226
+          with_quant_cash_adjusted_avg20: -0.0194
+          without_quant_cash_adjusted_avg20: 0.3558
+          partial_adopted_with_quant: 0
+          exposure_cards_with_quant: 0
+          decision: "v4 improves safety by eliminating partial adoption/exposure misuse but still does not beat no-quant."
+      next_experiment: "Stop pure prompt-based quant adoption scaling. Keep row_level_quant_percentile_guard_v4 as safety/hygiene only; next improvement must train or backfill non-quant positive confirmation channels (news/announcement, financial as-of, peer/area/industry chain, grounded BookSkill) and validate them against no_quant/quant_only/ML-only on fresh multi-panels."
+  nonquant_positive_confirmation_update_20260628:
+    implementation:
+      script: scripts/audit_nonquant_positive_confirmation.py
+      high_ranker_report: reports/date_generalization/nonquant_positive_confirmation_audit_v1.md
+      all_pool_report: reports/date_generalization/nonquant_positive_confirmation_audit_allpool_v1.md
+      findings: reports/date_generalization/nonquant_positive_confirmation_findings_v1.md
+      high_ranker_preview: reports/date_generalization/nonquant_positive_confirmation_audit_v1_agent_rule_preview.jsonl
+      all_pool_preview: reports/date_generalization/nonquant_positive_confirmation_audit_allpool_v1_agent_rule_preview.jsonl
+      safety_policy: "Agent previews contain no return_20d, pool_excess_20d, gt_status, rule_outcome_label, or future_return fields."
+      cache_policy: "Default joined-cache path is loaded through load_ground_truth so source fingerprints can rebuild stale full-channel caches before audit."
+    high_ranker_scope:
+      rows: 30438
+      status_counts: "accepted_safety_hygiene_not_alpha=2; reject_concentrated=7; rejected_or_diagnostic_only=4"
+      strongest_rule: financial_event_quality_low_risk_v1
+      strongest_rule_boundary: "financial_event_quality_low_risk_v1 total_rows=3468; H2026_rows=302; prior_pool_excess=-0.2329; H2026_pool_excess=+2.2049; status=accepted_safety_hygiene_not_alpha, not alpha."
+      safety_hygiene_rules: [financial_event_quality_low_risk_v1, financial_surprise_low_risk_v1]
+    all_pool_scope:
+      rows: 151235
+      status_counts: "accepted_safety_hygiene_not_alpha=1; reject_concentrated=2; rejected_or_diagnostic_only=10"
+      strongest_rule: financial_event_quality_low_risk_v1
+      strongest_rule_boundary: "financial_event_quality_low_risk_v1 total_rows=14921; H2026_rows=1205; prior_pool_excess=-0.0446; H2026_pool_excess=-0.2063; status=accepted_safety_hygiene_not_alpha, not alpha."
+      safety_hygiene_rules: [financial_event_quality_low_risk_v1]
+    adopted_policy:
+      - "No nonquant positive confirmation rule is usable_in_agent_default."
+      - "Financial as-of can be shown to Agent as safety/hygiene or review context, but not as positive promotion alpha."
+      - "News and BookSkill remain risk, quality, uncertainty, explanation, and audit channels until coverage and grounded applicability improve."
+      - "At least two nonquant confirmations remains a safety gate that blocks quant-alone raises; it is not a promotion rule."
+    next_experiment: "Continue financial/announcement and news coverage expansion; use safety_hygiene financial context in small DS panels only as review/no-raise support, not positive promotion."
+  accepted_quant_tool_adoption_update_20260627:
+    implementation:
+      schema: src/agent_training/decision_card.py
+      prompt_and_fallback: src/agent_training/evidence_pack.py
+      summary_table: scripts/run_full_channel_ablation_round.py
+      report: reports/date_generalization/accepted_quant_tool_adoption_findings_v1.md
+    fields:
+      - accepted_quant_tool_ids
+      - quant_tool_adoption_decision
+      - quant_tool_override_reasons
+    smoke:
+      prefix: accepted_quant_tool_adoption_flash_smoke_v2
+      model: deepseek-v4-flash
+      cards: 6
+      invalid_outputs: 0
+      total_tokens: 47907
+      valid_block: H2026_1
+      future_key_leaks_dryrun: 0
+    result:
+      full_agent_portfolio_adoption: not_adopted_counter_evidence
+      full_agent_override_reasons: "news_gap;financial_gap;peer_gap;bookskill_gap;chip_overhang;data_missing"
+      quant_tool_summary_only_portfolio_adoption: partially_adopted
+      quant_tool_summary_only_override_reasons: "financial_gap;chip_overhang;data_missing"
+      exposure_cards: 0
+    conclusion: "The workflow can now measure whether accepted tools are adopted or overridden. Current full Agent explicitly rejects the accepted kline_peer_chip tool because current cross-channel confirmation is weak."
+    next_experiment: "Scale only after each Flash round reports adoption distribution. If not_adopted_counter_evidence remains dominant, improve news/financial/peer/BookSkill inputs or sampling rather than forcing exposure."
+  agent_role: "explanation, counter-evidence, conflict resolution, BookSkill/news/financial/peer/quant integration, data-missing disclosure, user-facing wording, and boundary control"
+  quant_tool_role: "decision-point sampling, date/regime gate, supervised single-stock scorer, supervised portfolio ranker, drawdown risk guard, source-quality score, peer-graph summary, feature contribution export, and channel ablation diagnostics"
+  reflection_policy: "Agent reflections may create hypotheses and failure conditions, but may not directly upgrade decisions. Promotion requires supervised/tool validation and walk-forward evidence."
+  current_frequency_status: "Implemented daily-level frequencies include twice_weekly, weekly_friday, weekly_tuesday, every_2_weeks, and date_gate_only. Hour/minute level is design-only until reliable time-safe intraday cache exists."
+  next_minimal_deliverables:
+    - docs/QUANT_AGENT_DECISION_ARCHITECTURE.md
+    - config/decision_point_schema.yaml
+    - config/task_label_action_schema.yaml
+    - scripts/build_decision_point_table.py
+    - scripts/run_quant_tool_minimal_experiment.py
+    - reports/date_generalization/quant_agent_minimal_experiment.md
+    - reports/date_generalization/quant_tool_rule_outcomes.jsonl
+  latest_minimal_experiment:
+    id: quant_agent_minimal_experiment_v1
+    status: no_default_promotion
+    called_deepseek: false
+    feature_rows: 151235
+    decision_point_rows: 562998
+    step_metrics: 1584
+    accepted_candidates: 0
+    dominant_failure: H2026_1_latest_block_failed
+    rule_outcomes_default_usable: false
+    report: reports/date_generalization/quant_agent_minimal_experiment_v1.md
+  latest_agent_smoke:
+    id: quant_tool_multi_ablation_3panel_flash_v1
+    status: observe_safety_guard_not_alpha
+    called_deepseek: true
+    model: deepseek-v4-flash
+    base_packs: 24
+    ablation_packs: 192
+    decision_cards: 192
+    invalid_outputs: 0
+    future_key_leaks: 0
+    governance_smoke:
+      id: quant_tool_multi_ablation_3panel_governance_smoke_v1
+      critic_pass: "24/24"
+      source_refs: 270
+      rule_outcomes: 227
+    with_quant_cash_adjusted_avg20:
+      portfolio_pool: -0.3083
+      single_stock: 0.2945
+    without_quant_cash_adjusted_avg20:
+      portfolio_pool: -0.1676
+      single_stock: 0.5287
+    quant_tool_summary_only_active_exposure: 0
+    python_only_portfolio_active_exposure:
+      exposure_cards: 3
+      avg_return_20d_exposure: -15.1733
+      cash_adjusted_avg20: -2.3242
+    no_news_portfolio_active_exposure:
+      exposure_cards: 0
+      avg_return_20d_exposure:
+    no_quant_portfolio_active_exposure:
+      exposure_cards: 0
+      avg_return_20d_exposure:
+    panel_summary: reports/date_generalization/quant_tool_multi_ablation_3panel_panel_summary.csv
+    bookskill_attribution:
+      report: reports/date_generalization/quant_tool_multi_ablation_3panel_bookskill_attribution_v1_summary.md
+      detail: reports/date_generalization/quant_tool_multi_ablation_3panel_bookskill_attribution_v1_detail.csv
+      aggregate: reports/date_generalization/quant_tool_multi_ablation_3panel_bookskill_attribution_v1_aggregate.csv
+      active_exposure_rows: 3
+      active_exposure_source: python_only_NO_BOOKSKILL
+      promote_specific_strategy_id: false
+    conclusion: "3-panel结果确认python_only是稳定坏分支；full Agent和quant工具仍主要是防守/反证，active exposure过少，未证明alpha。下一步先优化候选采样、date/regime gate和BookSkill strategy_id归因，不继续盲目扩大DS。"
+    report: reports/date_generalization/quant_tool_multi_ablation_3panel_analysis_v1.md
+  latest_local_sampler_search:
+    id: portfolio_sampler_gate_search_focused_v1
+    status: observe_no_promotion
+    called_deepseek: false
+    detail_rows: 12960
+    aggregate_rows: 1080
+    panels: 3
+    valid_blocks:
+      - H2023_2
+      - H2024_2
+      - H2025_1
+      - H2026_1
+    promotion_status_counts:
+      observe_latest_block_weak: 994
+      observe_unstable: 79
+      observe_loss_too_high: 7
+      candidate_for_agent_sampler: 0
+    best_recent_repair_candidate:
+      score_profile: kline_multiscale_quality
+      date_gate: peer_breadth_ok_q50
+      row_gate: cross_channel_min2
+      decision_frequency: every_2_weeks
+      top_n: 10
+      decision_coverage_mean: 0.5664
+      raw_positive_20d_rate_mean: 0.5455
+      avg_return_20d_mean: 0.5696
+      loss_20d_over_5_rate_mean: 0.2004
+      h2026_pos_rate_mean: 0.6885
+      top_stock_share_mean: 0.0374
+      promotion_status: observe_loss_too_high
+      interpretation: "近期块较好但H2023_2明显拖累，loss rate刚超过严格门槛且hit blocks不足，不得升级为默认策略。"
+    best_raw_positive_candidate:
+      score_profile: kline_multiscale_quality
+      date_gate: low_overheat_q50
+      row_gate: cross_channel_min3
+      decision_frequency: weekly_friday
+      top_n: 10
+      raw_positive_20d_rate_mean: 0.6237
+      avg_return_20d_mean: 3.4502
+      h2026_pos_rate_mean: 0.5476
+      promotion_status: observe_latest_block_weak
+    strict_promotion_gate:
+      raw_positive_20d_rate_mean_min: 0.60
+      h2026_pos_rate_mean_min: 0.55
+      avg_return_20d_mean_positive: true
+      h2026_avg_return_mean_positive: true
+      raw_positive_20d_rate_std_max: 0.20
+      loss_20d_over_5_rate_mean_max: 0.20
+      hit_blocks_pos60_min_ratio: 0.75
+      decision_coverage_mean_min: 0.15
+      top_stock_share_mean_max: 0.25
+    conclusion: "不继续盲目扩大DeepSeek；先训练/优化date_regime_gate、portfolio_candidate_sampler、drawdown_risk_guard和peer_breadth+kline_multiscale工具，并修复2023_2/2024_2失败块。"
+    report: reports/date_generalization/portfolio_sampler_gate_search_focused_v1.md
+    diagnostics: reports/date_generalization/portfolio_sampler_gate_search_focused_v1_diagnostics.csv
+  latest_local_date_regime_gate:
+    id: date_regime_gate_global_v1
+    status: observe_counter_evidence_not_default
+    called_deepseek: false
+    base_experiment:
+      id: date_regime_gate_experiment_v1
+      rule_detail_rows: 40320
+      selected_rows: 576
+      aggregate_rows: 48
+      promotion_status_counts:
+        observe_latest_block_weak: 42
+        observe_unstable: 6
+      best_strategy:
+        strategy_id: kline_multiscale_quality__strict_safety__weekly_friday__top5
+        raw_positive_20d_rate_mean: 0.5331
+        baseline_raw_positive_20d_rate_mean: 0.4462
+        delta_raw_positive_20d_rate_mean: 0.0869
+        avg_return_20d_mean: 0.8057
+        loss_20d_over_5_rate_mean: 0.1726
+        raw_positive_20d_rate_std: 0.3422
+        h2026_pos_rate_mean: 0.3935
+        h2026_avg_return_mean: -2.2665
+      report: reports/date_generalization/date_regime_gate_experiment_v1.md
+      diagnostics: reports/date_generalization/date_regime_gate_experiment_v1_diagnostics.csv
+      rule_outcomes: reports/date_generalization/date_regime_gate_experiment_v1_rule_outcomes.jsonl
+    stable_experiment:
+      id: date_regime_gate_stable_v1
+      rule_detail_rows: 40320
+      selected_rows: 576
+      aggregate_rows: 48
+      promotion_status_counts:
+        observe_latest_block_weak: 40
+        observe_unstable: 6
+        observe_loss_too_high: 2
+      best_strategy:
+        strategy_id: kline_multiscale_quality__strict_safety__weekly_friday__top5
+        raw_positive_20d_rate_mean: 0.5640
+        baseline_raw_positive_20d_rate_mean: 0.4462
+        delta_raw_positive_20d_rate_mean: 0.1178
+        avg_return_20d_mean: 1.1840
+        loss_20d_over_5_rate_mean: 0.2026
+        raw_positive_20d_rate_std: 0.2999
+        h2026_pos_rate_mean: 0.3935
+        h2026_avg_return_mean: -2.2665
+      frequent_selected_rules:
+        - all_dates
+        - pool_above_ma200_ratio_ge_q60
+        - pool_avg_prior20_le_q20
+        - pool_peer_breadth_ge_q80
+        - pool_fin_quality_risk_avg_le_q40
+        - pool_news_coverage_ge_q80
+      report: reports/date_generalization/date_regime_gate_stable_v1.md
+      diagnostics: reports/date_generalization/date_regime_gate_stable_v1_diagnostics.csv
+      rule_outcomes: reports/date_generalization/date_regime_gate_stable_v1_rule_outcomes.jsonl
+    global_market_regime_experiment:
+      id: date_regime_gate_global_v1
+      rule_detail_rows: 77760
+      selected_rows: 576
+      aggregate_rows: 48
+      promotion_status_counts:
+        observe_latest_block_weak: 35
+        observe_unstable: 13
+      best_stable_strategy:
+        strategy_id: kline_multiscale_quality__strict_safety__weekly_friday__top5
+        raw_positive_20d_rate_mean: 0.5370
+        baseline_raw_positive_20d_rate_mean: 0.4462
+        delta_raw_positive_20d_rate_mean: 0.1096
+        avg_return_20d_mean: 1.3291
+        loss_20d_over_5_rate_mean: 0.1735
+        raw_positive_20d_rate_std: 0.3418
+        h2026_pos_rate_mean: 0.2963
+        h2026_avg_return_mean: -1.1957
+        promotion_status: observe_latest_block_weak
+      best_recent_but_unstable_strategy:
+        strategy_id: current_peer_pullback_proxy__cross_channel_min2__every_2_weeks__top10
+        raw_positive_20d_rate_mean: 0.5917
+        avg_return_20d_mean: 1.8734
+        raw_positive_20d_rate_std: 0.2945
+        h2026_pos_rate_mean: 0.8889
+        h2026_avg_return_mean: 4.73
+        promotion_status: observe_unstable
+      report: reports/date_generalization/date_regime_gate_global_v1.md
+      diagnostics: reports/date_generalization/date_regime_gate_global_v1_diagnostics.csv
+      rule_outcomes: reports/date_generalization/date_regime_gate_global_v1_rule_outcomes.jsonl
+    conclusion: "date-regime gate有训练信号但H2026_1失败，加入全局市场regime后仍无候选通过；当前只能作为灰色反证。下一步主线改为supervised date_regime_gate + portfolio_ranker，而不是继续扩大规则阈值网格或Prompt。"
+    usable_in_agent_default: false
+  course_correction_20260626:
+    status: supervised_ranker_agent_auditor_pivot
+    report: reports/date_generalization/strategy_course_correction_20260626.md
+    reason: "指标长期停留在0.45-0.56附近；full Agent主要防守、active exposure过低；local gates有信号但latest/OOT泛化失败。"
+    frozen_primary_paths:
+      - prompt_expansion_as_primary_learning
+      - hand_written_rule_grid_as_primary_learning
+      - agent_natural_language_reflection_direct_strategy_upgrade
+      - deepseek_shard_scaling_before_local_ranker_lift
+    new_primary_paths:
+      - date_regime_gate_supervised
+      - portfolio_ranker_group_by_date
+      - single_stock_supervised_scorer
+      - drawdown_and_bad_exposure_guard
+      - agent_counter_evidence_and_explanation_overlay
+    required_ranker_comparisons:
+      - date_gate_only
+      - ranker_topN
+      - ranker_plus_drawdown_guard
+      - ranker_plus_agent_counter_evidence
+    anti_cash_only_requirements:
+      report_active_exposure: true
+      report_date_coverage: true
+      report_unique_stock_count: true
+      report_top_stock_concentration: true
+      cash_adjusted_is_auxiliary_only: true
+    channel_role_reset:
+      news: risk_missing_conflict_source_quality_counter_evidence_first
+      bookskill: grounded_pre_decision_audit_and_counter_evidence_first
+      financial_reports: disclosure_asof_quality_and_risk_first
+      rag_memory: historical_failure_prompt_only_until_ablation_lift
+  promotion_gates:
+    - no_future_fields_in_tool_outputs_or_agent_evidence
+    - rolling_time_blocks_H2024_2_H2025_1_H2025_2_H2026_1_reported
+    - stock_and_date_concentration_checked
+    - python_only_bad_exposure_reduced_or_explained
+    - reject_too_few_samples_not_overridden
+    - full_agent_with_quant_tools_compared_against_python_only_and_quant_tool_summary_only
+
+external_financial_services_adaptation:
+  status: observe_lightweight_governance
+  source: "anthropics/financial-services local review + limited public page review"
+  local_review_doc: docs/EXTERNAL_FINANCIAL_SERVICES_REVIEW.md
+  goal_optimization_report: reports/date_generalization/external_financial_services_goal_optimization.md
+  borrowed_principles:
+    - reader_calculator_writer_split
+    - source_provenance_required
+    - asof_manifest_required
+    - rule_outcome_required
+    - critic_review_before_user_report
+    - research_hypothesis_memory
+    - human_review_only
+  not_imported:
+    - rating_price_target_language
+    - broker_connection
+    - auto_trade
+    - overseas_data_defaults
+    - managed_agent_platform_rewrite
+  smoke_first_policy: "先用 8-24 个 evidence pack 验证 source_ref_manifest、asof_manifest、rule_outcome 和 critic；通过前不得直接扩大到完整 DeepSeek 训练 round。"
+  latest_smoke_status: "governance_smoke_v3: after updating ledgers, 8 full-agent dry-run packs still pass with source_refs=81, rule_outcomes=74, asof_pass=8/8, critic_pass=8/8, source/enhanced future_leak_findings=0. v1 critic was 0/8 because memory_context exposed return_20d-like hindsight text; memory loader now filters metric_before/metric_after columns and redacts hindsight-token text segments."
+
+task_modes:
+  single_stock_watch:
+    user_intent: "单只股票评估、盯盘、复核、模拟研究暴露路径"
+    required_inputs:
+      - code
+      - decision_date
+      - time_safe_market_features
+      - financial_disclosure_status
+      - news_and_announcement_features
+      - peer_context_features
+      - quant_tool_summaries
+      - book_skill_candidates
+      - memory_experience
+      - counter_evidence
+      - data_missing_flags
+    required_outputs:
+      - research_grade
+      - simulated_action
+      - simulated_weight_change
+      - triggered_gates
+      - quant_tool_rule_outcomes
+      - triggered_book_skills
+      - news_warning_or_opportunity
+      - peer_context_summary
+      - counter_evidence
+      - data_missing_flags
+      - final_agent_reasoning_summary
+    success_metrics:
+      - cash_adjusted_positive_20d_rate
+      - data_missing_report_rate
+      - schema_pass_rate
+    default_decision_style:
+      - "风险/缺口优先解释"
+      - "不把保持观察当作高暴露"
+      - "弱证据时允许信息不足不动作"
+
+  portfolio_pool_optimize:
+    user_intent: "多股票候选池筛选、TopN、现金防守和研究注意力分配"
+    required_inputs:
+      - candidate_pool
+      - decision_date
+      - market_regime_features
+      - peer_group_features
+      - news_and_announcement_features
+      - quant_tool_summaries
+      - book_skill_candidates
+      - memory_experience
+      - python_gate_features
+      - counter_evidence
+      - data_missing_flags
+    required_outputs:
+      - selected_candidates
+      - skipped_candidates
+      - cash_defense_reason
+      - topn_used
+      - date_gate_used
+      - peer_gate_used
+      - news_gate_used
+      - quant_tool_rule_outcomes
+      - triggered_book_skills
+      - final_agent_reasoning_summary
+    success_metrics:
+      - positive_20d_rate
+      - cash_adjusted_positive_20d_rate
+      - avg_return_20d
+      - cash_adjusted_avg_return_20d
+      - loss_20d_over_5_rate
+      - stability_score
+    default_decision_style:
+      - "宁可放弃低质量日期，不为凑满 TopN 选弱证据"
+      - "同行确认优先于单股孤立动量"
+      - "过热无证据、新闻缺失、披露日缺失同时出现时强降权"
+
+fixed_pipeline:
+  - preflight
+  - data_cache_build_or_validate
+  - decision_point_table_build
+  - quant_tool_train_or_load
+  - quant_tool_rule_outcome_build
+  - source_ref_manifest_build
+  - asof_manifest_build
+  - news_event_keyword_vector_build
+  - news_deepseek_semantic_questionnaire
+  - rule_outcome_build
+  - evidence_pack_build
+  - source_provenance_audit
+  - evidence_channel_coverage_audit
+  - deepseek_decision
+  - schema_validation
+  - decision_critic_review
+  - metric_backfill_after_gt_maturity
+  - failure_reflection
+  - strategy_update_proposal
+  - strategy_freeze
+  - next_block_or_test_validation
+  - user_claim_reference_build
+  - user_report
+
+hard_guards:
+  no_future_fields_in_evidence:
+    - return_5d
+    - return_10d
+    - return_20d
+    - future_return_5d
+    - future_return_10d
+    - future_return_20d
+    - gt_status
+    - gt_pass
+  data_policy:
+    default_allowed_sources:
+      - local_cache
+      - official_disclosure
+      - public_aggregator
+      - quote_protocol
+      - historical_structured
+      - paid_standardized
+    allowed_paid_standardized_sources:
+      - tushare_pro
+      - wind
+      - choice
+      - ifind
+      - ths_member
+  source_provenance:
+    status: proposed_smoke_required
+    required_source_ref_fields:
+      - source_ref_id
+      - source_type
+      - source_name
+      - source_url_or_interface
+      - source_record_id
+      - document_title
+      - published_at
+      - available_at
+      - accessed_at
+      - report_period
+      - ann_date
+      - confidence
+      - materiality
+    claim_reference_policy: "用户可见事实、关键数字和 active rule outcome 必须引用 source_ref_ids；缺引用时降为 weak evidence 或 信息不足。"
+    reader_calculator_writer_policy: "新闻、公告、财报、OCR/BookSkill 和公开网页材料先由 reader 抽取结构化事实；calculator 只读结构化事实和本地特征；writer 只读审计后的 evidence、rule outcomes 和 critic，不直接读取未审计原文。"
+  asof_manifest:
+    status: proposed_smoke_required
+    required_before_deepseek_round: true
+    fields:
+      - decision_date
+      - decision_time
+      - evidence_pack_id
+      - max_available_at_by_channel
+      - financial_report_periods_visible
+      - news_window_days
+      - financial_report_window_days
+      - source_cache_generated_at
+      - date_only_items_count
+      - missing_available_at_count
+    block_policy: "若任何 active directional 字段缺 available_at，或把 report_period 当作可用时间，则禁止升级研究分级，标为 放入观察/信息不足。"
+  rule_outcome_contract:
+    status: proposed_smoke_required
+    applies_to:
+      - news_questionnaire
+      - financial_report_questionnaire
+      - book_skill
+      - ml_gate
+      - peer_context
+      - portfolio_guardrail
+      - memory_retrieval
+    required_fields:
+      - rule_id
+      - channel
+      - outcome
+      - confidence
+      - source_ref_ids
+      - evidence_summary
+      - counter_evidence_summary
+      - missing_fields
+      - action_hint
+    allowed_outcomes:
+      - pass
+      - fail
+      - n/a
+      - observe
+      - insufficient_source
+    action_hint_boundary: "rule_outcome 只能提供操作建议的辅助证据和风险/确认方向，不能由单通道直接生成最终买入/卖出/加减仓结论；禁止目标价必达、稳赚、必涨、自动下单等强承诺或执行措辞。"
+  decision_critic_review:
+    status: proposed_smoke_required
+    required_before_user_report: true
+    checks:
+      - user_grade_in_allowed_set
+      - no_profit_guarantee_or_auto_execution_words
+      - no_future_fields_visible
+      - source_ref_coverage_for_active_claims
+      - asof_manifest_valid
+      - financial_report_available_at_valid
+      - bookskill_grounding_valid_or_weak
+      - ml_gate_not_standalone_upgrade
+      - news_or_financial_single_channel_not_alpha
+      - sample_concentration_block_applied
+    outputs:
+      - critic_pass
+      - blocking_findings
+      - downgraded_rules
+      - user_report_warnings
+  book_skill:
+    must_review_before_decision: true
+    missing_source_is_weak_evidence: true
+    no_original_pdf_modification: true
+    resolver: src/agent_training/book_skill_resolver.py
+    resolver_policy: "DeepSeek evidence pack 必须通过 resolver 把 triggered skill_id 映射为 grounded card；可见字段只包括书名/章节/页码范围/提取方式/置信度/适用条件/失效条件/用户输出边界/证据政策。缺 grounded card 或缺来源的 skill 只能作为 weak/missing evidence，不得升级研究分级。"
+    resolver_dryrun_report: reports/date_generalization/bookskill_resolver_dryrun_v3_compact_memory_channel_coverage.md
+    default_evidence_pack_files:
+      - book_skills/grounded_skill_cards.yaml
+      - book_skills/invalid_conditions.md
+      - book_skills/core/low_confidence_or_deferred_cards.yaml
+      - book_skills/source_manifest.yaml
+      - book_skills/source_audit_report.md
+      - book_skills/coverage_report.md
+      - book_skills/core/source_priority.md
+    reference_only_files:
+      - book_skills/strategy_cards.yaml
+      - book_skills/core/macro_principles.md
+      - book_skills/core/quantitative_rules.md
+    allowed_active_files:
+      - book_skills/strategy_cards.yaml
+      - book_skills/grounded_skill_cards.yaml
+      - book_skills/core/macro_principles.md
+      - book_skills/core/quantitative_rules.md
+      - book_skills/invalid_conditions.md
+      - book_skills/core/low_confidence_or_deferred_cards.yaml
+      - book_skills/source_manifest.yaml
+      - book_skills/source_audit_report.md
+      - book_skills/coverage_report.md
+      - book_skills/core/source_priority.md
+    default_evidence_policy: "DeepSeek evidence pack 默认只读取 default_evidence_pack_files；reference_only_files 只能用于人工复核、离线 grounding、或重建 grounded cards，不得整文件塞入决策 prompt。"
+    source_trace_required_fields:
+      - book
+      - chapter_or_ocr_page
+      - strategy_id
+      - extraction_method
+      - confidence
+      - valid_conditions
+      - invalid_conditions
+    rule_outcome_policy: "BookSkill 触发必须转成 bookskill_rule_outcomes：strategy_id、来源、适用/失效条件、outcome、source_ref_ids、conflict_refs 和用户输出边界。缺页码/章节/来源/适用条件时只能 weak 或 insufficient_source。"
+    current_resolver_status: "bookskill_resolver_dryrun_v3_compact_memory: 48 packs, future_leak_findings=0, book_skill_candidates nonempty 47/48, grounded source detail 47/48, missing grounded references=0; historical performance/raw outcome fields are excluded from DS-visible Book Skill evidence."
+    latest_ablation_status: "full_channel_ablation_3panel_v1: 180 Flash cards invalid=0 total_tokens=1120345 leak=0 after 36-questionnaire-pack fill+retry. portfolio full_agent active=1 bad=0 exposure_return=7.38 cash_adj_avg=-0.0087; python_only active=16 bad=9 exposure_avg=-4.3606; no_news active=2 bad=1 exposure_avg=-12.05; no_questionnaire active=1 bad=0 cash_adj_avg=0.2180; no_bookskill active=0. Treat grounded Book Skill as safety/counter-evidence and semantic questionnaire as risk/uncertainty evidence, not positive alpha."
+    grounding_v2:
+      script: scripts/audit_bookskill_grounding_v2.py
+      report: reports/date_generalization/bookskill_grounding_v2.md
+      strategy_summary: reports/date_generalization/bookskill_grounding_v2_strategy_summary.csv
+      branch_summary: reports/date_generalization/bookskill_grounding_v2_branch_summary.csv
+      agent_preview: reports/date_generalization/bookskill_grounding_v2_agent_preview.jsonl
+      detail_rows: 709
+      strategy_rows: 8
+      branch_rows: 26
+      safety_policy: "Agent preview contains source/applicability/boundary fields only; return_20d, delta_cash, avg_return_20d, positive_20d_rate and GT/result fields are excluded."
+      decision: "No concrete strategy_id is promoted as standalone positive alpha. PPS-Q-017, PPS-Q-019 and DOW-B-017 remain mandatory checklist items; they can help review overheat/reversal risk and avoid false veto in low-hard-counter support branches, but must not raise research grade or weight by themselves."
+      policy_counts: "mandatory_checklist_not_alpha=5; observe_too_few_cases=2; weak_until_grounded=1"
+      branch_use_counts: "associative_only_not_decisive=9; too_few_branch_cases=8; avoid_false_veto_checklist=5; defensive_overheat_checklist=4"
+    candidate_rules:
+      - rule_id: bookskill_grounded_safety_blocker_v1
+        status: observe_safety_component
+        condition: "portfolio_pool decision has strong Python signal but news/financial/peer confirmation is weak or missing"
+        action: "Book Skill grounded applicable/failure conditions must be reviewed before allowing active research exposure; if Book Skill is hidden, missing, or weak while other channels have gaps, keep 放入观察/保持观察."
+        evidence: "full_channel_ablation_small_v1: no_bookskill produced 3 portfolio active exposures, 2 bad, exposure avg20=-9.3233 while full_agent stayed defensive. full_channel_ablation_3panel_v1: no_bookskill did not create active exposure, but full_agent still avoided the 9 bad python_only active exposures. Keep observe_safety_component until larger strategy_id-level attribution."
+      - rule_id: bookskill_overheat_reversal_defensive_checklist_v2
+        status: mandatory_checklist_not_alpha
+        condition: "single_stock risk branch is overheat_reversal_friction_without_hard_event and grounded PPS-Q-017/PPS-Q-019/DOW-B-017 appears"
+        action: "Use BookSkill as an applicability/failure-condition checklist for overheated reversal friction; it may support keeping low observation weight or requiring more evidence, but may not create positive confirmation."
+        evidence: "bookskill_grounding_v2 branch summary: overheat_reversal_friction_without_hard_event for PPS-Q-017/PPS-Q-019/DOW-B-017 has rows=63/60/60, positive_20d_rate about 0.19-0.20 and positive avg_delta_cash, consistent with defensive checklist use."
+      - rule_id: bookskill_low_hard_counter_false_veto_checklist_v2
+        status: mandatory_checklist_not_alpha
+        condition: "single_stock risk branch is low_hard_counter_with_reversal_support and grounded PPS-Q-017/PPS-Q-019/DOW-B-017 appears"
+        action: "Use BookSkill to double-check false-veto risk and avoid mechanical downweighting without explicit hard negative news/financial evidence; still require quant/peer/chip support and cannot upgrade by itself."
+        evidence: "bookskill_grounding_v2 branch summary: low_hard_counter_with_reversal_support has high posterior positive rate for PPS-Q-017/DOW-B-017/PPS-Q-019, but this is associative and driven mainly by branch/chip/peer context, so it is a checklist not alpha."
+    archived_material_policy: "deep_dive、草稿、旧版自动卡和项目外归档只能用于人工复核或重建，不得直接进入 DeepSeek 决策 evidence pack"
+  evidence_channel_coverage:
+    script: scripts/audit_evidence_pack_channel_coverage.py
+    latest_report: reports/date_generalization/full_channel_ablation_3panel_v1_channel_coverage.md
+    latest_summary_csv: reports/date_generalization/full_channel_ablation_3panel_v1_channel_coverage_summary.csv
+    required_before_deepseek_round: true
+    default_required_channels:
+      - python_features
+      - kline_features
+      - peer_context_features
+      - news_features
+      - financial_report_features
+      - book_skill_candidates
+      - memory_context
+      - counter_evidence
+    optional_or_observe_channels:
+      - news_semantic_questionnaire
+      - retrieved_cases_context
+    latest_dryrun_status: "full_channel_ablation_3panel_v1 dry-run: 180 evidence packs, future_leak_findings=0. full_agent coverage python/kline/peer/news/news_semantic_questionnaire/financial/memory/counter_evidence all 36/36; BookSkill 35/36; retrieved_cases_context 0/36. Global low questionnaire coverage is expected for no_news/no_questionnaire/python_only ablations."
+    block_policy: "正式 DeepSeek 训练/验收 round 前必须输出 coverage summary；若 required channel 覆盖为 0 或不符合该 shard 的预期，先修入口或标注该通道禁用，不得宣称 full-agent。"
+  portfolio_cross_channel_confirmation:
+    guardrail_id: portfolio_cross_channel_confirmation_gap_v1
+    implementation: src/agent_training/evidence_pack.py
+    status: observe_safety_guardrail
+    applies_to_variants:
+      - deepseek_agent
+      - full_agent
+      - keyword_plus_questionnaire
+      - keyword_plus_questionnaire_guarded
+      - news_plus_financial_report
+      - news_plus_financial_report_guarded
+      - kline_weak_prompt
+    excluded_ablation_variants:
+      - no_news
+      - no_peer
+      - no_bookskill
+      - no_memory
+      - no_python_gate
+      - python_only
+    rule: "组合模式若要继续深挖或增加研究暴露，但新闻、财报、同行、Book Skill、过热/高波动中出现三类以上确认缺口，则执行层压回 放入观察/保持观察。"
+    evidence: "full_channel_ablation_small_v1 shows python_only/no_bookskill/no_news/no_peer/no_memory can create bad active exposures; full_channel_ablation_3panel_v1 shows python_only portfolio active=16/18 with 9 bad exposures, while full_agent active=1/18 bad=0. This guard preserves learned safety behavior for default/full-agent decisions while leaving ablation controls measurable."
+  memory:
+    accepted_experience_can_help_decision: true
+    rejected_experience_must_be_counter_evidence: true
+    compact_context_required: true
+    loader: src/agent_training/memory_context.py
+    default_rows_per_ledger: 2
+    max_chars: 3600
+    row_char_limit: 260
+    prompt_hygiene_policy: "DeepSeek evidence pack 必须读取结构化 compact ledger 行，不得把原始 ledger/Markdown 尾部硬截断塞入 prompt；metric_before/metric_after/return_20d/gt_status 等后验字段或文本片段必须过滤/打码；若 schema invalid 或输出截断，优先降低 rows_per_ledger/row_char_limit。"
+    research_hypothesis_memory:
+      status: proposed_smoke_required
+      purpose: "记录可证伪研究假设、支持证据、反证、适用/失效条件、催化剂和下一步复核；不使用 long/short/target/position 语言。"
+      required_fields:
+        - hypothesis_id
+        - thesis_or_rule
+        - supporting_evidence
+        - disconfirming_evidence
+        - applicable_conditions
+        - failure_conditions
+        - catalyst_or_next_check
+        - source_ref_ids
+        - status
+      prompt_policy: "DeepSeek 只可见假设状态、适用/失败条件和下一步动作；后验收益、GT 标签和 future_return 字段不得进入 prompt。"
+    case_memory_retrieval:
+      status: observe_candidate
+      retriever: src/agent_training/case_memory_retriever.py
+      smoke_script: scripts/retrieve_case_memory_smoke.py
+      smoke_report: reports/date_generalization/case_memory_retrieval_smoke.md
+      default_top_k: 3
+      allowed_source_ledgers:
+        - memory/strategy_experience_ledger.csv
+        - memory/book_skill_adaptation_ledger.csv
+        - memory/news_world_model_ledger.csv
+        - memory/ablation_findings_ledger.csv
+        - memory/failure_case_ledger.csv
+      forbidden_evidence_fields:
+        - return_5d
+        - return_10d
+        - return_20d
+        - future_return_5d
+        - future_return_10d
+        - future_return_20d
+        - gt_status
+        - gt_pass
+        - metric_before
+        - metric_after
+      policy: "案例检索只能返回 case_id、规则状态、适用/失败条件和下一步动作；不得把后验收益或 GT 字段塞入 DeepSeek evidence pack。进入默认前必须比较 no_rag、memory_compact_only、retrieved_cases_v1、retrieved_cases_v2_applicable，并通过 leakage audit、channel coverage audit 和 governance critic。"
+      applicability_policy: "RAG 命中必须经过 applicability critic；若时间块、任务模式、行业/概念、数据来源或失败条件不匹配，只能作为背景，不得触发升级或降权。retrieved_cases_v2_applicable 只允许相同失败条件案例作为 counter-evidence/checklist，partial case 只能观察。"
+      smoke_result: "case_memory_retrieval_smoke_v1 命中 no_news 坏主动暴露、financial_report_only 单通道风险、announcement row-cap 三类近期失败/反证案例；测试通过。rag_case_memory_dryrun_v1 生成 48 个 evidence pack，future_leak_findings=0。rag_case_memory_flash_v1 48 张 Flash 卡 invalid=0 total_tokens=227796；retrieved_cases_v1 阻止一张 no_news 坏暴露，但在 news_plus_financial_report_guarded 下又产生一张 H2025_1 坏暴露，因此不得默认启用。rag_applicability_v2_dryrun_v1 生成 48 个 evidence pack，future_leak_findings=0；retrieved_cases_v2_applicable 为 16/16 个 v2 pack 输出案例上下文，其中 12/16 命中 applicable checklist。rag_applicability_v2_flash_v1 48 张 Flash 卡 invalid=0 total_tokens=302100 leak=0；v2 产生 3 张主动研究暴露且含 -14.96/-2.96 的坏暴露，v1 为 0 张主动暴露，因此 v2 不得默认启用。"
+    latest_dual_mode_status: "run_deepseek_dual_mode_round.py 已改用 load_compact_memory_context；bookskill_resolver_dryrun_v3_compact_memory 中 memory_context 48/48 非空。governance_smoke_v1 暴露 compact memory 仍含 return_20d-like hindsight text，v2/v3 修复后 source/enhanced leak=0 且 critic_pass=8/8。旧的 ledger/Markdown 尾部硬截断和后验指标文本不得再作为默认入口。RAG v2 applicability 已通过 48-pack dry-run，但 Flash 小对照显示它会增加坏主动暴露；继续保持 observe_candidate，只能作为报告提示或硬 guard 设计素材。"
+  quantitative_kline_channel:
+    status: observe_not_default
+    exploration_script: scripts/run_kline_channel_exploration.py
+    report: reports/date_generalization/kline_channel_multiscale_exploration_v2.md
+    csv: reports/date_generalization/kline_channel_multiscale_exploration_v2.csv
+    cached_report: reports/date_generalization/kline_channel_multiscale_exploration_v2_cached.md
+    daily_kline_feature_cache: data/date_generalization_cache/market_5000/daily_kline_multiscale_features.csv.gz
+    daily_kline_feature_cache_report: reports/date_generalization/daily_kline_multiscale_feature_cache.md
+    corr_peer_cache: data/date_generalization_cache/market_5000/corr_peer_kline_features.csv
+    corr_peer_cache_report: reports/date_generalization/corr_peer_kline_feature_cache.md
+    tushare_peer_cache: data/date_generalization_cache/market_5000/tushare_industry_region_peer_features.csv.gz
+    tushare_peer_cache_report: reports/date_generalization/tushare_industry_region_peer_feature_cache.md
+    tushare_peer_ml_report: reports/date_generalization/lightweight_ml_peer_graph_experiment_v1_summary.md
+    tushare_peer_ml_aggregate: reports/date_generalization/lightweight_ml_peer_graph_experiment_v1_aggregate.csv
+    legacy_report: reports/date_generalization/kline_channel_multiscale_exploration_v1.md
+    legacy_csv: reports/date_generalization/kline_channel_multiscale_exploration_v1.csv
+    interaction_report: reports/date_generalization/local_kline_news_fin_peer_interactions_v1.md
+    prompt_dryrun_report: reports/date_generalization/kline_prompt_dryrun_v1_summary.md
+    prompt_flash_report: reports/date_generalization/kline_prompt_flash_v1_summary.md
+    prompt_flash_findings: reports/date_generalization/kline_prompt_flash_v1_findings.md
+    lightweight_ml_report: reports/date_generalization/lightweight_ml_channel_experiment_v2_summary.md
+    lightweight_ml_aggregate: reports/date_generalization/lightweight_ml_channel_experiment_v2_aggregate.csv
+    current_reaudit_findings: reports/date_generalization/kline_peer_ml_current_reaudit_findings_v1.md
+    current_reaudit_summary: reports/date_generalization/lightweight_ml_channel_experiment_current_reaudit_v1_summary.md
+    current_reaudit_aggregate: reports/date_generalization/lightweight_ml_channel_experiment_current_reaudit_v1_aggregate.csv
+    lightweight_ml_cached_report: reports/date_generalization/lightweight_ml_channel_experiment_v2_gzip_cache_summary.md
+    lightweight_ml_cached_aggregate: reports/date_generalization/lightweight_ml_channel_experiment_v2_gzip_cache_aggregate.csv
+    input_policy: "K 线特征只能由 decision_date 当日及以前 daily cache 计算；return_20d/gt_status 只能用于离线评估，不得进入 DeepSeek evidence pack。"
+    prompt_policy: "K 线只作为量价弱提示和反证解释；kline_prompt_flash_v1 未证明组合模式增益，因此不得作为默认正向 gate，也不继续扩大纯 K 线 DS round。"
+    lightweight_ml_policy: "current_reaudit_v1 确认 K 线/同行是有用的 Agent 前置量化复核工具，但不得默认升权：best single-stock kline_corr_tushare_peer_regime mean pos20=0.7000、avg20=6.4425、H2026_1=0.4220；tushare_peer_context H2026_1=0.4675，优于纯 K 线 0.3641 和 corr peer/regime 0.4098，但仍低于 0.60。组合 price_core/top15+regime H2026_1=0.6133 但 reject_too_few_samples。不得把本地 ML 分数、Tushare peer、corr peer 或 regime gate 直接转成继续深挖、组合 TopN 默认选择或研究暴露提升。"
+    ml_gate_audit_policy: "任何 tree-based/rule-based/learning-to-rank 分数进入 evidence pack 前，必须输出 ml_gate_rule_outcomes：训练/验证/test 时间块、特征白名单、禁用字段、样本数、股票数、日期数、top share、失败块、source_ref_ids 和是否 observe/accepted/rejected。ML gate 单通道不得升级研究分级。"
+    cache_policy: "效果优先，项目内缓存总量低于 10GB 可接受；market_5000 当前约 346MB。扩大到 1000/3000/全 A 时优先离线缓存 daily K-line、corr TopK 和真实行业/概念/地域图谱，接近 10GB 再做分片或列式压缩。"
+    feature_groups:
+      short_kline: "3/5/10/20 日收益与波动、RSI、MACD、ATR、量比、布林位置、20 日均值回归、方向反转率、效率比、当前连涨连跌强度。"
+      long_kline: "60/120/240 日收益、长周期回撤、20/60/120/240 均线结构、MA200/MA240 距离、斜率、长周期区间位置和效率比。"
+      cycle_kline: "MA20/MA60 穿越次数、区间位置、布林位置、均值回归 z 值、短长波动比、区间宽度、方向反转率、趋势效率比、上涨日占比。"
+      peer_kline: "同组/候选池相对收益、正收益广度、MA200 广度、相对波动；接入行业/概念/地域图谱前不得宣称真实同行规则。"
+      tushare_industry_region_peer: "用户授权 Tushare stock_basic 离线缓存中的 industry/area 分组，剔除自身后计算同行收益、广度、MA200、新闻预警/机会均值和自身相对同行关注缺口；当前只作单支复核/反证候选。"
+    candidate_rules:
+      - rule_id: kline_20d_pullback_observe_v1
+        status: observe_candidate
+        condition: "kline_return_20d <= -10.1231"
+        action: "作为回撤后修复候选提示；必须同时检查同行确认、新闻/财报风险、Book Skill 和数据缺口，不得单独升级。"
+        evidence: "kline_channel_multiscale_exploration_v1: valid pos20=0.7107 vs baseline=0.5782；test pos20=0.5467 vs baseline=0.4926。local_kline_news_fin_peer_interactions_v1 复核：test loss_gt5=0.2461 vs baseline=0.2779，样本3812、股票461；但 H2026_1 pos20=0.4904，仍有时间块风险。kline_prompt_flash_v1: 96 Flash cards invalid=0 leak=0 total_tokens=519894；kline_weak_prompt 没有主动暴露，但 portfolio cash_adj_avg=0.2100 低于 no_kline=0.2551，single_stock 只小幅改善均值且正收益率不变，因此不升级默认。"
+      - rule_id: corr_peer_kline_single_stock_observe_v1
+        status: observe_candidate_single_stock_only
+        condition: "time-safe 120-trading-day corr Top10 peer K-line features improve single_stock additive model"
+        action: "只能作为单支盯盘/复核的候选证据；必须展示 H2026_1 未通过反证，不得用于组合 TopN 默认排序。扩大前先缓存 corr TopK，并加入市场 regime/date gate。"
+        evidence: "lightweight_ml_channel_experiment_v2: kline_corr_peer_regime single_stock mean pos20=0.6832 avg20=7.3612, but H2026_1 pos20=0.3921. current_reaudit_v1: kline_corr_peer_regime mean pos20=0.6797 avg20=5.7191 H2026_1=0.4098; kline_corr_tushare_peer_regime mean pos20=0.7000 but H2026_1=0.4220. Portfolio corr-peer/regime/top15 H2026_1=0.3152 in v2 and remains observe/reject-thin, so only single-stock review context."
+      - rule_id: tushare_industry_area_peer_single_stock_observe_v1
+        status: observe_candidate_single_stock_only
+        condition: "Tushare stock_basic industry/area peer context improves single_stock local additive model, but latest block remains below acceptance threshold"
+        action: "作为单支盯盘/复核的真实行业/地域同行背景；若行业广度弱、目标相对同行落后或同行新闻更热但目标沉默，应作为反证。不得单独触发继续深挖或增加研究暴露，不得用于组合 TopN 默认选择。"
+        evidence: "lightweight_ml_peer_graph_experiment_v1/current_reaudit_v1: tushare_peer_context single_stock mean pos20=0.6877 avg20=6.2355 H2026_1=0.4675 status=observe_candidate; better than pure K-line H2026_1=0.3641 and corr_peer_regime H2026_1=0.4098, but below 0.60."
+      - rule_id: tushare_peer_portfolio_not_ready_v1
+        status: rejected_for_default_portfolio
+        condition: "Tushare industry/area peer context used for portfolio_pool TopN/rank selection"
+        action: "组合模式只作为对照和解释，不进入默认 TopN；top3/regime 好看但样本过薄时必须标灰。下一轮需加入概念、指数、产业链、新闻共现和最小样本/日期数约束。"
+        evidence: "lightweight_ml_peer_graph_experiment_v1: tushare_peer_context portfolio top15/regime H2026_1 around 0.4000 and top3+regime status reject_too_few_samples; portfolio task not passed."
+      - rule_id: kline_low_reversal_deep_pullback_micro_candidate_v1
+        status: reject_too_few_samples
+        condition: "kline_direction_reversal_rate_20d <= 0.3500 and kline_return_20d <= -18.0609"
+        action: "可进入小样本 DS 复核池，但必须标注样本不足；不得默认升权。"
+        evidence: "kline_channel_multiscale_exploration_v2: test pos20=0.6591 vs baseline=0.4926, avg20=5.8931, but test samples=88 below acceptance floor."
+      - rule_id: kline_240d_deep_discount_not_alpha_v1
+        status: rejected_for_positive_gate
+        condition: "kline_ma_gap_close_240 <= -23.6408"
+        action: "不得作为 240 日深折价正向规则；只作为反证或待复核背景。"
+        evidence: "kline_channel_multiscale_exploration_v2: valid pos20=0.6675 but test pos20=0.4541 below baseline=0.4926."
+      - rule_id: regime_date_gate_overfit_risk_v1
+        status: observe_with_strict_sample_floor
+        condition: "validation-selected regime/date gate"
+        action: "只有同时满足最小样本、最小决策日期数、跨时间块一致性时才可进入 DS 复核；不得默认启用。"
+        evidence: "lightweight_ml_channel_experiment_v2/current_reaudit_v1: price_core/top15+regime mean pos20=0.7023 and H2026_1=0.6133, but aggregate status reject_too_few_samples; kline_corr_peer_regime+regime H2026_1 often drops below baseline. 好看的 regime gate 只能灰色展示，不能作为默认组合选择。"
+      - rule_id: kline_long_deep_drawdown_not_alpha_v1
+        status: rejected_for_positive_gate
+        condition: "kline_return_60d <= -16.9912"
+        action: "不得作为长周期深跌正向规则；只能作为风险/复核提示。"
+        evidence: "valid pos20=0.5810 略高于 baseline=0.5782，但 test pos20=0.3814 明显低于 baseline=0.4926。"
+      - rule_id: kline_cycle_volatility_rebound_observe_v1
+        status: observe
+        condition: "kline_volatility_ratio_20_60 >= 1.2560 and kline_trend_consistency_20d <= 0.35"
+        action: "作为震荡/波动扩张复核提示，不得默认加权。"
+        evidence: "test pos20=0.5226，比 baseline=0.4926 高约 0.0300；样本和稳定性不足。"
+      - rule_id: peer_kline_low_breadth_not_ready_v1
+        status: rejected_for_default
+        condition: "peer_kline_group_above_ma200_rate <= 0.1757"
+        action: "当前本地 500 股候选池横截面规则不进入默认策略；待 Tushare 行业/概念/地域图谱后重测。"
+        evidence: "train/valid 看似较好，但 test 命中样本为 0。local_kline_news_fin_peer_interactions_v1 进一步显示 kline_pullback_peer_confirmed test pos20=0.3919 低于 baseline=0.4926，说明当前 peer K 线不是真实同行确认。"
+  news_semantic_questionnaire:
+    enabled: true
+    config: config/news_deepseek_questionnaire.yaml
+    training_model: deepseek-v4-flash
+    final_review_model: deepseek-v4-pro
+    output_policy: "问卷只输出结构化新闻语义证据，不直接输出研究分级或投资指令。"
+    optimization_policy: "每轮必须比较 no_news、keyword_only、questionnaire_only、keyword_plus_questionnaire、risk_only_questionnaire；新闻细分实验需继续比较 uncertainty_only_questionnaire、quality_only_questionnaire、semantic_risk_only_questionnaire、risk_uncertainty_questionnaire。未验证前不得把机会分作为强正向 alpha。2026-06-25/26 matched-news 与 2023/2024 公告补洞微测中，ds_news_opportunity_score、ds_news_net_score、公告数量和官方来源本身都未证明正向 alpha；默认只把问卷用于风险/不确定性/证据质量/同行确认缺口反证。"
+    missing_policy: "新闻缺失、来源弱、时间戳弱必须进入 ds_news_uncertainty_score，不能当低风险。"
+    feature_cache_update_20260628:
+      script: scripts/build_news_questionnaire_feature_cache.py
+      cache: data/date_generalization_cache/market_5000/news_questionnaire_features.csv.gz
+      report: reports/date_generalization/news_questionnaire_feature_cache_after_h2025_2_backfill_panel_v1.md
+      agent_preview: reports/date_generalization/news_questionnaire_feature_cache_after_h2025_2_backfill_panel_v1_agent_preview.jsonl
+      findings_report: reports/date_generalization/news_backfill_and_questionnaire_findings_v1.md
+      rows: 147
+      unique_stocks: 95
+      coverage_total: 0.000944
+      coverage_by_block:
+        H2023_1: 0.0
+        H2023_2: 0.000258
+        H2024_1: 0.000260
+        H2024_2: 0.000242
+        H2025_1: 0.001502
+        H2025_2: 0.001127
+        H2026_1: 0.002766
+      h2025_2_backfill_news_join:
+        combined_news_event_rows: 358839
+        combined_news_feature_rows: 102153
+        joined_gt_rows: 155690
+        matched_rows: 41348
+        matched_rate: 0.265579
+        news_missing_rate_mean: 0.734421
+        row_cap_partitions: 30
+        cached_anns_d_partitions: 203
+      h2025_2_questionnaire_panel:
+        packs: 40
+        invalid_outputs: 0
+        total_tokens: 411923
+        net_score_direction_match_rate: 0.5000
+        corr_opportunity_vs_return_20d: -0.1321
+        corr_net_vs_return_20d: -0.1222
+      h2023_1_backfill_news_join:
+        findings_report: reports/date_generalization/news_h2023_1_backfill_findings_v1.md
+        combined_news_event_rows: 864253
+        combined_news_feature_rows: 242196
+        joined_gt_rows: 155690
+        matched_rows: 54646
+        matched_rate: 0.350992
+        news_missing_rate_mean: 0.649008
+        row_cap_partitions: 65
+        cached_anns_d_partitions: 384
+        h2023_1_matched_rate: 0.909771
+        sparse_blocks_after_backfill:
+          H2024_1: 0.078455
+          H2024_2: 0.130210
+          H2025_1: 0.047609
+        nonquant_high_ranker_accepted_positive: 0
+        nonquant_all_pool_safety_hygiene_only: 2
+      h2024_1_backfill_news_join:
+        findings_report: reports/date_generalization/news_h2024_1_backfill_findings_v1.md
+        combined_news_event_rows: 1334933
+        combined_news_feature_rows: 382539
+        joined_gt_rows: 155690
+        matched_rows: 74458
+        matched_rate: 0.478245
+        news_missing_rate_mean: 0.521755
+        row_cap_partitions: 84
+        cached_anns_d_partitions: 563
+        h2024_1_matched_rate: 0.827632
+        sparse_blocks_after_backfill:
+          H2024_2: 0.231543
+          H2025_1: 0.047609
+          H2026_1: 0.446010
+        nonquant_high_ranker_accepted_positive: 0
+        nonquant_high_ranker_safety_hygiene: 1
+      h2025_1_backfill_pass2_news_join:
+        findings_report: reports/date_generalization/news_h2025_1_backfill_pass2_findings_v1.md
+        combined_news_event_rows: 1540683
+        combined_news_feature_rows: 458072
+        joined_gt_rows: 155690
+        matched_rows: 94004
+        matched_rate: 0.603790
+        news_missing_rate_mean: 0.396210
+        row_cap_partitions: 96
+        cached_anns_d_partitions: 737
+        h2025_1_files: 180
+        h2025_1_expected_days: 181
+        h2025_1_missing_dates:
+          - "20250326"
+        block_matched_rates:
+          H2023_1: 0.909771
+          H2023_2: 0.260540
+          H2024_1: 0.827632
+          H2024_2: 0.231543
+          H2025_1: 0.824793
+          H2025_2: 0.867320
+          H2026_1: 0.446010
+        nonquant_high_ranker_accepted_positive: 1
+        nonquant_high_ranker_safety_hygiene: 1
+        nonquant_all_pool_accepted_positive: 0
+        candidate_positive_confirmation:
+          rule_id: news_high_quality_positive_v1
+          scope: high_ranker_only
+          total_selected_rows: 3728
+          h2026_selected_rows: 422
+          prior_positive_rate_lift: 0.040927
+          h2026_positive_rate_lift: 0.085388
+          prior_pool_excess_20d: 0.932530
+          h2026_pool_excess_20d: 0.743735
+          all_pool_status: accepted_safety_hygiene_not_alpha
+        ds_flash_candidate_panel_v1:
+          report: reports/date_generalization/news_hq_positive_candidate_flash_findings_v1.md
+          sample_plan: reports/date_generalization/news_hq_positive_high_ranker_candidate_sample_plan_v1.csv
+          model: deepseek-v4-flash
+          base_packs: 12
+          ablation_packs: 48
+          invalid_outputs: 0
+          total_tokens: 509980
+          evidence_future_leak_findings: 0
+          requested_max_workers: 2500
+          effective_workers: 48
+          full_agent_vs_no_news:
+            portfolio_pool_cash_adjusted_avg20_delta: 0.1633
+            portfolio_pool_pos20_delta: 0.5000
+            single_stock_cash_adjusted_avg20_delta: 0.1223
+            single_stock_pos20_delta: 0.3334
+            h2026_1_cash_adjusted_full_agent: 0.0521
+            h2026_1_cash_adjusted_no_news: -0.1306
+          exposure_cards: 0
+          decision: observe_confirmation_candidate_not_default_alpha
+        ds_flash_fresh12_panel_v1:
+          report: reports/date_generalization/news_hq_positive_candidate_fresh12_findings_v1.md
+          sample_plan: reports/date_generalization/news_hq_positive_high_ranker_candidate_fresh12_sample_plan_v1.csv
+          model: deepseek-v4-flash
+          base_packs: 12
+          ablation_packs: 48
+          invalid_outputs: 0
+          total_tokens: 504238
+          evidence_future_leak_findings: 0
+          requested_max_workers: 2500
+          effective_workers: 48
+          full_agent_vs_no_news:
+            portfolio_pool_cash_adjusted_avg20_delta: 0.1060
+            portfolio_pool_pos20_delta: 0.3333
+            single_stock_cash_adjusted_avg20_delta: 0.3533
+            single_stock_pos20_delta: 0.1667
+          combined_two_panel_view:
+            portfolio_pool_cash_adjusted_avg20_delta: 0.1347
+            portfolio_pool_pos20_delta: 0.4166
+            single_stock_cash_adjusted_avg20_delta: 0.2378
+            single_stock_pos20_delta: 0.2500
+            full_agent_minus_no_news_weight_delta_portfolio: -0.0167
+            full_agent_minus_no_news_weight_delta_single_stock: 0.0000
+          exposure_cards: 0
+          decision: observe_confirmation_candidate_not_default_alpha
+        ds_flash_fresh24_questionnaire_panel_v1:
+          report: reports/date_generalization/news_hq_positive_fresh24_questionnaire_findings_v1.md
+          sample_plan: reports/date_generalization/news_hq_positive_high_ranker_fresh24_v1_sample_plan.csv
+          model: deepseek-v4-flash
+          questionnaire_packs: 12
+          questionnaire_tokens: 122155
+          base_packs: 24
+          ablation_packs: 96
+          invalid_outputs: 0
+          total_tokens: 1032732
+          evidence_future_leak_findings: 0
+          sampler_rule_text_hits: 0
+          full_agent_questionnaire_visible: 24
+          no_news_questionnaire_visible: 0
+          no_news_news_features_visible: 0
+          full_agent_vs_no_news:
+            portfolio_pool_cash_adjusted_avg20_delta: -0.4769
+            portfolio_pool_pos20_delta: 0.0833
+            single_stock_cash_adjusted_avg20_delta: 0.0790
+            single_stock_pos20_delta: 0.0000
+            paired_sum_delta_cash_approx: -4.7160
+          h2026_full_agent:
+            portfolio_pool_pos20: 0.0000
+            single_stock_pos20: 0.0000
+          questionnaire_offline_correlation_note: "small-n diagnostic only; ds_news_net_score corr_return20=-0.6604 and risk/uncertainty can mark reversible reversal friction as negative."
+          decision: rejected_for_promotion_keep_confirmation_and_branch_learning
+        branch_case_audit_v1:
+          script: scripts/audit_news_questionnaire_branch_cases.py
+          report: reports/date_generalization/news_questionnaire_branch_case_audit_v1.md
+          agent_preview: reports/date_generalization/news_questionnaire_branch_case_audit_v1_agent_preview.jsonl
+          questionnaire_rows: 159
+          unique_stocks: 102
+          similar_case_rows: 436
+          target_stockdates_with_prior_cases: 150
+          future_leakage_scan: 0
+          primary_branch_rows:
+            unclassified_news_context: 53
+            routine_official_low_signal: 40
+            soft_gap: 23
+            reversible_reversal_friction: 21
+            peer_diffusion: 9
+            explicit_negative_event: 7
+            policy_region_direct_support: 6
+          key_result: "reversible_reversal_friction prior_blocks pos20=0.8125/excess=24.2055 but H2026 pos20=0.2000/excess=-1.8759; soft_gap is weak in both prior and H2026; policy_region_direct_support is weak and tiny; routine_official_low_signal improves H2026 but prior is negative. Treat branch tags as checklist/counter-evidence only, not alpha."
+          decision: accepted_as_branch_case_auditor_not_alpha
+          evidence_wiring_dryrun_v1:
+            report: reports/date_generalization/news_branch_case_context_dryrun_v1_findings.md
+            evidence_pack: reports/date_generalization/news_branch_case_context_dryrun_v1_evidence_pack.jsonl
+            channel_coverage: reports/date_generalization/news_branch_case_context_dryrun_v1_channel_coverage.md
+            leakage_audit: reports/date_generalization/news_branch_case_context_dryrun_v1_evidence_leakage_audit.md
+            called_deepseek: false
+            base_packs: 24
+            ablation_packs: 144
+            future_leak_findings: 0
+            branch_context_visibility:
+              full_agent: "24/24"
+              questionnaire_only: "24/24"
+              no_questionnaire: "0/24"
+              no_news: "0/24"
+              no_memory: "0/24"
+              python_only: "0/24"
+            decision: accepted_data_hygiene_not_performance_proof
+          onoff_flash_v1:
+            report: reports/date_generalization/news_branch_case_context_onoff_flash_findings_v1.md
+            smoke_run: reports/date_generalization/news_branch_case_context_onoff_flash_smoke_v1_summary.md
+            fresh_run: reports/date_generalization/news_branch_case_context_preview_fresh12_flash_v1_summary.md
+            cards: 96
+            invalid_outputs: 0
+            total_tokens: 1116979
+            future_leak_findings: 0
+            combined_metrics:
+              portfolio_pool:
+                full_agent_cash_avg_mean: 1.1009
+                no_branch_case_context_cash_avg_mean: 0.7811
+                full_agent_cash_pos_mean: 0.7916
+                no_branch_case_context_cash_pos_mean: 0.6666
+              single_stock:
+                full_agent_cash_avg_mean: 0.8435
+                no_branch_case_context_cash_avg_mean: 0.6737
+                full_agent_cash_pos_mean: 0.8750
+                no_branch_case_context_cash_pos_mean: 0.7916
+            paired_risk:
+              portfolio_pool_lowered_positive_rows: 4
+              portfolio_pool_raised_negative_rows: 1
+              single_stock_lowered_positive_rows: 3
+              single_stock_raised_negative_rows: 1
+            decision: observe_positive_checklist_component_not_alpha
+      default_agent_use: "risk_uncertainty_explanation_not_positive_alpha"
+      forbidden_use: "do not use ds_news_opportunity_score, ds_news_risk_score, ds_news_uncertainty_score, or ds_news_net_score as direct default positive/negative thresholds, alpha, promotion gate, or hard veto"
+      safety_note: "Input score CSV posterior return fields are dropped from the feature cache and agent preview."
+    soft_gap_policy: "新闻/财报缺失、来源弱、问卷覆盖不足属于 confidence discount/soft gap；除非存在明确负面事件、披露风险或同行弱确认，不得把缺失本身解释为方向性负面。accepted quant tool 遇到软缺口时优先要求 Agent 给 partially_adopted 或保持观察，不得用缺失一票否决；但四象限验证显示也不得用 prompt 强行升权。"
+    source_ref_policy: "每个高影响问卷答案必须输出 score、answer、source_ref_ids、missing_reason 和 conflict_refs；高风险、高机会或高不确定性判断若没有 source_ref，只能输出 insufficient_source/observe。"
+    rule_outcome_policy: "peer_active_self_silent、news_opportunity_peer_weak_or_fin_missing、routine_official_low_signal 等规则必须转成 rule_outcomes，不能只藏在自然语言 prompt 中。"
+    candidate_rules:
+      - rule_id: news_questionnaire_uncertainty_guard_v1
+        status: observe
+        condition: "ds_news_uncertainty_score >= 0.6"
+        action: "作为反证降权或要求更多证据；不得单独给出正向研究分级。"
+        evidence: "63-row matched-news panel: uncertainty<0.6 raw_pos 0.5472 vs baseline 0.5238, loss_over_5 0.2453 vs 0.2698。提升小，继续观察。"
+      - rule_id: news_questionnaire_risk_or_uncertainty_safe_v1
+        status: observe
+        condition: "ds_news_risk_score < 0.6 and ds_news_uncertainty_score < 0.6"
+        action: "可作为现金防守/放弃弱证据日期的辅助条件；不能替代 Book Skill、量价和同行确认。"
+        evidence: "63-row matched-news panel: cash_blended_positive_20d_rate 0.6667 vs baseline 0.5238，但 raw_avg_return_20d 低于 baseline。"
+      - rule_id: news_questionnaire_positive_score_not_alpha_v1
+        status: rejected_for_positive_gate
+        condition: "ds_news_opportunity_score high or ds_news_net_score >= 0"
+        action: "不得直接增加正向权重；只可进入解释或等待跨通道确认。"
+        evidence: "63-row matched-news panel: net_non_negative_only raw_avg_return_20d -2.1056，opportunity_high_risk_controlled raw_avg_return_20d -0.1650。deepseek_news_risk_uncertainty_quality_lpm20_v1 中完整问卷 portfolio cash_adj_avg=-0.6435，低于 no_news=-0.5563，且 000681 opportunity=1/net=0.5 后 20d=-14.05。"
+      - rule_id: news_questionnaire_reversal_friction_not_hard_negative_v1
+        status: accepted_branching_requirement_not_alpha
+        condition: "high-ranker reversal/chip candidate has high ds_news_risk_score, high uncertainty, ST/inquiry/abnormal-volatility or other explicit risk words"
+        action: "不得机械暂时剔除或降至 0；必须先分叉判断 explicit_negative_event 与 reversible_reversal_friction。若 K线/筹码/同行反转证据强但新闻风险高，只能作为高风险观察或要求更多证据，不能把风险分直接当硬 veto。"
+        evidence: "news_hq_positive_fresh24_questionnaire_v1: fresh24 neutralized no_news control plus questionnaire showed full_agent portfolio avg20=0.4940 below no_news=0.9709; ds_news_net_score corr_return20=-0.6604; 000908 high-risk news caused full_agent lower weight on a posterior +165.28 reversal sample, contributing approx -8.264 to paired full_agent-no_news delta."
+      - rule_id: news_questionnaire_branch_case_auditor_v1
+        status: accepted_checklist_not_alpha
+        condition: "news_semantic_questionnaire is available for a decision point"
+        action: "把新闻语义先转为 explicit_negative_event / reversible_reversal_friction / routine_official_low_signal / soft_gap / peer_diffusion / policy_region_direct_support / target_specific_positive_event 分叉，并附 prior-only 相似案例元信息；Agent 只能把它作为 checklist、反证、confidence discount 或防 false-veto 材料，不得单独升权。"
+        evidence: "news_questionnaire_branch_case_audit_v1: 159 questionnaire rows/102 stocks, 436 prior-similar case links, agent preview future leak scan=0. primary branches: unclassified=53 routine_official=40 soft_gap=23 reversal_friction=21 peer_diffusion=9 explicit_negative=7 policy_region=6. reversal_friction prior pos20=0.8125/excess=24.2055 but H2026 pos20=0.2000/excess=-1.8759; soft_gap weak in prior/H2026; policy_region weak/tiny; no branch promoted as alpha."
+      - rule_id: news_questionnaire_missing_is_soft_gap_v1
+        status: accepted_prompt_hygiene_not_alpha
+        condition: "news_missing_rate high, questionnaire missing, or source-quality weak without explicit negative evidence"
+        action: "写入不确定性和信息缺口；不得单独上调或下调方向判断。若量化工具为 accepted candidate，只允许作为 partially_adopted/needs_confirmation 的软缺口处理，最终仍需同行、财报、BookSkill 或风险反证共同裁决。"
+        evidence: "news_questionnaire_flash_four_quadrant_v1: 6/6 四象限样本问卷补齐，future leak=0；full_channel_quant_news_softgap_2panel_flash_v1 中 full+quant portfolio cash-adjusted avg20 从 0.6314 改善到 1.0050，但 exposure_cards=0。four_quadrant_softgap_flash_v1 显示 soft-gap 可提升 partially_adopted 到 3/6，但 full+quant avg20=-0.1636 低于 without_quant=-0.0860，因此这是 prompt hygiene，不是正向 alpha。"
+      - rule_id: news_questionnaire_uncertainty_only_portfolio_candidate_v1
+        status: observe
+        condition: "portfolio_pool task; only uncertainty/mainline/source/timestamp/repetition fields visible; no opportunity/net positive fields"
+        action: "作为可能减少高机会分干扰的组合候选方向；不得冻结为默认策略，需完整对照、更多时间块和更大样本验证。"
+        evidence: "deepseek_news_risk_uncertainty_quality_lpm20_v1 + controls: uncertainty_only portfolio cash_adj_avg=0.3971，优于完整问卷 -0.6435、no_news -0.5563、keyword_only -0.0060、questionnaire_only 0.0086；但组合卡仅11张、暴露2张，仍是 observe。"
+      - rule_id: news_questionnaire_quality_single_stock_candidate_v1
+        status: observe
+        condition: "single_stock task; focus on source coverage, official support, timestamp confidence and evidence quality"
+        action: "单支盯盘仅作为复核/降权路径候选；不替代 Python gate、Book Skill 或财报披露确认，也不证明正向暴露能力。"
+        evidence: "deepseek_news_risk_uncertainty_quality_lpm20_v1 + controls: quality_only single_stock cash_adj_avg=0.3234，优于完整问卷 0.2200、no_news 0.1823、keyword_only 0.2520、questionnaire_only 0.2632；但 single_stock exposure=0，仍是 observe。"
+      - rule_id: news_questionnaire_semantic_risk_single_stock_candidate_v1
+        status: observe
+        condition: "single_stock task; semantic risk fields visible but keyword/event statistics and opportunity/net fields hidden"
+        action: "作为关键词误判的反证补充；不得作为正向机会规则。"
+        evidence: "deepseek_news_risk_uncertainty_quality_lpm20_v1: semantic_risk_only single_stock cash_adj_avg=0.2681，优于完整问卷 0.2200；H2025_1 single_stock=0.4726。"
+      - rule_id: news_questionnaire_routine_announcement_positive_cap_v1
+        status: safety_guardrail_observe_for_performance
+        condition: "ds_news_opportunity_score >= 0.7 and (ds_news_mainline_clarity < 0.5 or ds_news_decision_relevance < 0.5 or ds_news_repetition_lag >= 0.6)"
+        action: "把机会分降为背景信息；不得因为常规公告、重复转载、无清晰经营主线而提升研究分级。只有 Book Skill、Python gate、同行/政策和财务披露共同确认时才可重新考虑。"
+        evidence: "lpm4 小样本曾改善，但 2026-06-25 lpm20 扩样复测不泛化：guarded portfolio cash_adj_avg -0.0267 低于完整问卷 0.0606，single_stock 0.0885 低于完整问卷 0.2226。保留为执行层安全护栏：cap触发且Book Skill/披露日确认缺口存在时，不得输出继续深挖或增加研究暴露。"
+      - rule_id: news_opportunity_peer_weak_or_fin_missing_counter_v1
+        status: observe_counterevidence
+        condition: "news opportunity is high, but peer confirmation is weak or financial report channel is missing/unavailable"
+        action: "不得因为新闻机会分或无负面新闻单独升级；要求同行、财报披露、Book Skill 和 Python gate 交叉确认，否则保持观察/信息不足或降权。"
+        evidence: "news_financial_interaction_local_v1 after 2023/2024 announcement backfill: rows=2334 stocks=163 positive_20d_rate=0.3706 avg20=-1.1924 loss_gt5=0.4254；news_financial_interaction_flash_micro_v1 中 keyword_only single_stock 曾在高涨幅、财报缺失、Book Skill 未解析下给出唯一增加研究暴露卡，虽单例后验为正，但路径不可奖励。backfill_flash_micro_v1 中所有变体 exposure=0，keyword_only 未打败 no_news，继续作为反证。"
+      - rule_id: news_risk_high_peer_weak_counter_v1
+        status: observe_counterevidence
+        condition: "news_warning_score/news_negative_materiality high and peer_relative_to_group_20d or peer breadth is weak"
+        action: "作为风险扩散/同行弱确认反证；优先降低研究暴露或要求更多证据，不得用孤立强势量价抵消。"
+        evidence: "news_financial_interaction_local_v1 after 2023/2024 announcement backfill: rows=2499 stocks=204 positive_20d_rate=0.3778 avg20=-0.6509 loss_gt5=0.4134；Flash micro 中该规则多为观察/降权/现金防守，无默认升级。"
+      - rule_id: peer_active_self_silent_counter_v1
+        status: observe_counterevidence_date_limited
+        condition: "peer_group_news_count_avg >= 2 and target self event_count <= 1 or news_missing_rate >= 0.8"
+        action: "作为相对新闻关注缺口；组合模式不得把同行热度自动转嫁给目标股，单支模式要说明目标自身证据缺口。"
+        evidence: "news_financial_interaction_local_v1: rows=7322 stocks=348 positive_20d_rate=0.3588 avg20=-1.9168 loss_gt5=0.4428, but only H2026_1 covered; needs earlier news backfill before defaulting."
+      - rule_id: routine_official_low_signal_not_alpha_v1
+        status: observe_control
+        condition: "official_confirmation_score high and announcement_materiality_score high, but news_warning_score and news_opportunity_score near zero"
+        action: "作为常规公告 control；不得把公告数量或官方来源本身当作正向 alpha。"
+        evidence: "news_financial_interaction_local_v1 after 2023/2024 announcement backfill: rows=11878 stocks=440 positive_20d_rate=0.4221 avg20=-0.0089 loss_gt5=0.3382；覆盖扩张后仍低于 baseline positive_20d_rate=0.4862，提示常规公告不是 alpha。"
+      - rule_id: news_high_quality_positive_high_ranker_candidate_v1
+        status: accepted_positive_confirmation_candidate_high_ranker_only
+        condition: "rev_plus_chip_core high-ranker context and target news is available, official/high quality, opportunity-tagged, and not high warning"
+        action: "只可作为 high-ranker 候选的一条正向确认进入 DS 小面板；不得单独触发继续深挖、不得单独提高组合研究暴露、不得替代 BookSkill/财报/同行/K线筹码交叉确认。"
+        evidence: "H2025_1 pass2 high-ranker nonquant audit: selected=3728 H2026=422 prior_lift=0.040927 H2026_lift=0.085388 prior_pool_excess=0.932530 H2026_pool_excess=0.743735 top_concentration=0.122807 min_dates=23. All-pool audit has 0 accepted positive rules and this rule is only accepted_safety_hygiene_not_alpha with prior_lift=0.009385. DS Flash panel1 48/48 ok invalid=0 leak=0: full_agent beats no_news in portfolio 0.2634 vs 0.1001 and single_stock 0.1598 vs 0.0375. Fresh12 excluding prior stock-dates also passes: portfolio 0.5020 vs 0.3960 and single_stock 0.7927 vs 0.4394. Combined two-panel full_agent vs no_news deltas are portfolio avg20 +0.1347 pos +0.4166 and single avg20 +0.2378 pos +0.2500, but exposure_cards=0 and full_agent-no_news paired weight delta is not positive. Keep as observe confirmation candidate, not standalone alpha."
+      - rule_id: news_backfilled_announcements_not_positive_alpha_v1
+        status: rejected_for_positive_gate
+        condition: "historical announcement backfill or official source coverage increases, but no cross-channel confirmation and no_news control is stronger"
+        action: "不得把公告补洞、事件数量、官方来源或关键词可见性本身解释为正向能力；只允许作为 evidence coverage、风险、缺失率和反证材料。"
+        evidence: "H2025_2/H2023_1/H2024_1/H2025_1 pass2 backfills increased default combined_news_event_table to 1540683 and feature_rows to 458072. Joined GT matched rows improved to 94004/155690 and news_missing_rate_mean=0.396210, but row-cap risk remains 96/737, 2025-03-26 is missing, and H2023_2/H2024_2/H2026_1 matched rates remain 0.260540/0.231543/0.446010. High-ranker nonquant audit after H2025_1 pass2 has one high-ranker-only positive candidate, while all-pool has 0 accepted positive rules; announcement backfill itself is not positive alpha. DS questionnaire panel packs=40 invalid=0 net_score_direction_match_rate=0.5000; opportunity/net score correlations with 20d return are -0.1321/-0.1222."
+      - rule_id: news_aware_blocks_no_news_bad_exposure_v1
+        status: observe_safety_guard
+        condition: "no_news or missing-news context gives higher grade/exposure mainly because Python relative-strength/pullback is strong, while news/financial/Book Skill confirmation is hidden or weak"
+        action: "隐藏新闻不得被解释为低风险；若新闻、财报、同行和 Book Skill 没有形成交叉确认，主动研究暴露必须保持观察/信息不足或等待下一轮复核。新闻/财报可见变体若阻止坏主动暴露，应记录为 safety evidence，而不是正向 alpha。"
+        evidence: "balanced_news_ablation_micro48_flash_v1: 4 stock-date x dual task x 6 variants, invalid=0, total_tokens=207005, leak=0. 唯一增加研究暴露来自 no_news+portfolio_pool+H2025_1，20d exposure return=-14.96；keyword_only、uncertainty_only、quality_only、no_financial 和 news_plus_financial_report_guarded 均 exposure=0。"
+      - rule_id: announcement_row_cap_partial_coverage_v1
+        status: accepted_data_quality_guard
+        condition: "anns_d date shard rows reach row-cap threshold or source audit reports possible_row_cap"
+        action: "该日期只能标为 partial coverage；不得宣称完整历史公告覆盖，不得用公告数量/官方来源数量提高研究分级。扩大 DS 前必须先做官方披露源/其他标准化来源抽样核对，或找到可靠分页/分片方式。"
+        evidence: "announcement_row_cap_audit after H2025_1 pass2 backfill: cached_anns_d_partitions=737, possible_row_cap_partitions=96, possible_row_cap_ratio=0.1303. Coverage is broader but still partial on dense announcement dates."
+  financial_report_channel:
+    enabled: true
+    source_policy: "optional paid_standardized / official_disclosure offline cache; no online request at decision point"
+    feature_file: data/date_generalization_cache/market_5000/financial_report_features.csv
+    event_file: data/date_generalization_cache/market_5000/financial_report_events.csv
+    evidence_pack_block: financial_report_features
+    asof_window_days: 90
+    date_only_time_policy: "date-only disclosures become available at next natural day 00:00:00"
+    deepseek_questionnaire_config: config/financial_report_deepseek_questionnaire.yaml
+    variance_table_policy: "财报问卷应优先生成本期 vs 上期、去年同期、同行和可用预期的 variance table；缺少可比口径时标为 insufficient_source，不得把单期改善直接当正向 alpha。"
+    rule_outcome_policy: "财报判断必须输出 financial_report_rule_outcomes，包含 report_period、available_at/ann_date/f_ann_date、source_ref_ids、质量风险、披露质量、冲突证据和 action_hint。"
+    current_status: "implemented_observe_safety_hygiene_not_alpha"
+    current_coverage_evidence: "2026-06-28 after 200-stock P0 + 200-stock P1 fina_audit + 50-stock P1 statements: 24803 events, 13127 feature rows, 4028 feature stocks; audit_opinion=1195, income_statement=1103, cashflow_statement=1101, balance_sheet=1111; H2026 90d event coverage all_pool=0.2874 high_ranker=0.3347"
+    financial_p1_statements_update_20260628:
+      status: "variance_table_context_not_alpha"
+      findings: reports/date_generalization/financial_p1_statements_50_findings_v1.md
+      source_inventory_report: reports/date_generalization/financial_source_inventory_after_p1_statements_50_v1.md
+      asof_90d_report: reports/date_generalization/financial_asof_window_expansion_after_p1_statements_50_90d_v1.md
+      safety_gate_90d_report: reports/date_generalization/financial_safety_hygiene_gate_after_p1_statements_50_90d_v1.md
+      nonquant_high_ranker_report: reports/date_generalization/nonquant_positive_confirmation_after_p1_statements_50_v1.md
+      nonquant_all_pool_report: reports/date_generalization/nonquant_positive_confirmation_after_p1_statements_50_allpool_v1.md
+      implemented_in: src/world_model/financial_report_channel.py
+      tests: tests/test_financial_report_channel.py
+      cache_manifest:
+        record_count: 4329
+        table_files: 4310
+      statement_cache_coverage:
+        income: "1425 rows / 50 stocks"
+        cashflow: "1652 rows / 50 stocks"
+        balancesheet: "1488 rows / 50 stocks"
+      rebuilt_financial_channel:
+        event_rows: 24803
+        feature_rows: 13127
+        income_statement_events: 1103
+        cashflow_statement_events: 1101
+        balance_sheet_events: 1111
+      asof_90d_policy_status_counts:
+        accepted: 0
+        observe_positive_thin_or_rate_weak: 1
+        observe_risk_review_candidate: 1
+        rejected_or_diagnostic_only: 8
+      high_ranker_90d_safety_gate:
+        accepted_review_no_raise_candidate: 0
+        observe_filter_candidate: 1
+        observe_review_only: 1
+      nonquant_confirmation_after_statements:
+        high_ranker_accepted_safety_hygiene_not_alpha: []
+        all_pool_accepted_safety_hygiene_not_alpha: [financial_event_quality_low_risk_v1, financial_surprise_low_risk_v1]
+        accepted_positive_confirmation: []
+      decision:
+        - "Keep statement variance features as financial explanation, risk-review and source-completeness context."
+        - "Do not use statement coverage or low-risk statement features to promote research grade by default."
+        - "Do not scale DS financial-promotion round from this 50-stock smoke."
+        - "Future financial work should either train a targeted statement-risk scorer or fix announcement/news source coverage."
+    financial_p1_fina_audit_update_20260628:
+      status: "audit_opinion_review_context_not_alpha"
+      findings: reports/date_generalization/financial_p1_fina_audit_200_findings_v1.md
+      source_inventory_report: reports/date_generalization/financial_source_inventory_after_p1_fina_audit_200_v1.md
+      asof_90d_report: reports/date_generalization/financial_asof_window_expansion_after_p1_fina_audit_200_90d_v1.md
+      safety_gate_90d_report: reports/date_generalization/financial_safety_hygiene_gate_after_p1_fina_audit_200_90d_v1.md
+      nonquant_high_ranker_report: reports/date_generalization/nonquant_positive_confirmation_after_p1_fina_audit_200_v1.md
+      nonquant_all_pool_report: reports/date_generalization/nonquant_positive_confirmation_after_p1_fina_audit_200_allpool_v1.md
+      implemented_in: src/world_model/financial_report_channel.py
+      tests: tests/test_financial_report_channel.py
+      cache_manifest:
+        record_count: 4179
+        table_files: 4160
+      fina_audit_coverage:
+        rows: 1195
+        stocks: 199
+        opinions:
+          standard_unqualified: 1112
+          emphasis_unqualified: 49
+          qualified: 29
+          disclaimer: 5
+      rebuilt_financial_channel:
+        event_rows: 21488
+        feature_rows: 12847
+        audit_opinion_events: 1195
+      audit_opinion_policy:
+        standard_unqualified: "not positive alpha; disclosure quality background only"
+        emphasis_unqualified: "medium risk review"
+        qualified_or_disclaimer: "high risk review"
+      asof_90d_policy_status_counts:
+        accepted: 0
+        observe_positive_thin_or_rate_weak: 1
+        observe_risk_review_candidate: 1
+        rejected_or_diagnostic_only: 8
+      high_ranker_90d_safety_gate:
+        accepted_review_no_raise_candidate: 0
+        observe_filter_candidate: 1
+        observe_review_only: 1
+      decision:
+        - "Keep audit_opinion in financial_report_features as source-labeled review/risk context."
+        - "Do not promote standard unqualified audit opinions as alpha."
+        - "Do not mechanically exclude qualified/disclaimer audit opinions without cross-channel confirmation."
+        - "Do not scale DS financial-promotion round based on fina_audit alone."
+    financial_p0_200_update_20260628:
+      status: "coverage_improved_but_no_alpha_promotion"
+      findings: reports/date_generalization/financial_p0_200_update_findings_v1.md
+      source_inventory_report: reports/date_generalization/financial_source_inventory_after_p0_200_v1.md
+      asof_report: reports/date_generalization/financial_asof_window_expansion_after_p0_200_v1.md
+      safety_gate_report: reports/date_generalization/financial_safety_hygiene_gate_after_p0_200_v1.md
+      nonquant_high_ranker_report: reports/date_generalization/nonquant_positive_confirmation_after_p0_200_v1.md
+      nonquant_all_pool_report: reports/date_generalization/nonquant_positive_confirmation_after_p0_200_allpool_v1.md
+      cache_manifest:
+        record_count: 3979
+        table_files: 3960
+      p0_table_coverage:
+        fina_indicator: "4739 rows / 200 stocks"
+        forecast: "2327 rows / 179 stocks"
+        express: "123 rows / 84 stocks"
+        anns_d: "86768 rows; 13 possible row-cap files remain"
+      rebuilt_financial_channel:
+        event_rows: 20293
+        feature_rows: 12524
+        feature_stocks: 4028
+      h2026_event_coverage:
+        all_pool_30d: 0.1448
+        all_pool_90d: 0.2874
+        all_pool_365d: 0.5007
+        high_ranker_30d: 0.1695
+        high_ranker_90d: 0.3347
+        high_ranker_365d: 0.5329
+      asof_policy_status_counts:
+        accepted: 0
+        observe_positive_thin_or_rate_weak: 4
+        observe_risk_review_candidate: 1
+        reject_concentrated: 1
+        rejected_or_diagnostic_only: 44
+      high_ranker_safety_gate_after_p0_200:
+        accepted_review_no_raise_candidate: 0
+        observe_review_only: 3
+        observe_filter_candidate: 2
+        rejected_or_diagnostic_only: 20
+      nonquant_confirmation_after_p0_200:
+        high_ranker_accepted_safety_hygiene_not_alpha: [financial_surprise_low_risk_v1]
+        all_pool_accepted_safety_hygiene_not_alpha: [financial_surprise_low_risk_v1, financial_event_quality_low_risk_v1]
+        accepted_positive_confirmation: []
+      decision:
+        - "P0=200 improves coverage but still produces no accepted financial alpha or promotion rule."
+        - "Financial quality/surprise stays safety_hygiene_not_alpha; high-risk stays review/uncertainty context."
+        - "Do not run larger DS promotion round on financial features alone."
+        - "Next data work should either use cache-first P0 shards toward 500, or prioritize P1 financial statements/audit opinions and announcement row-cap fixes."
+    financial_asof_window_expansion_update_20260628:
+      script: scripts/audit_financial_asof_window_expansion.py
+      findings: reports/date_generalization/financial_asof_window_expansion_findings_v1.md
+      report: reports/date_generalization/financial_asof_window_expansion_v1.md
+      agent_preview: reports/date_generalization/financial_asof_window_expansion_v1_agent_preview.jsonl
+      safe_detail: reports/date_generalization/financial_asof_window_expansion_v1_safe_detail.csv.gz
+      tested_windows_days: [30, 60, 90, 180, 365]
+      base_rows: 151235
+      detail_rows: 908365
+      promotion_status_counts:
+        accepted: 0
+        observe: 7
+        reject_concentrated: 2
+        reject_too_few_samples: 0
+        rejected_or_diagnostic_only: 41
+      coverage_h2026_all_pool:
+        window_30d: 0.0752
+        window_60d: 0.1017
+        window_90d: 0.1447
+        window_180d: 0.1929
+        window_365d: 0.3490
+      coverage_h2026_high_ranker:
+        window_30d: 0.0917
+        window_60d: 0.1266
+        window_90d: 0.1831
+        window_180d: 0.2233
+        window_365d: 0.3842
+      upstream_financial_channel_after_p0_smoke:
+        event_rows: 17179
+        feature_rows: 9817
+        asof90_gt_match_rate: 0.2594
+        event_types_added: [performance_forecast, performance_express]
+      observe_rules:
+        positive_observe: [financial_quality_low_risk_v1_365d_all_pool, financial_positive_surprise_low_risk_v1_60d_high_ranker]
+        risk_review_observe: [financial_high_risk_guard_v1_30d_all_pool, financial_high_risk_guard_v1_60d_all_pool, financial_high_risk_guard_v1_30d_high_ranker, financial_high_risk_guard_v1_60d_high_ranker, financial_high_risk_guard_v1_365d_high_ranker]
+      implementation_improvement:
+        asof_join: "merge_financial_report_features_asof uses per-stock sorted windows with searchsorted and vectorized decision_time; full 5-window sweep still needs cached detail before scaling."
+      decision:
+        - "No financial_asof_window preview is usable as a default positive confirmation."
+        - "Financial as-of can be used as safety/hygiene or risk-review context after 100-stock P0 backfill, but not as alpha."
+        - "The 365d window is not a default decision window; use it only as long-memory background diagnostics."
+        - "Window widening does not create a robust positive rule; root fix is broader data and more specific financial risk/quality semantics."
+        - "Do not spend DS on financial positive-promotion until the financial/announcement cache is broader and fresh-panel validation passes."
+      next_experiment: "Cache multi-window as-of detail, continue P0/P1 backfill, then test financial safety_hygiene context in a small DS panel as no-raise/risk-review support."
+    financial_safety_hygiene_gate_update_20260628:
+      status: "historical_p0_100_review_no_raise_candidate_superseded_by_p0_200_observe"
+      script: scripts/audit_financial_safety_hygiene_gates.py
+      report: reports/date_generalization/financial_safety_hygiene_gate_audit_v1.md
+      aggregate_csv: reports/date_generalization/financial_safety_hygiene_gate_audit_v1_aggregate.csv
+      step_metrics_csv: reports/date_generalization/financial_safety_hygiene_gate_audit_v1_step_metrics.csv
+      detail_cache: data/date_generalization_cache/market_5000/financial_asof_window_expansion_detail_cache.csv.gz
+      detail_cache_policy: "offline evaluation only; contains future return labels; never agent-facing evidence"
+      tested_scope: high_ranker_q0.80
+      tested_windows_days: [30, 60, 90, 180, 365]
+      detail_rows: 140370
+      policy_status_counts:
+        accepted_review_no_raise_candidate: 2
+        observe_filter_candidate: 3
+        observe_review_only: 3
+        baseline_reference: 5
+        reject_concentrated: 1
+        rejected_or_diagnostic_only: 16
+      accepted_review_no_raise_candidates:
+        - gate_id: financial_high_risk_guard_subset_30d
+          prior_avg_return_lift: -1.781027
+          h2026_avg_return_lift: -1.350210
+          prior_loss_gt5_lift: 0.076443
+          h2026_loss_gt5_lift: 0.148084
+        - gate_id: financial_high_risk_guard_subset_60d
+          prior_avg_return_lift: -1.267728
+          h2026_avg_return_lift: -1.480297
+          prior_loss_gt5_lift: 0.047598
+          h2026_loss_gt5_lift: 0.155662
+      observe_filter_candidates:
+        - "exclude_high_risk 30d/60d/90d has small positive lifts but not enough for a hard filter."
+      rejected_positive_financial_candidates:
+        - "financial_quality_low_risk and financial_positive_surprise_low_risk remain unstable or concentrated across windows."
+      decision:
+        - "P0=100 suggested 30d/60d financial_high_risk_guard as review/no-raise checklist, but P0=200 downgraded it to observe-only review context."
+        - "Do not mechanically downgrade or exclude solely because this checklist fires."
+        - "Do not use financial positive surprise or quality-low-risk as default promotion alpha."
+        - "If a future DS panel tests this context, report bad exposure, missed-positive, concentration and leakage separately."
+    financial_source_inventory_update_20260628:
+      status: "p0_backfill_required_before_ds_promotion"
+      script: scripts/audit_financial_source_inventory.py
+      report: reports/date_generalization/financial_source_inventory_v1.md
+      tables_csv: reports/date_generalization/financial_source_inventory_v1_tables.csv
+      block_coverage_csv: reports/date_generalization/financial_source_inventory_v1_block_coverage.csv
+      gap_plan_csv: reports/date_generalization/financial_source_inventory_v1_gap_plan.csv
+      dry_run_fetch_plan: data/date_generalization_cache/tushare_pro/fetch_plan.md
+      dry_run_fetch_plan_manifest: data/date_generalization_cache/tushare_pro/fetch_plan_manifest.json
+      target_tables: 8
+      cached_tables_with_rows: 4
+      missing_tables: 4
+      row_cap_risk_tables: 1
+      p0_findings:
+        forecast: "2327 rows / 179 stocks after 200-stock P0 backfill"
+        express: "123 rows / 84 stocks after 200-stock P0 backfill; many empty_ok"
+        fina_indicator: "4739 rows / 200 stocks after 200-stock P0 backfill"
+        anns_d: "86768 rows but 13 possible row-cap files and H2025_2 empty"
+      p1_findings:
+        income: "missing_table"
+        cashflow: "missing_table"
+        balancesheet: "missing_table"
+        fina_audit: "missing_table"
+      implemented_support:
+        build_tushare_cache_interfaces: [forecast, express, income, cashflow, balancesheet, fina_audit]
+        financial_report_channel_events: [performance_forecast, performance_express, audit_opinion, income_statement, cashflow_statement, balance_sheet]
+        execution_guard: "stock-loop financial interfaces require explicit --max-stocks"
+        request_timeout_seconds_default: 20
+        stock_sharding: "supports --stock-offset and --skip-existing for resumable shards"
+        manifest_policy: "real cache manifest uses cumulative call_records, not only current-run records"
+      decision:
+        - "Inventory output is not alpha and is not Agent default evidence."
+        - "Continue bounded P0 shards before any broad all-A fetch; verify fields and disclosure dates after each shard."
+        - "20-stock, 80-stock, and offset-100 100-stock P0 execute shards completed with timeout and skip-existing controls."
+        - "After P0 backfill, rebuild financial_report_events/features and rerun window/nonquant audits before DS."
+    decision_policy:
+      - "财报事件是高可信新闻类子通道，但未完成消融验证前不得作为正向 alpha。"
+      - "财务质量风险、披露质量弱、问询/修正/非标审计可作为反证复核。"
+      - "financial_report_missing_rate 高时只能提高不确定性，不能当作好消息。"
+      - "普通新闻与官方财报/公告冲突时，官方披露优先，公开聚合新闻降权。"
+      - "缺少 ann_date/f_ann_date 或无法证明 available_at<=decision_time 的字段不得进入 walk-forward 正负判断。"
+      - "若 financial_report_join_status=event_window_matched 或 financial_report_event_count>0，不得继续声称该决策点财报披露日缺失；但仍可因财务质量风险、负惊喜、Book Skill 未解析等降权。"
+      - "financial_report_only 只能作为复核/反证/不确定性通道；缺少普通新闻、同行、Python gate 和 Book Skill 共同确认时，不得单独升级研究分级或研究暴露。"
+      - "365d 财报窗口不得作为默认正向确认；只能作为历史财报背景诊断，默认事件窗口仍保持 90d 或更短，直到真实披露日数据扩容后重新验证。"
+      - "30/60d financial_high_risk_guard 可作为财报复核/不升权 checklist，但不得机械剔除；exclude_high_risk 仅 observe，不能硬过滤。"
+      - "fina_audit audit_opinion 可作为审计意见/披露质量/风险复核材料；标准无保留不得当正向 alpha，非标/保留/无法表示不得机械硬剔除。"
+      - "income/cashflow/balancesheet 三表 variance 可作为财报解释、现金流/负债/利润质量复核材料；三表覆盖或低风险不得默认升权。"
+    required_ablation:
+      - no_financial_report_channel
+      - financial_report_only
+      - news_plus_financial_report
+      - news_plus_financial_report_guarded
+    promotion_guards:
+      - guard_id: financial_report_sample_concentration_block_v1
+        status: accepted_safety_guard
+        condition: "financial-report rule evidence rows < 20, unique_stocks < 10, or top_stock_share > 0.20"
+        action: "规则只能保持 observe，不得升级为默认规则或正向 alpha；若同时 financial_quality_risk_score >= 0.6 或 financial_surprise_score <= -0.4 且新闻/同行/Book Skill 未确认恢复，下一轮应测试将研究暴露压到 0 或信息不足不动作。"
+        evidence: "financial_report_local_stratified_analysis 与 financial_report_balanced_sample_flash_v1 均显示风险候选集中在少数股票；外部 subagent 复核确认这是当前最大过拟合风险。"
+      - guard_id: financial_asof_window_widening_not_promotion_v1
+        status: accepted_safety_guard
+        condition: "candidate financial rule depends on 180d/365d as-of widening or long-memory financial report carry-forward"
+        action: "不得因为窗口放宽后覆盖提高而升级研究分级或研究权重；若要使用，只能标为历史财报背景/诊断候选，并要求真实财报/公告 backfill 后重新审计。"
+        evidence: "financial_asof_window_expansion_v1 after 100-stock P0 backfill: 30/60/90/180/365d sweep produced 0 accepted, 7 observe, 2 reject_concentrated, 41 rejected_or_diagnostic_only; high-ranker H2026 365d coverage rose to 38.42%, but observe rules remain safety/risk-review only."
+      - guard_id: financial_high_risk_review_no_raise_v1
+        status: observe_review_context_not_hard_filter
+        condition: "financial_high_risk_guard fires inside 30d or 60d as-of window"
+        action: "作为财报复核/不确定性 checklist；不得单独输出暂时剔除，也不得作为 hard filter 或固定 no-raise。若目标新闻、公告、同行、BookSkill、K线/筹码和财报明细共同支持，可保持观察但必须解释冲突。"
+        evidence: "financial_safety_hygiene_gate_after_p0_200_v1: high-ranker safety gate has accepted_review_no_raise_candidate=0, observe_review_only=3, observe_filter_candidate=2. P0=100 had stronger downside signal, but P0=200 downgraded the strict acceptance, so keep review context only."
+    candidate_rules:
+      - rule_id: financial_report_matched_clears_missing_flag_v1
+        status: accepted_data_hygiene
+        condition: "financial_report_join_status == event_window_matched or financial_report_event_count > 0"
+        action: "从 data_missing_flags 中移除旧 financial_publish_date_missing 标记；不得在理由中说财报披露日缺失。"
+        evidence: "financial_report_matched_ablation_flash_v1 发现旧 data_gaps 与已匹配财报事件冲突；financial_report_matched_evidence_fix_flash_v2 修复后不再误报。"
+      - rule_id: financial_negative_surprise_overheat_guard_v1
+        status: observe_concentrated_risk_guard
+        condition: "financial_surprise_score < -0.4 and prior_return_20d/RSI/volatility shows overheat and Book Skill unresolved"
+        action: "作为高波动风险复核，不得因 Python pullback 或相对强度直接升级；若触发但股票集中度不足，必须保持 observe，不固化为默认规则。"
+        evidence: "financial_report_local_stratified_analysis: rows=68 unique_stocks=3 avg20=8.8916 but pos_delta=-0.1018 and loss_delta=+0.2419；均值被少数样本拉高，风险和集中度不支持升级。"
+      - rule_id: financial_positive_surprise_not_alpha_v1
+        status: observe
+        condition: "financial_surprise_score > 0 but relative strength/news/Book Skill/quality confirmation weak"
+        action: "正向财报惊喜只能作为观察理由，不能单独提高研究分级或研究暴露。"
+        evidence: "financial_report_local_stratified_analysis: strict positive_surprise_low_risk_candidate rows=0；positive_surprise_weak_context rows=173 unique_stocks=2 pos_delta=-0.2182 loss_delta=+0.2179。"
+      - rule_id: financial_quality_risk_high_guard_v1
+        status: observe_concentrated_risk_guard
+        condition: "financial_quality_risk_score >= 0.6"
+        action: "作为财务质量反证复核；需要结合财报原文、Book Skill 财务质量卡、现金流和负债字段，不得单独定性。"
+        evidence: "financial_report_local_stratified_analysis: rows=372 unique_stocks=3 avg20=1.4658 median20=-2.46 pos_delta=-0.2400 loss_delta=+0.2385；风险明显但股票集中度不足。"
+      - rule_id: financial_risk_to_zero_guard_v1
+        status: observe_candidate
+        condition: "financial_quality_risk_score >= 0.6 or (financial_surprise_score <= -0.4 and overheat), and Book Skill/peer/news do not confirm recovery"
+        action: "下一轮候选：优先把研究暴露压到 0 或信息不足不动作，而不是保留小非零权重；必须用 20-40 行、至少 10 只股票验证；未通过前不得作为正向 alpha。严格高风险样本集中时，不得硬扩样，应加入新闻可用宽风险和 neutral control。"
+        evidence: "financial_report_balanced_sample_flash_v1: 48 cards invalid=0 exposure=0；financial-only 识别风险但小非零权重使 portfolio cash_adj=-0.0251，弱于 no_financial 0.2713。financial_report_risk_guard_diversified_flash_mini_v1: 64 cards invalid=0 total_tokens=344175；guarded vs plain news_plus_financial portfolio cash_adj 0.2175 vs 0.1378，single_stock 0.2709 vs 0.1213，guard triggered 8 packs；但 portfolio 仍弱于 no_financial 0.4154 且 exposure=0，只能保持 observe。financial_report_next_probe_flash_small_shard_v1: 64 cards invalid=0 after resume, total_tokens=357300；guarded vs no_financial portfolio 0.3989 vs 0.3082, single 0.3862 vs 0.3603；所有 exposure=0，组合改善但单支仅小幅改善，因此继续 observe，不升级默认。外部审阅指出 strict risk 只有少数股票且 news_missing=1.0，已用 threshold search 加入 nonpositive_surprise_news_available 宽风险控制。"
+      - rule_id: financial_nonpositive_surprise_news_available_v1
+        status: observe_context_probe
+        condition: "financial_surprise_score <= 0.0 and news_missing_rate < 0.8"
+        action: "作为新闻+财报通道的宽风险/复核样本，不作为财报风险归零触发条件；用于测试 DS 是否能在普通新闻可用时给出更稳的复核判断。"
+        evidence: "financial_report_threshold_search: rows=901 unique_stocks=108 top_stock_share=0.0244 pos_delta=-0.0765 loss_delta=+0.0182 avg_news_missing=0，但只覆盖 2 个时间块。financial_report_news_available_probe_flash_v1: 48 cards invalid=0 total_tokens=251986 leak_audit=0；news_plus_financial_report_guarded vs no_financial portfolio cash_adj 0.4682 vs 0.2642，single 0.4311 vs 0.2961，但 guarded exposure=0 且仅 6 stock-date。financial_report_next_probe_flash_small_shard_v1 纳入 strict risk/multi-report/neutral 后，guarded delta 缩小到 portfolio +0.0907、single +0.0259；只能继续观察，不能作为默认风险归零或正向规则。"
+      - rule_id: financial_report_only_no_upgrade_without_confirmation_v1
+        status: safety_guardrail_observe
+        condition: "variant/input context is financial_report_only, or ordinary news/peer/Python/Book Skill confirmation is unavailable"
+        action: "财报单通道不得把研究分级升级到继续深挖；最多用于放入观察、信息不足、反证和后续复核项。若 Agent 给出升级，后处理或下一轮 prompt 应压回观察/信息不足，除非普通新闻、同行、Python gate 和 Book Skill 同时确认。"
+        evidence: "financial_report_news_available_probe_flash_v1 中 financial_report_only 在 portfolio_pool H2026_1 产生 1 张继续深挖/增加研究暴露卡，后验暴露结果为 -0.9；说明单独财报证据存在过度乐观风险。financial_report_next_probe_flash_small_shard_v1 中 financial_report_only single_stock cash_adj=0.2129，低于 no_financial_report_channel 0.3603；说明财报单通道在单支模式也可能增加噪音。"
+      - rule_id: financial_multi_report_review_v1
+        status: observe_review_trigger
+        condition: "financial_report_event_count >= 3"
+        action: "触发专门复核，检查是否同日多份定期报告/审计/修正公告导致信息密度升高；不作为单独正向规则。"
+        evidence: "financial_report_local_stratified_analysis: rows=1020 unique_stocks=40 pos_delta=+0.0394 loss_delta=-0.0356；覆盖较宽但提升温和，更像复核触发器。"
+  output_boundary:
+    user_facing_buy_sell_words_forbidden: true
+    use_research_grades_only: true
+
+round_artifacts:
+  summary_md_required: true
+  aggregate_csv_required: true
+  diagnostics_csv_required: true
+  strategy_memory_update_required: true
+  raw_large_files_archive_dir: reports/date_generalization/archive_raw_rounds/
+  experiment_detail_dir: reports/date_generalization/experiments/
+
+current_baseline:
+  source: reports/date_generalization/deepseek_strategy_round_comparison.csv
+  portfolio_pool_gate:
+    cash_adjusted_positive_20d_rate: 0.5333
+    raw_positive_20d_rate: 0.4043
+    cash_adjusted_avg_return_20d: 0.1805
+    raw_avg_return_20d: -0.2435
+  single_stock_gate:
+    cash_adjusted_positive_20d_rate: 0.9000
+    raw_positive_20d_rate: 0.7824
+
+accepted_quant_tool_adoption_2panel_update_20260627:
+  status: "continue_with_channel_repair_before_scaling_ds"
+  evidence:
+    summary: reports/date_generalization/accepted_quant_tool_adoption_2panel_flash_v1_summary.md
+    findings: reports/date_generalization/accepted_quant_tool_adoption_2panel_flash_findings_v1.md
+    input_gap_audit: reports/date_generalization/accepted_quant_tool_adoption_2panel_flash_v1_agent_input_gap_audit.md
+    leakage_audit: reports/date_generalization/accepted_quant_tool_adoption_2panel_flash_v1_leakage_audit.md
+  run:
+    model: deepseek-v4-flash
+    cards: 24
+    valid_blocks: [H2025_2, H2026_1]
+    panel_count: 2
+    total_tokens: 194165
+    invalid_outputs: 0
+    future_leak_findings: 0
+  decision:
+    - "accepted kline_peer_chip 工具在组合模式可见且被引用，但本轮只产生 partially_adopted/not_adopted_counter_evidence，没有 adopted 或主动研究暴露。"
+    - "active_exposure 为 0 时不得宣称 alpha；cash-adjusted 改善只能解释为防守权重路径。"
+    - "扩大 DS 前必须先跑 input-gap audit；若 financial/news/peer/bookskill/RAG coverage 没改善，不继续同类扩样。"
+  input_gap_priority:
+    - gap: financial_gap
+      reason_cards: 8
+      coverage_rate: 0.0
+      next_action: "补真实披露日财报与公告事件 as-of 通道。"
+    - gap: peer_gap
+      reason_cards: 8
+      coverage_rate: 0.0833
+      next_action: "补同行/地域/产业链相对强度确认，避免把行业热度机械转嫁给目标股。"
+    - gap: news_gap
+      reason_cards: 8
+      coverage_rate: 0.4167
+      next_action: "补目标自身、行业、政策、地域新闻问卷覆盖；新闻仍以风险/不确定性为主。"
+    - gap: bookskill_gap
+      reason_cards: 8
+      coverage_rate: 0.5833
+      next_action: "把 BookSkill 从来源引用推进到适用/失效条件和正反证标签。"
+    - gap: memory_or_rag_counter
+      reason_cards: 3
+      coverage_rate: 0.0
+      next_action: "补时间安全 RAG 案例检索或关闭误导性记忆。"
+
+financial_event_quality_adoption_micro_update_20260627:
+  status: "financial_gap_reduced_but_not_sufficient_for_active_exposure"
+  evidence:
+    summary: reports/date_generalization/financial_event_quality_adoption_flash_micro_v1_summary.md
+    findings: reports/date_generalization/financial_event_quality_adoption_flash_micro_findings_v1.md
+    input_gap_audit: reports/date_generalization/financial_event_quality_adoption_flash_micro_v1_agent_input_gap_audit.md
+    leakage_audit: reports/date_generalization/financial_event_quality_adoption_flash_micro_v1_leakage_audit.md
+  run:
+    model: deepseek-v4-flash
+    cards: 12
+    valid_blocks: [H2025_2, H2026_1]
+    portfolio_row_gate: financial_event_quality_pc2
+    total_tokens: 100383
+    invalid_outputs: 0
+    future_leak_findings: 0
+  decision:
+    - "financial_event_quality_pc2 能把组合 full-agent 样本的 financial_event_asof_rate 提升到 1.0；默认 none gate 的 selected rows 主要是 code_not_in_feature_table 或 no_event_in_window。"
+    - "组合 full-agent financial_gap 从默认样本的 4/4 降到 0/2，但 active_exposure 仍为 0；财报 as-of 是必要补洞，不是充分条件。"
+    - "剩余 blocker 是 news_gap、bookskill_gap、chip_overhang/overheat、部分 peer_gap 和 data_missing。"
+  next_sampler_requirement:
+    - "构造 accepted_quant_tool + financial_event_asof + peer_positive/peer_negative + news_available/news_missing 四象限组合样本。"
+    - "为四象限样本补新闻语义问卷和 BookSkill per-card applicability 标签后再跑 24-48 card Flash。"
+    - "单支模式另建财报覆盖 sampler 与 opportunity/risk 双头 scorer；不得复用组合 TopK 结论。"
+
+four_quadrant_softgap_update_20260627:
+  status: "soft_gap_hygiene_accepted_but_prompt_forced_adoption_rejected"
+  evidence:
+    sampler_prefix: four_quadrant_softgap_sampler_v1
+    questionnaire_summary: reports/date_generalization/news_questionnaire_flash_four_quadrant_v1_summary.md
+    two_panel_summary: reports/date_generalization/full_channel_quant_news_softgap_2panel_flash_v1_summary.md
+    validation_summary: reports/date_generalization/four_quadrant_softgap_flash_v1_summary.md
+    validation_metrics: reports/date_generalization/four_quadrant_softgap_flash_v1_metrics.csv
+    validation_adoption: reports/date_generalization/four_quadrant_softgap_flash_v1_quant_tool_adoption.csv
+  run:
+    model: deepseek-v4-flash
+    validation_cards: 18
+    base_stock_dates: 6
+    variants:
+      - full_agent_with_quant_tools
+      - full_agent_without_quant_tools
+      - quant_tool_summary_only
+    total_tokens: 179832
+    invalid_outputs: 0
+    future_leak_findings: 0
+  sample_design:
+    fixed_available_channel: financial_event_asof
+    axes:
+      - peer_positive_or_negative_weak
+      - news_available_or_missing
+    limitation: "H2026_1 覆盖四象限但 4 个 selected 样本 20 日收益全负；H2025_2 缺 news_available 两象限。该样本用于高冲突诊断，不用于宣称整体收益。"
+  key_findings:
+    - "soft-gap 协议修正了缺失即负面的 prompt 问题；新闻/财报缺失现在只作为置信度折扣。"
+    - "Agent 能更清楚地区分软缺口与硬反证：full+quant partially_adopted=3/6，not_adopted_counter_evidence=3/6。"
+    - "采纳意愿提升没有带来收益提升：full+quant portfolio cash_adjusted_avg20=-0.1636，低于 without_quant=-0.0860；H2026_1 四个样本后验均为负。"
+    - "accepted kline/peer/chip 工具在高冲突 H2026 象限不具备直接泛化收益；继续用 prompt 要求更多采用会放大错误样本。"
+  decision:
+    - "保留 soft-gap 作为 evidence/prompt hygiene。"
+    - "拒绝继续 prompt-forcing accepted quant tool adoption。"
+    - "下一步把 peer_gap、chip_overhang、news_missing_or_uncertain、BookSkill applicability、financial_event_quality 转成可回测 rule_outcomes。"
+    - "训练 hard_counter / soft_gap / neutral / positive_support 分类器；只有 prior blocks 与 H2026/OOT 同时显示正 lift，且 DS 消融 full+tool 不差于 without_tool，才允许提高研究暴露。"
+
+channel_rule_outcome_classifier_update_20260627:
+  status: "hard_counter_guard_candidate_positive_support_rejected"
+  implementation:
+    script: scripts/run_channel_rule_outcome_classifier.py
+    test: tests/test_channel_rule_outcome_classifier.py
+    report: reports/date_generalization/channel_rule_outcome_classifier_v1.md
+    aggregate: reports/date_generalization/channel_rule_outcome_classifier_v1_aggregate.csv
+    rule_outcomes: reports/date_generalization/channel_rule_outcome_classifier_v1_rule_outcomes.jsonl
+    model_family: logistic_only
+    rows: 151235
+    scored_rows: 139476
+    step_metrics: 36
+    split: "walk-forward half-year blocks; each valid block trains only on prior blocks"
+    label_classes:
+      - hard_counter
+      - soft_gap
+      - neutral
+      - positive_support
+  key_results:
+    hard_counter:
+      promotion_status: accepted_guard_candidate
+      prior_positive_rate_lift: -0.0753
+      h2026_positive_rate_lift: -0.004141
+      prior_loss_gt5_lift: 0.120167
+      h2026_loss_gt5_lift: 0.062486
+      prior_selected_pool_excess_20d: -1.14905
+      h2026_selected_pool_excess_20d: -0.051524
+      interpretation: "The classifier can identify rows that are more likely to be bad exposure; use as counter-evidence/guard candidate, not positive alpha."
+    soft_gap:
+      promotion_status: observe_soft_gap_prior_ok_latest_weak
+      interpretation: "Supports missing-as-confidence-discount hygiene in prior blocks, but H2026 is weak; keep observe."
+    positive_support:
+      promotion_status: rejected_or_diagnostic_only
+      interpretation: "Still no stable positive-support classifier; do not increase active exposure from this v1."
+  decision:
+    - "Add hard_counter classifier output to the next small DS ablation as an observe guard."
+    - "Do not use v1 positive_support to promote candidates."
+    - "Do not set usable_in_agent_default=true yet; rule outcomes are sanitized observe candidates and require DS ablation."
+    - "Next DS shard should compare full_agent_with_hard_counter_tool, full_agent_without_channel_classifier, quant_tool_summary_only, and python_only/gray baseline on both portfolio and single-stock samples."
+  flash_smoke:
+    prefix: channel_classifier_hard_counter_flash_smoke_v1
+    findings: reports/date_generalization/channel_classifier_hard_counter_flash_smoke_findings_v1.md
+    summary: reports/date_generalization/channel_classifier_hard_counter_flash_smoke_v1_summary.md
+    leakage_audit: reports/date_generalization/channel_classifier_hard_counter_flash_smoke_v1_leakage_audit.md
+    channel_coverage: reports/date_generalization/channel_classifier_hard_counter_flash_smoke_v1_channel_coverage.md
+    model: deepseek-v4-flash
+    cards: 8
+    invalid_outputs: 0
+    total_tokens: 63987
+    future_leak_findings: 0
+    decision: "integration_success_but_no_promotion"
+    key_result: "Row-level hard-counter scores entered evidence and could change a single-stock decision from observe/0.05 to temporary-remove/0.0, but this small sample did not improve cash-adjusted outcome; guard may over-suppress."
+    next_experiment: "Build stratified hard-counter samples before scaling: high/low hard-counter probability, conflict high/low, portfolio/single-stock, and report bad exposure separately from all-observe defense."
+  stratified_flash_v2:
+    prefix: hard_counter_stratified_flash_v2
+    sample_report: reports/date_generalization/hard_counter_stratified_sample_v2.md
+    summary: reports/date_generalization/hard_counter_stratified_flash_v2_summary.md
+    findings: reports/date_generalization/hard_counter_stratified_flash_v2_findings.md
+    leakage_audit: reports/date_generalization/hard_counter_stratified_flash_v2_leakage_audit.md
+    channel_coverage: reports/date_generalization/hard_counter_stratified_flash_v2_channel_coverage.md
+    threshold_policy: reports/date_generalization/channel_hard_counter_threshold_policy_v1.md
+    sample_plan_support:
+      script: scripts/build_hard_counter_stratified_sample_plan.py
+      runner_flag: "--sample-plan"
+      future_field_policy: "sample plan drops return_5d/10d/20d, pool_excess_20d, gt_status, rule_outcome_label, and future_* before evidence construction"
+    model: deepseek-v4-flash
+    stock_dates: 8
+    ablation_cards: 64
+    invalid_outputs: 0
+    total_tokens: 525952
+    future_leak_findings: 0
+    coverage_note: "full-agent variants had Python/K-line/peer/news/questionnaire/financial/memory/counter-evidence coverage, but BookSkill candidates were 10/16 and RAG 0/16."
+    aggregate_metrics:
+      portfolio_with_hard_counter_cash_adjusted_avg20: 0.2
+      portfolio_without_classifier_cash_adjusted_avg20: -0.1014
+      single_with_hard_counter_cash_adjusted_avg20: 0.305
+      single_without_classifier_cash_adjusted_avg20: -0.1413
+      exposure_cards_all_variants: 0
+    paired_diagnostics:
+      portfolio_lowered_negative_posterior: 2
+      portfolio_lowered_positive_posterior: 3
+      portfolio_raised_positive_posterior: 1
+      portfolio_raised_negative_posterior: 1
+      single_lowered_negative_posterior: 1
+      single_lowered_positive_posterior: 0
+      single_raised_positive_posterior: 3
+      single_raised_negative_posterior: 0
+    threshold_policy_result:
+      hard_prob_ge_0_95_rows: 3943
+      hard_prob_ge_0_95_positive_20d_rate: 0.32488
+      hard_prob_ge_0_95_loss_gt5_rate: 0.523206
+      hard_prob_0_80_to_0_95_contains_soft_gap: true
+      interpretation: "Hard-counter probability must be calibrated as risk_tier/required_confirmation/false_veto_risk, not as a single must_remove threshold."
+    decision: "observe_calibrated_guard_candidate_not_default"
+    next_experiment: "Train or derive calibrated guard tiers: 0.95+ high-risk review, 0.80-0.95 yellow soft-gap review, and require missing positive confirmation plus BookSkill/news/financial/peer/chip conflicts before strong downweight. Re-test with active-exposure and missed-positive gates."
+  calibrated_flash_v1:
+    prefix: hard_counter_calibrated_flash_v1
+    summary: reports/date_generalization/hard_counter_calibrated_flash_v1_summary.md
+    findings: reports/date_generalization/hard_counter_calibrated_flash_v1_findings.md
+    leakage_audit: reports/date_generalization/hard_counter_calibrated_flash_v1_leakage_audit.md
+    channel_coverage: reports/date_generalization/hard_counter_calibrated_flash_v1_channel_coverage.md
+    model: deepseek-v4-flash
+    ablation_cards: 32
+    invalid_outputs: 0
+    total_tokens: 341866
+    future_leak_findings: 0
+    code_change: "channel classifier evidence now includes risk_tier, required_confirmation, known_false_veto_risk, and calibration_policy."
+    dryrun_isolation: "risk_tier appears in full_agent_with_hard_counter_tool 16/16 and never in full_agent_without_channel_classifier."
+    aggregate_metrics:
+      portfolio_with_calibrated_hard_counter_cash_adjusted_avg20: 0.0567
+      portfolio_without_classifier_cash_adjusted_avg20: 0.043
+      single_with_calibrated_hard_counter_cash_adjusted_avg20: 0.0193
+      single_without_classifier_cash_adjusted_avg20: 0.0219
+      exposure_cards_all_variants: 0
+    paired_diagnostics:
+      portfolio_lowered_negative_posterior: 2
+      portfolio_lowered_positive_posterior: 1
+      portfolio_raised_positive_posterior: 3
+      portfolio_raised_negative_posterior: 0
+      single_lowered_negative_posterior: 0
+      single_lowered_positive_posterior: 0
+      single_raised_positive_posterior: 1
+      single_raised_negative_posterior: 1
+    decision: "calibration_reduces_portfolio_false_veto_but_not_default"
+    next_experiment: "Keep calibrated risk-tier wording. Before any default promotion, test on larger 24-64 stock-date panels with explicit single-stock risk scorer and BookSkill/RAG coverage; single-stock mode needs separate calibration because this run slightly underperformed without-classifier."
+  single_stock_channel_scorer_v1:
+    status: "local_tool_candidate_review_only"
+    script: scripts/audit_single_stock_channel_scorer_v1.py
+    test: tests/test_single_stock_channel_scorer.py
+    report: reports/date_generalization/single_stock_channel_scorer_v1.md
+    csv: reports/date_generalization/single_stock_channel_scorer_v1.csv
+    agent_preview: reports/date_generalization/single_stock_channel_scorer_v1_agent_tool_preview.jsonl
+    scored_preview_rows_h2026: 18679
+    safe_join_policy: "Only logistic_channel_outcome probability columns are joined; return_20d, pool_excess_20d, rule_outcome_label and single-stock labels are forbidden in agent preview."
+    h2026_agent_preview_grade_counts:
+      continue_deep_dive: 5917
+      watch: 12724
+      temporary_exclude: 38
+      insufficient: 0
+    h2026_agent_preview_leak_count: 0
+    opportunity_results_h2026:
+      baseline_ml_positive_20d_rate: 0.4344
+      baseline_ml_delta_pos_vs_base: 0.0525
+      baseline_ml_delta_mean_vs_base: 1.4948
+      channel_augmented_positive_20d_rate: 0.4106
+      channel_augmented_delta_pos_vs_base: 0.0287
+      channel_augmented_delta_mean_vs_base: 0.9285
+      channel_only_rule_positive_20d_rate: 0.4795
+      channel_only_rule_delta_pos_vs_base: 0.0976
+      channel_only_rule_delta_mean_vs_base: 3.2019
+    risk_results_h2026:
+      baseline_ml_loss_gt5_rate: 0.4766
+      baseline_ml_delta_loss_vs_base: 0.0591
+      baseline_ml_risk_recall: 0.1409
+      baseline_ml_loss_exposure_reduction: 0.0083
+      channel_augmented_loss_gt5_rate: 0.47
+      channel_augmented_delta_loss_vs_base: 0.0525
+      channel_augmented_risk_recall: 0.2944
+      channel_augmented_loss_exposure_reduction: 0.0186
+      channel_only_rule_loss_gt5_rate: 0.4272
+      channel_only_rule_delta_loss_vs_base: 0.0097
+      channel_only_rule_risk_recall: 0.9447
+      channel_only_rule_active_exposure: 0.9234
+    decision: "Do not add channel probabilities to opportunity alpha. Use channel-augmented risk scorer only as a review queue / risk evidence candidate; it improves H2026 recall and loss exposure reduction but is not stable enough for default temporary-exclude decisions."
+    next_experiment: "Calibrate single-stock risk scorer with exposure caps and prior-block stability gates; compare against base opportunity model and require no degradation of opportunity green status before DS integration."
+  single_stock_opportunity_scorer_v2:
+    status: "green_low_complexity_tool_candidate_diagnostic_high_dimensional_models_only"
+    script: scripts/audit_single_stock_opportunity_scorer_v2.py
+    test: tests/test_single_stock_opportunity_scorer_v2.py
+    report: reports/date_generalization/single_stock_opportunity_scorer_v2.md
+    csv: reports/date_generalization/single_stock_opportunity_scorer_v2.csv
+    feature_audit: reports/date_generalization/single_stock_opportunity_scorer_v2_feature_audit.csv
+    agent_preview: reports/date_generalization/single_stock_opportunity_scorer_v2_agent_tool_preview.jsonl
+    safe_join_policy: "Agent preview exposes only tool id/version, model family, feature group, opportunity score/quantile/threshold, status, four research grades, required confirmation, top feature names, and source refs. Future returns, labels, GT fields and trading instruction words are rejected."
+    h2026_agent_preview:
+      rows: 18679
+      future_key_findings: 0
+      instruction_findings: 0
+      preview_variant: additive_bin_baseline_existing
+      grade_counts:
+        continue_deep_dive: 2930
+        watch: 15749
+    candidate_results_h2026:
+      additive_bin_baseline_existing:
+        status: green_candidate
+        selected_features: 16
+        prior_delta_pos_hit_rate: 1.0
+        prior_delta_mean_hit_rate: 1.0
+        delta_pos_vs_base: 0.0525
+        delta_mean_vs_base: 1.4948
+        positive_20d_rate: 0.4344
+        avg_return_20d: 0.2042
+        loss_gt5_rate: 0.3413
+        active_exposure: 0.2905
+        unique_stocks: 490
+        top_stock_share: 0.0063
+      logistic_l1_wide_safe_no_channel:
+        status: yellow_diagnostic_high_complexity
+        selected_features: 154
+        delta_pos_vs_base: 0.1432
+        delta_mean_vs_base: 3.2599
+        positive_20d_rate: 0.5251
+        avg_return_20d: 1.9693
+        active_exposure: 0.1152
+        decision_boundary: "Promising diagnostic only. L1 did not sparsify the wide feature set; require embargo, multi-panel repeat, and strong feature cap before any promotion."
+      news_financial_only:
+        status: reject_or_observe_only
+        delta_pos_vs_base: 0.0
+        delta_mean_vs_base: 0.0
+        active_exposure: 1.0
+    integration_smoke:
+      dryrun:
+        prefix: single_stock_opportunity_tool_dryrun_v1
+        base_packs: 4
+        ablation_packs: 12
+        called_deepseek: false
+        opportunity_visible_single_with_tool: "2/2"
+        opportunity_hidden_single_without_tool: "2/2"
+        opportunity_visible_quant_only: "2/2"
+        portfolio_false_attach: 0
+        future_key_findings: 0
+        instruction_findings: 0
+      flash_smoke:
+        prefix: single_stock_opportunity_tool_flash_smoke_v1
+        model: deepseek-v4-flash
+        report: reports/date_generalization/single_stock_opportunity_tool_flash_smoke_v1_findings.md
+        summary: reports/date_generalization/single_stock_opportunity_tool_flash_smoke_v1_summary.md
+        decision_cards: 12
+        invalid_outputs: 0
+        total_tokens: 109119
+        future_key_findings: 0
+        instruction_findings: 0
+        single_with_tool_cash_adjusted_avg20: 0.5470
+        single_without_tool_cash_adjusted_avg20: 0.1964
+        single_quant_only_cash_adjusted_avg20: 0.8591
+        exposure_cards_all_variants: 0
+        paired_readout: "with tool reduced simulated weight on posterior-negative 000407 to 0 but still missed posterior-positive 000545 because cross-channel hard counterevidence dominated."
+        decision: "integration_success_not_promotion"
+      risk_queue_panel_flash:
+        prefix: single_stock_opportunity_risk_queue_panel_flash_v1
+        model: deepseek-v4-flash
+        report: reports/date_generalization/single_stock_opportunity_risk_queue_panel_flash_v1_findings.md
+        summary: reports/date_generalization/single_stock_opportunity_risk_queue_panel_flash_v1_summary.md
+        sample_plan: reports/date_generalization/single_stock_risk_queue_sample_v1_sample_plan.csv
+        decision_cards: 60
+        invalid_outputs_after_resume: 0
+        total_tokens: 671073
+        future_key_findings: 0
+        instruction_findings: 0
+        with_opportunity_cash_adjusted_avg20: 0.4501
+        without_opportunity_cash_adjusted_avg20: 0.2620
+        with_risk_queue_cash_adjusted_avg20: 0.2838
+        without_risk_queue_cash_adjusted_avg20: 0.6865
+        quant_tool_summary_only_cash_adjusted_avg20: -0.1065
+        exposure_cards_all_variants: 0
+        paired_opportunity_vs_no_opportunity: "changed=3; lowered_negative=3; lowered_positive=0; raised_negative=0; raised_positive=0"
+        paired_risk_vs_no_risk: "changed=3; lowered_negative=2; lowered_positive=1 on 000636 +118.13; raised_negative=0; raised_positive=0"
+        decision: "opportunity_tool_observe_safety_component; risk_queue_false_veto_requires_branch_rule_optimization"
+      risk_branch_micro_flash_v2:
+        prefix: single_stock_risk_branch_micro_flash_v2
+        model: deepseek-v4-flash
+        report: reports/date_generalization/single_stock_risk_branch_micro_flash_v2_findings.md
+        branch_audit: reports/date_generalization/single_stock_risk_branch_micro_flash_v2_branch_audit.md
+        sample_plan: reports/date_generalization/single_stock_risk_branch_micro_sample_v1.csv
+        stock_date_rows: 4
+        decision_cards: 16
+        invalid_outputs: 0
+        total_tokens: 192793
+        future_key_findings: 0
+        instruction_findings: 0
+        low_hard_support_branch:
+          stock_date_rows: 2
+          posterior_positive_rate: 1.0
+          avg_return_20d: 61.81
+          avg_weight_after_guardrail: 0.10
+        overheat_reversal_friction_branch:
+          stock_date_rows: 2
+          posterior_positive_rate: 0.0
+          avg_return_20d: -18.605
+          avg_weight_after_guardrail: 0.05
+        paired_risk_vs_no_risk_after_guardrail: "changed=0; lowered_positive=0; lowered_negative=0"
+        decision: "branch-aware guardrail accepted as safety calibration; not alpha proof because n=4 and exposure_cards=0"
+      branch_guardrail_panel24_flash_v1:
+        prefix: single_stock_branch_guardrail_panel24_flash_v1
+        model: deepseek-v4-flash
+        report: reports/date_generalization/single_stock_branch_guardrail_panel24_flash_v1_findings.md
+        branch_audit: reports/date_generalization/single_stock_branch_guardrail_panel24_flash_v1_branch_audit.md
+        sample_plan: reports/date_generalization/single_stock_branch_guardrail_panel24_v1_sample_plan.csv
+        stock_date_rows: 24
+        unique_stocks: 18
+        top_stock_share: 0.125
+        variants: "with_opportunity/no_opportunity/with_risk/no_risk/quant_only"
+        decision_cards: 120
+        invalid_outputs: 0
+        total_tokens: 1315624
+        future_key_findings: 0
+        instruction_findings: 0
+        rag_coverage: 0
+        metrics:
+          full_agent_with_opportunity_cash_adjusted_avg20: 0.4481
+          full_agent_without_opportunity_cash_adjusted_avg20: 0.4326
+          full_agent_with_risk_cash_adjusted_avg20: 0.4797
+          full_agent_without_risk_cash_adjusted_avg20: 0.1494
+          quant_tool_summary_only_cash_adjusted_avg20: 0.5342
+        branch_diagnostics:
+          low_hard_support: "rows=6; pos20=0.8333; avg20=23.5233; risk_vs_no_risk lowered_positive=0 raised_positive=5 raised_negative=1"
+          overheat_reversal_friction: "rows=17; pos20=0.1765; avg20=-10.4124; risk_vs_no_risk lowered_negative=3 raised_negative=1"
+        refinement_after_panel:
+          rule_id: chip_support_requires_lower_support_v2
+          status: accepted_safety_refinement
+          failure_case: "000037 was raised in low_hard_support branch but posterior 20d=-13.25; branch came from high winner_rate with lower_support=0.1296 and weak peer support."
+          old_rule: "lower_support>=0.18 and upper_overhang<=0.12 OR winner_rate_pct>=80"
+          new_rule: "lower_support>=0.18 and upper_overhang<=0.12"
+          dryrun_v2_effect: "same 24-row panel: low_hard_support 6->5; 000037 moved to mixed_review_only; future/instruction leak=0"
+          purity_audit: reports/date_generalization/single_stock_branch_guardrail_panel24_v2_purity_audit.md
+          purity_after_refinement: "low_hard_support rows=5; positive_20d_rate=1.0; avg20=30.878; changed_rows=1 (000037 low_hard_support->mixed_review_only, return20=-13.25)"
+        decision: "branch-aware risk queue remains safety calibration; next DS run must use tightened chip support and report RAG coverage."
+      branch_guardrail_panel24_rag_flash_v1:
+        prefix: single_stock_branch_guardrail_panel24_rag_flash_v1
+        model: deepseek-v4-flash
+        case_memory_mode: retrieved_cases_v2_applicable
+        case_memory_top_k: 3
+        strict_control_prefix: single_stock_branch_guardrail_panel24_norag_flash_v2
+        implementation:
+          entrypoint: scripts/run_full_channel_ablation_round.py
+          cli_flags:
+            - "--case-memory-mode retrieved_cases_v2_applicable"
+            - "--case-memory-top-k 3"
+          retriever: src/agent_training/case_memory_retriever.py
+          test: tests/test_full_channel_ablation_round.py::test_attach_case_memory_retrieval_injects_safe_applicable_context
+        report: reports/date_generalization/single_stock_branch_guardrail_panel24_rag_flash_v1_findings.md
+        summary: reports/date_generalization/single_stock_branch_guardrail_panel24_rag_flash_v1_summary.md
+        leakage_audit: reports/date_generalization/single_stock_branch_guardrail_panel24_rag_flash_v1_leakage_audit.md
+        branch_purity: reports/date_generalization/single_stock_branch_guardrail_panel24_rag_flash_v1_branch_purity.md
+        paired_changes: reports/date_generalization/single_stock_branch_guardrail_panel24_rag_flash_v1_paired_decision_changes.csv
+        attribution_audit:
+          script: scripts/audit_single_stock_rag_bookskill_attribution.py
+          test: tests/test_rag_bookskill_attribution_audit.py
+          report: reports/date_generalization/single_stock_branch_guardrail_panel24_rag_bookskill_attribution_v1.md
+          detail: reports/date_generalization/single_stock_branch_guardrail_panel24_rag_bookskill_attribution_v1_detail.csv
+          variant_summary: reports/date_generalization/single_stock_branch_guardrail_panel24_rag_bookskill_attribution_v1_variant_summary.csv
+          rag_case_summary: reports/date_generalization/single_stock_branch_guardrail_panel24_rag_bookskill_attribution_v1_rag_case_summary.csv
+          bookskill_summary: reports/date_generalization/single_stock_branch_guardrail_panel24_rag_bookskill_attribution_v1_bookskill_summary.csv
+          branch_bookskill_summary: reports/date_generalization/single_stock_branch_guardrail_panel24_rag_bookskill_attribution_v1_branch_bookskill_summary.csv
+          harmful_examples: reports/date_generalization/single_stock_branch_guardrail_panel24_rag_bookskill_attribution_v1_harmful_examples.csv
+          rows: 120
+          control_prefix: single_stock_branch_guardrail_panel24_norag_flash_v2
+          leakage_policy: "Future returns are joined only after decision cards are written; attribution outputs must never feed same-block evidence."
+          rag_case_findings:
+            FAIL-20260626-007: "high-frequency but too broad: rows=64, positive_20d_rate=0.375, avg_delta_cash=-0.0102; do not strengthen without stricter applicability."
+            ABL-20260626-011: "positive in this panel: rows=36, avg_delta_cash=+0.2644, sum_delta_cash=+9.52; keep as checklist candidate only."
+            BS-20260625-002: "positive but thin: rows=16, unique_stocks=3, avg_delta_cash=+0.5027; needs larger on/off validation."
+          bookskill_findings:
+            broad_audit_material: "PPS-Q-017, DOW-B-017, and PPS-Q-019 are common checklist material, but branch lift is mainly quant/peer/chip; do not treat them as alpha."
+            do_not_strengthen_now: "PPS-Q-009 and DOW-B-004 were weak or negative in this attribution panel."
+            branch_note: "low_hard_counter_with_reversal_support remained strong but BookSkill IDs there are associative; the decisive signal is tightened chip lower_support/overhang plus branch policy."
+          decision: "Attribution v1 supports keeping RAG and BookSkill as mandatory audit/checklist inputs, but no case_id or strategy_id is promoted. Next panels must log case/strategy applicability, failure condition, branch, paired outcome, bad exposure and missed-positive."
+        strict_applicability_hardening_v2:
+          module: src/agent_training/case_memory_retriever.py
+          tests: tests/test_case_memory_retriever.py
+          report: reports/date_generalization/single_stock_branch_guardrail_panel24_rag_strict_dryrun_v2_findings.md
+          dryrun_prefix: single_stock_branch_guardrail_panel24_rag_strict_dryrun_v2
+          policy_changes:
+            - "Include quant_tool_summaries risk branch, risk_branch_labels, policy_status and calibration text in retrieval applicability tags."
+            - "Broad/meta RAG cases can only be partial/meta caution, not stock-specific applicable counter-evidence."
+            - "FAIL-20260626-007 is a broad-case override learned from attribution v1."
+          dryrun_checks:
+            evidence_packs: 120
+            invalid_outputs: 0
+            full_channel_rag_context: "96/96"
+            quant_only_rag_context: "0/24"
+            fail_20260626_007_hits: 0
+            rag_context_future_key_hits: 0
+            secret_pattern_hits: 0
+          decision: "Adopt strict applicability for future RAG dry-runs and DS rounds. This is retrieval hygiene, not alpha evidence."
+        strict_rag_micro8_v1:
+          sample_plan: reports/date_generalization/single_stock_rag_strict_micro8_sample_plan.csv
+          no_rag_prefix: single_stock_rag_strict_micro8_norag_flash_v1
+          rag_prefix: single_stock_rag_strict_micro8_rag_flash_v1
+          attribution_report: reports/date_generalization/single_stock_rag_strict_micro8_attribution_v1.md
+          findings_report: reports/date_generalization/single_stock_rag_strict_micro8_findings_v1.md
+          model: deepseek-v4-flash
+          cards_per_run: 40
+          invalid_outputs: 0
+          tokens:
+            no_rag: 441179
+            strict_rag: 459899
+          safety_checks:
+            secret_hits: 0
+            rag_context_future_key_hits: 0
+            fail_20260626_007_hits: 0
+          non_quant_paired_result:
+            rows: 32
+            changed_rows: 8
+            sum_delta_cash: 0.7235
+            avg_delta_cash: 0.0226
+            lowered_negative: 4
+            lowered_positive: 1
+            raised_positive: 1
+            raised_negative: 2
+          decision: "Strict RAG micro8 is a hygiene validation, not promotion evidence. It removed the broad FAIL-20260626-007 case but exposed financial tag over-broadness."
+        financial_event_split_v2:
+          module: src/agent_training/case_memory_retriever.py
+          test: tests/test_case_memory_retriever.py::test_no_recent_financial_event_is_not_financial_report_context
+          dryrun_prefix: single_stock_rag_strict_micro8_rag_dryrun_v2
+          policy_changes:
+            - "financial_report_context is reserved for true event/report context."
+            - "code_not_in_feature_table maps to financial_missing."
+            - "no_event_in_window maps to financial_no_recent_event and must not match financial_report_only failure cases as applicable."
+          dryrun_checks:
+            evidence_packs: 40
+            invalid_outputs: 0
+            full_channel_rag_context: "32/32"
+            quant_only_rag_context: "0/8"
+            future_key_hits: 0
+          decision: "Adopt for future RAG runs. Do not rerun paid DS just for this hygiene fix; include it in the next larger on/off panel after other channel improvements."
+        stock_date_rows: 24
+        unique_stocks: 18
+        decision_cards: 120
+        invalid_outputs: 0
+        total_tokens: 1365030
+        strict_control_tokens: 1314608
+        effective_workers: 120
+        future_key_findings: 0
+        rag_coverage:
+          full_agent_tool_ablation_useful_context: "96/96"
+          quant_tool_summary_only_context: "0/24"
+        metrics:
+          full_agent_with_opportunity_cash_adjusted_avg20: 0.5814
+          full_agent_without_opportunity_cash_adjusted_avg20: 0.5294
+          full_agent_with_risk_cash_adjusted_avg20: 0.5457
+          full_agent_without_risk_cash_adjusted_avg20: 0.2799
+          quant_tool_summary_only_cash_adjusted_avg20: 0.5197
+          exposure_cards_all_variants: 0
+        strict_control_metrics:
+          full_agent_with_opportunity_cash_adjusted_avg20: 0.5247
+          full_agent_without_opportunity_cash_adjusted_avg20: 0.4775
+          full_agent_with_risk_cash_adjusted_avg20: 0.4997
+          full_agent_without_risk_cash_adjusted_avg20: -0.0232
+          quant_tool_summary_only_cash_adjusted_avg20: 0.6122
+        deltas_vs_same_code_no_rag_v2:
+          full_agent_with_opportunity_cash_adjusted_avg20: 0.0567
+          full_agent_without_opportunity_cash_adjusted_avg20: 0.0519
+          full_agent_with_risk_cash_adjusted_avg20: 0.0460
+          full_agent_without_risk_cash_adjusted_avg20: 0.3031
+          quant_tool_summary_only_cash_adjusted_avg20: -0.0925
+        paired_decision_summary: "Same-code RAG vs no-RAG v2: with_opportunity changed=2 delta_cash_mean=+0.0567; with_risk changed=3 +0.0459; no_opportunity changed=4 +0.0518; no_risk changed=13 +0.3031; quant_only changed=8 -0.0926."
+        branch_purity_summary:
+          low_hard_support: "rows=5; positive_20d_rate=1.0; avg20=30.8780; loss_gt5=0"
+          overheat_reversal_friction: "rows=17; positive_20d_rate=0.1765; avg20=-10.4124; loss_gt5=0.5882"
+        decision: "RAG applicable case memory may be enabled for controlled single-stock full-channel runs as failure-condition checklist/counter-evidence only. It must not raise research exposure by itself and is not alpha proof."
+    decision: "Use low-complexity additive-bin baseline opportunity scorer as the next single-stock opportunity-side tool summary. Do not use channel classifier probabilities, raw news/financial positive scores, or high-dimensional logistic/L1 as direct opportunity alpha."
+    next_experiment: "Run a larger 24-64 stock-date single-stock panel with RAG on/off, tightened chip support v2, branch-aware risk queue, opportunity scorer, no-opportunity, no-risk, and quant-only arms. Report branch-level paired diagnostics, bad exposure, missed-positive, active exposure, BookSkill strategy_id attribution, RAG applicability, and leakage. Before promoting the wide diagnostic model, add a 20-trading-day embargo, multi-panel repeat, feature-count cap, and out-of-fold/prior-only channel features."
+  single_stock_risk_calibration_v2:
+    status: "ds_smoke_observe_review_only"
+    script: scripts/audit_single_stock_risk_calibration_v2.py
+    test: tests/test_single_stock_risk_calibration.py
+    report: reports/date_generalization/single_stock_risk_calibration_v2.md
+    csv: reports/date_generalization/single_stock_risk_calibration_v2.csv
+    review_queue: reports/date_generalization/single_stock_risk_calibration_v2_review_queue.jsonl
+    fixed15_candidate_queue: reports/date_generalization/single_stock_risk_calibration_v2_fixed15_candidate_queue.jsonl
+    safe_join_policy: "Review queue is field-whitelisted; no return_5d/10d/20d, pool_excess_20d, rule_outcome_label, single_stock labels or gt fields are allowed."
+    time_safe_selected_queue_h2026:
+      side: risk_channel_priority_capped
+      cap_pct: 0.10
+      rows: 1885
+      active_exposure: 0.1009
+      loss_gt5_rate: 0.4716
+      delta_loss_vs_base: 0.0541
+      risk_recall: 0.1140
+      loss_exposure_reduction: 0.0060
+      research_grade_counts:
+        watch: 1845
+        temporary_exclude: 40
+      leak_count: 0
+      decision: "review_only; useful high-precision queue but recall below product target."
+    best_pareto_candidate_after_audit:
+      side: risk_channel_priority_fixed_15pct
+      cap_pct: 0.15
+      active_exposure: 0.1513
+      loss_gt5_rate: 0.4768
+      delta_loss_vs_base: 0.0593
+      risk_recall: 0.1728
+      loss_exposure_reduction: 0.0105
+      status: green_review_candidate_for_next_oot_not_retroactive_default
+      queue: reports/date_generalization/single_stock_risk_calibration_v2_fixed15_candidate_queue.jsonl
+      queue_rows: 2827
+      queue_policy_status: fixed15_next_oot_candidate_not_retroactive_default
+      decision_boundary: "Identified after H2026 audit; must be validated on next OOT/future block or DS shard before defaulting."
+    fixed_cap_pareto_h2026:
+      priority_10pct:
+        recall: 0.1140
+        loss_exposure_reduction: 0.0060
+        active_exposure: 0.1009
+      priority_15pct:
+        recall: 0.1728
+        loss_exposure_reduction: 0.0105
+        active_exposure: 0.1513
+      priority_20pct:
+        recall: 0.2258
+        loss_exposure_reduction: 0.0131
+        active_exposure: 0.2006
+    ds_flash_smoke_v1:
+      prefix: single_stock_risk_queue_flash_v1
+      model: deepseek-v4-flash
+      sample_plan: reports/date_generalization/single_stock_risk_queue_flash_sample_v1_sample_plan.csv
+      report: reports/date_generalization/single_stock_risk_queue_flash_v1_risk_queue_findings.md
+      summary: reports/date_generalization/single_stock_risk_queue_flash_v1_summary.md
+      leakage_audit: reports/date_generalization/single_stock_risk_queue_flash_v1_leakage_audit.md
+      channel_coverage: reports/date_generalization/single_stock_risk_queue_flash_v1_channel_coverage.md
+      variants: "full_agent_with_risk_review_queue vs full_agent_without_risk_review_queue vs quant_tool_summary_only"
+      stock_date_rows: 6
+      decision_cards: 18
+      invalid_outputs: 0
+      total_tokens: 191872
+      future_leak_findings: 0
+      full_agent_with_queue_cash_adjusted_avg20: 0.3770
+      full_agent_without_queue_cash_adjusted_avg20: 0.2264
+      with_queue_active_exposure: 0.0500
+      without_queue_active_exposure: 0.0583
+      exposure_cards_all_variants: 0
+      paired_decision_changes_vs_without:
+        changed_total: 3
+        changed_negative_posterior: 3
+        changed_positive_posterior: 0
+        extra_positive_downweights: 0
+      coverage_gaps:
+        news_semantic_questionnaire: 0.0
+        retrieved_cases_context: 0.0
+      conclusion: "Risk queue integration is safe and directionally useful as defensive review evidence in this tiny shard, but it is not alpha proof and not a default hard rule."
+    next_ds_sample_plans:
+      validation_selected_10pct_diverse:
+        sample_plan: reports/date_generalization/single_stock_risk_queue_sample_v1_sample_plan.csv
+        report: reports/date_generalization/single_stock_risk_queue_sample_v1.md
+        rows: 12
+        unique_stocks: 11
+        top_stock_share: 0.1667
+      fixed15_candidate_diverse:
+        sample_plan: reports/date_generalization/single_stock_risk_queue_fixed15_sample_v1_sample_plan.csv
+        report: reports/date_generalization/single_stock_risk_queue_fixed15_sample_v1.md
+        rows: 12
+        unique_stocks: 11
+        top_stock_share: 0.1667
+      fixed15_incremental_boundary:
+        sample_plan: reports/date_generalization/single_stock_risk_queue_fixed15_incremental_sample_v1_sample_plan.csv
+        report: reports/date_generalization/single_stock_risk_queue_fixed15_incremental_sample_v1.md
+        dryrun_report: reports/date_generalization/single_stock_risk_queue_fixed15_incremental_dryrun_v1_findings.md
+        flash_report: reports/date_generalization/single_stock_risk_queue_fixed15_incremental_flash_v1_risk_queue_findings.md
+        flash_summary: reports/date_generalization/single_stock_risk_queue_fixed15_incremental_flash_v1_summary.md
+        guardrail_replay_summary: reports/date_generalization/single_stock_risk_queue_fixed15_incremental_flash_v1_guardrail_replay_v1_summary.md
+        leakage_audit: reports/date_generalization/single_stock_risk_queue_fixed15_incremental_dryrun_v1_leakage_audit.md
+        channel_coverage: reports/date_generalization/single_stock_risk_queue_fixed15_incremental_dryrun_v1_channel_coverage.md
+        source_rows: 2827
+        excluded_rows: 1885
+        remaining_rows: 942
+        rows: 8
+        unique_stocks: 8
+        top_stock_share: 0.125
+        tiers: "hard_counter_yellow_review_0.80_0.95=4; low_hard_counter_probability=4"
+        dryrun_packs: 24
+        future_leak_findings: 0
+        with_queue_visible: "8/8"
+        without_queue_visible: "0/8"
+        policy_status_visible: fixed15_next_oot_candidate_not_retroactive_default
+        questionnaire_tokens: 102764
+        flash_decision_cards: 24
+        flash_decision_tokens: 257312
+        flash_invalid_outputs: 0
+        flash_future_leak_findings: 0
+        raw_with_queue_cash_adjusted_avg20: -0.4930
+        raw_without_queue_cash_adjusted_avg20: -0.2720
+        raw_with_queue_positive20: 0.375
+        raw_without_queue_positive20: 0.625
+        guardrail_id: single_stock_risk_review_queue_no_raise_v1
+        guardrail_replay_changed_cards: 4
+        guardrail_replay_with_queue_avg20: -0.0919
+        guardrail_replay_with_queue_positive20: 0.375
+        coverage_gaps: "retrieved_cases_context; questionnaire was backfilled for this sample"
+        decision: "reject_fixed15_incremental_as_default; keep as next-OOT candidate only"
+      note: "Top-tier rows overlap heavily between 10pct and fixed15. The incremental fixed15 sample excludes 10pct date/code rows; small Flash with questionnaire showed fixed15 boundary worsened results and exposed Agent misuse of review-only risk evidence."
+    guardrails:
+      single_stock_risk_review_queue_no_raise_v1:
+        status: default_branch_aware
+        scope: single_stock
+        implemented_in: src/agent_training/evidence_pack.py
+        branch_policy_module: src/agent_training/risk_branch_policy.py
+        rule: "Risk review queue may not upgrade research grade or raise active exposure. For low_hard_counter_with_reversal_support, it may block upgrades but must not mechanically downweight observation-level weight without explicit negative news or financial risk. For overheat/reversal friction or explicit hard negative branches, keep low-weight review/cap behavior."
+        reason: "fixed15 incremental Flash showed DS can misuse observe_review_only risk evidence as opportunity support; later 60-card panel showed one-size-fits-all cap false-vetoed 000636, while branch-aware micro v2 removed low-hard-support lowered_positive cases."
+      single_stock_risk_review_queue_branch_no_downweight_v1:
+        status: default_safety_calibration
+        scope: single_stock
+        implemented_in: src/agent_training/evidence_pack.py
+        condition: "primary_risk_branch == low_hard_counter_with_reversal_support and no explicit_hard_negative_event"
+        action: "Do not convert observation-level research weight to lower exposure solely because the review-only risk queue is present; keep at low observation weight and require explicit negative event or financial risk before downweighting."
+        evidence: "single_stock_risk_branch_micro_flash_v2: low-hard support branch 2/2 posterior positive avg20=61.81, avg weight=0.10; v1 risk_vs_no_risk lowered_positive=2, v2 lowered_positive=0."
+      chip_support_requires_lower_support_v2:
+        status: default_safety_refinement
+        scope: single_stock
+        implemented_in: src/agent_training/risk_branch_policy.py
+        condition: "chip support inside risk branch policy"
+        action: "Treat chip_support_or_low_overhang as true only when lower_support>=0.18 and upper_overhang<=0.12; winner_rate_pct alone is not support and may indicate crowding."
+        evidence: "single_stock_branch_guardrail_panel24_flash_v1 found 000037 raised by low-hard support branch with posterior 20d=-13.25; dry-run v2 moved it to mixed_review_only after removing winner_rate-only support."
+    decision: "Use v2 as a compact DS pre-review tool. Default queue remains validation-selected 10pct review-only plus no-raise guardrail; fixed15 is rejected as H2026 default and remains only a future/next-OOT candidate."
+    next_experiment: "Do not scale fixed15 boundary. Run a 24-64 stock-date DS shard focused on single-stock opportunity-side scorer, RAG/BookSkill applicability, and no_queue vs validation_selected_10pct with branch-aware guardrail plus chip_support_requires_lower_support_v2; require branch-level paired diagnostics, clearer Agent decisions, bad-exposure reduction, missed-positive control, questionnaire/RAG coverage reporting, and no trading instructions."

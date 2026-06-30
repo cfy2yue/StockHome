@@ -1,0 +1,519 @@
+sources:
+- file: 【专业投机原理（珍藏版）】.pdf
+  path: E:\stock\ref\【专业投机原理（珍藏版）】.pdf
+  size_bytes: 46290846
+  pages: 464
+  text_layer_pages: 0
+  ocr_pages: 5
+  needs_ocr_pages: 459
+  has_text_layer: false
+  has_readable_text: false
+  chapters_detected:
+  - 言》的前言中：“我们认为这是自明之理，人类生而平等，拥有天赋不可侵犯的权
+  - 目录
+  - 第一篇
+  - 第1章从赌徒到市场宗师：
+  - 第2章鳄鱼原则：重点思考的必要性/25
+  - 第3章一致性成功的事业经营哲学/31
+  - 第4章在混沌的市场中寻找秩序：
+  - 第5章
+  - 第6章
+  - 第7章
+  - 第8章
+  - 第9章1
+  page_status_sample:
+  - page: 1
+    status: ocr
+    text_length: 188
+    ocr_confidence: 0.8474
+  - page: 2
+    status: ocr
+    text_length: 196
+    ocr_confidence: 0.9422
+  - page: 3
+    status: ocr
+    text_length: 1311
+    ocr_confidence: 0.9817
+  - page: 4
+    status: ocr
+    text_length: 333
+    ocr_confidence: 0.9772
+  - page: 5
+    status: ocr
+    text_length: 277
+    ocr_confidence: 0.78
+  - page: 6
+    status: needs_ocr
+    text_length: 0
+    ocr_confidence: null
+  - page: 7
+    status: needs_ocr
+    text_length: 0
+    ocr_confidence: null
+  - page: 8
+    status: needs_ocr
+    text_length: 0
+    ocr_confidence: null
+  - page: 9
+    status: needs_ocr
+    text_length: 0
+    ocr_confidence: null
+  - page: 10
+    status: needs_ocr
+    text_length: 0
+    ocr_confidence: null
+- file: 安全边际.pdf
+  path: E:\stock\ref\安全边际.pdf
+  size_bytes: 1180468
+  pages: 281
+  text_layer_pages: 280
+  ocr_pages: 0
+  needs_ocr_pages: 1
+  has_text_layer: true
+  has_readable_text: true
+  chapters_detected:
+  - 第一章
+  - 第二章价值投资哲学
+  - 第三章
+  - 附录一
+  - 附录二
+  - 附录三
+  - 本书的第一部分包括了第一章到第四章的内容，主要说明投资者
+  - 一般会在哪里跌倒。第一章的内容探讨了投资与投机的区别，成功投
+  - 特殊角色。第二章的内容则着眼于华尔街，介绍它的定位短期化、利
+  - 的行为。第三章的内容解释了统治当今金融市场的机构投资者的投资
+  - 第四章的内容是以垃圾债券的研究案例来说明在前三章中强调
+  - 在本书的第二部分，第五章到第八章，探讨了价值投资的理念和
+  - 实例。在第五章中检视为什么绝大多数价值投资者都是风险的厌恶
+  - 者，以及与这种态度相对应的投资应用之法。第六章则描述了价值投
+  - 资的理念，以及安全边际的含义和重要性。第七章讨论了价值投资的
+  - 一视同仁。第八章介绍了一些价值投资者常用的企业估值方法。
+  - 本书第三部分，第九章到第十四章，主要描述了价值投资的过程，
+  - 以及价值投资理念的应用。第九章探讨了当价值投资者得到了投资想
+  - 法，他们是通过那些研究和分析的步骤来评估这些想法的。第十章则
+  - 十一章和第十二章分别探索了两个特殊的投资品种：互助储蓄银行转
+  - 换盒财务危机和破产证券。第十三章则提示了良好的组合管理和交易
+  - 策略的重要性。最后，第十四章就如何选择投资专业人士管理你的财
+  - 第一部分
+  - 第二章与投资者对立的华尔街本质
+  - 街与客户之间的紧张关系。我在第一章中曾提到，对封闭式基金的投
+  - 第三章机构表演竞赛：客户是输家
+  - 第四章
+  - 第二部分价值投资哲学
+  - 第五章明确你的投资目标
+  - 正如在第七章中花很长篇幅讨论过的，无法根据历史数据来决定一项
+  - 么做的：价值投资法。第六章对价值投资进行了描述，第七章详细阐
+  - 第六章安全边际的重要性
+  - 第七章价值投资哲学起源
+  - 我在第三章讨论机构投资时曾提到，许多职业投资者使用自上往
+  - 第六章对雷管股票的讨论。）
+  - 定位（在第三章中已经有过讨论）。他们的目标是取得较市场、其他
+  - 来决定这家企业的命运，至少会起到部分的决定作用（第八章中将就
+  - 投资组合中的现金流（将在第十章中进行更详细的讨论）。对依然健
+  - 住新创造的机会提供了资金（将在第十三章中就对冲进行更深入的探
+  - 第八章企业评估艺术
+  page_status_sample:
+  - page: 1
+    status: needs_ocr
+    text_length: 16
+    ocr_confidence: null
+  - page: 2
+    status: text_layer
+    text_length: 341
+    ocr_confidence: null
+  - page: 3
+    status: text_layer
+    text_length: 617
+    ocr_confidence: null
+  - page: 4
+    status: text_layer
+    text_length: 615
+    ocr_confidence: null
+  - page: 5
+    status: text_layer
+    text_length: 651
+    ocr_confidence: null
+  - page: 6
+    status: text_layer
+    text_length: 604
+    ocr_confidence: null
+  - page: 7
+    status: text_layer
+    text_length: 630
+    ocr_confidence: null
+  - page: 8
+    status: text_layer
+    text_length: 644
+    ocr_confidence: null
+  - page: 9
+    status: text_layer
+    text_length: 594
+    ocr_confidence: null
+  - page: 10
+    status: text_layer
+    text_length: 623
+    ocr_confidence: null
+- file: 手把手教你读财报－唐朝.pdf
+  path: E:\stock\ref\手把手教你读财报－唐朝.pdf
+  size_bytes: 40876329
+  pages: 146
+  text_layer_pages: 1
+  ocr_pages: 145
+  needs_ocr_pages: 0
+  has_text_layer: false
+  has_readable_text: true
+  chapters_detected:
+  - 老唐这本书是被网友逼着写的。自从他将第一篇文章发布于雪球，“球友”们便日夜
+  - 目录
+  - 第一章你必须学会读财报
+  - 第一节
+  - 第二节
+  - 第三节
+  - 第四节
+  - 第五节财报的结构/27
+  - 第二章投资高手关心的表——资产负债表
+  - 第一节货币资金/33
+  - 第二节经营相关资产/40
+  - 第五节
+  - 第六节快速阅读资产负债表/111
+  - 第三章
+  - 第八章欺诈与反欺诈
+  - 第一节利润表的重点/125
+  - 第二节创造利润的过程/132
+  - 第二节 财报被操纵的痕迹/ 266
+  - 第三节速读利润表/151
+  - 第四章 事关存亡的表—现金流量表
+  - 第一节现金流量表拆解/161
+  - 第二节企业的现金流肖像/175
+  - 第三节 现金流量表速读/182
+  - 第五章财报的综合阅读及分析
+  - 第一节 鸟瞰三大表/189
+  - 第二节财务指标分析/195
+  - 第三节使用财务数据估值/204
+  - 第六章所有者权益变动表和财报附注
+  - 第一节所有者权益变动表/213
+  - 第二节财报附注/220
+  - 第七章
+  - 第一节会计数据和财务指标摘要/231
+  - 第二节董事会报告/232
+  - 第三节重要事项/250
+  - 第一章
+  - 第一节财报是用来排除企业的
+  - 第二节财报大框架：财报阅读入门
+  - 第三节读财报前的准备工作
+  - 第一章 你必须学会读财报
+  - 第四节 重要提示
+  page_status_sample:
+  - page: 1
+    status: ocr
+    text_length: 198
+    ocr_confidence: 0.8917
+  - page: 2
+    status: ocr
+    text_length: 627
+    ocr_confidence: 0.9017
+  - page: 3
+    status: ocr
+    text_length: 444
+    ocr_confidence: 0.9421
+  - page: 4
+    status: ocr
+    text_length: 1349
+    ocr_confidence: 0.9863
+  - page: 5
+    status: ocr
+    text_length: 467
+    ocr_confidence: 0.9575
+  - page: 6
+    status: ocr
+    text_length: 375
+    ocr_confidence: 0.9678
+  - page: 7
+    status: ocr
+    text_length: 578
+    ocr_confidence: 0.9806
+  - page: 8
+    status: ocr
+    text_length: 1186
+    ocr_confidence: 0.9884
+  - page: 9
+    status: ocr
+    text_length: 887
+    ocr_confidence: 0.9733
+  - page: 10
+    status: ocr
+    text_length: 1248
+    ocr_confidence: 0.9875
+- file: 日本蜡烛图技术.pdf
+  path: E:\stock\ref\日本蜡烛图技术.pdf
+  size_bytes: 9027247
+  pages: 356
+  text_layer_pages: 0
+  ocr_pages: 4
+  needs_ocr_pages: 352
+  has_text_layer: false
+  has_readable_text: false
+  chapters_detected: []
+  page_status_sample:
+  - page: 1
+    status: ocr
+    text_length: 39
+    ocr_confidence: 0.5063
+  - page: 2
+    status: ocr
+    text_length: 45
+    ocr_confidence: 0.9378
+  - page: 3
+    status: ocr
+    text_length: 554
+    ocr_confidence: 0.9497
+  - page: 4
+    status: needs_ocr
+    text_length: 0
+    ocr_confidence: 0.9663
+  - page: 5
+    status: ocr
+    text_length: 494
+    ocr_confidence: 0.9711
+  - page: 6
+    status: needs_ocr
+    text_length: 0
+    ocr_confidence: null
+  - page: 7
+    status: needs_ocr
+    text_length: 0
+    ocr_confidence: null
+  - page: 8
+    status: needs_ocr
+    text_length: 0
+    ocr_confidence: null
+  - page: 9
+    status: needs_ocr
+    text_length: 0
+    ocr_confidence: null
+  - page: 10
+    status: needs_ocr
+    text_length: 0
+    ocr_confidence: null
+- file: 海龟交易法则.pdf
+  path: E:\stock\ref\海龟交易法则.pdf
+  size_bytes: 2052519
+  pages: 35
+  text_layer_pages: 35
+  ocr_pages: 0
+  needs_ocr_pages: 0
+  has_text_layer: true
+  has_readable_text: true
+  chapters_detected:
+  - 前言
+  - 第一章 完整的交易系统
+  - 第二章 市场
+  - 第三章 头寸规模
+  - 第四章 入市
+  - 第五章 止损
+  - 第六章 离市
+  - 第七章 策略
+  - 第八章 进一步的学习
+  - 第二章 市场：海龟交易什么
+  page_status_sample:
+  - page: 1
+    status: text_layer
+    text_length: 89
+    ocr_confidence: null
+  - page: 2
+    status: text_layer
+    text_length: 413
+    ocr_confidence: null
+  - page: 3
+    status: text_layer
+    text_length: 762
+    ocr_confidence: null
+  - page: 4
+    status: text_layer
+    text_length: 910
+    ocr_confidence: null
+  - page: 5
+    status: text_layer
+    text_length: 857
+    ocr_confidence: null
+  - page: 6
+    status: text_layer
+    text_length: 757
+    ocr_confidence: null
+  - page: 7
+    status: text_layer
+    text_length: 779
+    ocr_confidence: null
+  - page: 8
+    status: text_layer
+    text_length: 68
+    ocr_confidence: null
+  - page: 9
+    status: text_layer
+    text_length: 672
+    ocr_confidence: null
+  - page: 10
+    status: text_layer
+    text_length: 677
+    ocr_confidence: null
+- file: 股票作手回忆录（高清版）.pdf
+  path: E:\stock\ref\股票作手回忆录（高清版）.pdf
+  size_bytes: 2342568
+  pages: 163
+  text_layer_pages: 163
+  ocr_pages: 0
+  needs_ocr_pages: 0
+  has_text_layer: true
+  has_readable_text: true
+  chapters_detected:
+  - 第七章 股票永远不会太高，高到让你不能开始买进，也永远不会太低，低到不能开始卖出
+  - 第三章 凡事都有两面，但是股市只有一面
+  - 第四章 等你知道不该做什么才能不亏钱时，你开始学习该做什么才能赢钱
+  - 第五章 不要失去你的头寸
+  - 第六章 考虑大盘，而不是个股
+  - 第八章 在多头市场看多，在空头市场看空
+  - 第九章 投机客一定不能只是个学生，他必须同时是学生和投机客
+  - 第十章 总有一个错误在你前边
+  - 第十二章 股市不会为你的皮大衣付钱
+  - 第十三章 身为投机客，我的事业是始终支持自已的判断
+  - 第十四章 抓住空头回补的理想时机
+  - 第十五章 在投机操作中，没有什么事情能够绝对预定
+  - 第十六章 内幕消息:大家多么想要内幕消息
+  - 第十七章 经验会付给你稳定的红利,观察会让你得到最好的内幕消息
+  - 第十八章 投机客的勇气就是有信心根据自己的决定行动
+  - 第十九章 股票投机成功的基础，是假设大家未来会继续犯以前所犯的错误
+  - 第二十章 ㊣不要指望把利润救回来，在还能出脱而且能够廉价出脱时，赶快脱身
+  - 第二十二章 在华尔街上，狗绝对不会有反对咬狗的愚蠢偏见
+  - 第二十三章 警惕那种只解释不具名内线人士希望大众相信的解释
+  page_status_sample:
+  - page: 1
+    status: text_layer
+    text_length: 54
+    ocr_confidence: null
+  - page: 2
+    status: text_layer
+    text_length: 2813
+    ocr_confidence: null
+  - page: 3
+    status: text_layer
+    text_length: 1407
+    ocr_confidence: null
+  - page: 4
+    status: text_layer
+    text_length: 1355
+    ocr_confidence: null
+  - page: 5
+    status: text_layer
+    text_length: 1665
+    ocr_confidence: null
+  - page: 6
+    status: text_layer
+    text_length: 1472
+    ocr_confidence: null
+  - page: 7
+    status: text_layer
+    text_length: 1561
+    ocr_confidence: null
+  - page: 8
+    status: text_layer
+    text_length: 1596
+    ocr_confidence: null
+  - page: 9
+    status: text_layer
+    text_length: 1569
+    ocr_confidence: null
+  - page: 10
+    status: text_layer
+    text_length: 1736
+    ocr_confidence: null
+- file: 道氏理论(高清).pdf
+  path: E:\stock\ref\道氏理论(高清).pdf
+  size_bytes: 33943021
+  pages: 223
+  text_layer_pages: 0
+  ocr_pages: 180
+  needs_ocr_pages: 43
+  has_text_layer: false
+  has_readable_text: true
+  chapters_detected:
+  - 《长阳投资经典译丛》序言
+  - 序言
+  - 序言，及其作为伟大的金融出版物《华尔街日报）
+  - 第1章
+  - 第2章
+  - 第3章
+  - 第4章
+  - 第5章
+  - 第6章
+  - 第7章
+  - 第8章
+  - 第9章
+  - 第10章
+  - 第11章
+  - 第12章
+  - 第13章
+  - 第14章
+  - 第15章成交量与价格运动的关系
+  - 第16章双顶和双底
+  - 第17章个股
+  - 第18章投机交易
+  - 第19章股市哲学
+  - 第1章氏理论的演变
+  - 第2章汉密尔顿用述的道氏理论
+  - 第2章汉密尔额闻述的道氏理论
+  - 第2章议密尔额用述的道氏理论
+  - 第4章平均份格插数消溶一切
+  - 第4章 平均价格插数消溶一切
+  - 第5章道氏理论并非总是正
+  - 第5章道氏理论并非总是正确
+  - 第5章建氏理论并非总是正
+  - 第6章流氏的三种运动
+  - 第10章次级反应运动
+  - 第11章日间波动
+  - 第12章两个平均价格指数必原互相确认
+  - 第12章 两个平均价格指数必质互相确认
+  - 第12章 两个平均价格指数必须互相确认
+  - 第12章两个平均价格指数必须互相确认
+  - 第13章确定趋势
+  - 第14章线态窄区同盘签
+  page_status_sample:
+  - page: 1
+    status: ocr
+    text_length: 58
+    ocr_confidence: 0.7118
+  - page: 2
+    status: ocr
+    text_length: 59
+    ocr_confidence: 0.6607
+  - page: 3
+    status: ocr
+    text_length: 521
+    ocr_confidence: 0.9054
+  - page: 4
+    status: ocr
+    text_length: 368
+    ocr_confidence: 0.9429
+  - page: 5
+    status: ocr
+    text_length: 497
+    ocr_confidence: 0.8941
+  - page: 6
+    status: ocr
+    text_length: 85
+    ocr_confidence: 0.9759
+  - page: 7
+    status: ocr
+    text_length: 339
+    ocr_confidence: 0.9538
+  - page: 8
+    status: ocr
+    text_length: 378
+    ocr_confidence: 0.9125
+  - page: 9
+    status: ocr
+    text_length: 357
+    ocr_confidence: 0.9233
+  - page: 10
+    status: ocr
+    text_length: 495
+    ocr_confidence: 0.9332

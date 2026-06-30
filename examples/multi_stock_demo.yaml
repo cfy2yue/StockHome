@@ -1,0 +1,5 @@
+candidates:
+  - code: "600888"
+    name: "新疆众和"
+task: "multi_stock_comparison"
+output_dir: "reports/test_runs/multi_stock_demo"

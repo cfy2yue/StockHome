@@ -1,0 +1,59 @@
+﻿provider: deepseek
+api_key_env: DEEPSEEK_API_KEY
+base_url: https://api.deepseek.com
+default_model: deepseek-v4-pro
+low_cost_model: deepseek-v4-flash
+backtest_training_model: deepseek-v4-flash
+formal_inference_model: deepseek-v4-pro
+final_acceptance_model: deepseek-v4-pro
+reasoning_model: deepseek-v4-pro
+model_policy:
+  backtest_rounds: deepseek-v4-flash
+  multi_epoch_strategy_training: deepseek-v4-flash
+  ablation_and_error_reflection: deepseek-v4-flash
+  formal_user_inference: deepseek-v4-pro
+  final_acceptance_metrics: deepseek-v4-pro
+concurrency_limits:
+  deepseek-v4-flash: 2500
+  deepseek-v4-pro: 500
+  deepseek-chat: 2500
+  deepseek-reasoner: 500
+concurrency_policy:
+  default_max_workers_arg: 0
+  mode: use_model_limit_and_pack_count
+  effective_workers_formula: "min(evidence_pack_count, model_concurrency_limit[model]) when max_workers <= 0; otherwise min(requested_max_workers, evidence_pack_count, model_concurrency_limit[model])"
+  training_and_search_default: "use as much DeepSeek concurrency as the selected model and evidence pack count allow"
+  flash_training_target_model: deepseek-v4-flash
+  flash_training_model_limit: 2500
+  pro_review_target_model: deepseek-v4-pro
+  pro_review_model_limit: 500
+  on_429_or_timeout: "record invalid/usage rows, reduce requested max_workers in the next shard, do not silently mark success"
+  shard_merge_key: "agent_policy_version + valid_block + decision_date + code + task_mode + variant"
+request_defaults:
+  stream: false
+  max_tokens: 6144
+  response_format:
+    type: json_object
+  reasoning_effort: medium
+security:
+  never_commit_api_key: true
+  mask_key_in_logs: true
+  do_not_write_key_to_reports: true
+  do_not_include_key_in_prompts: true
+  allowed_storage: environment_variable_or_untracked_local_env_or_ds_api_txt
+  local_smoke_test_allowed: true
+agent_boundary:
+  python_role: evidence_builder
+  deepseek_role: agent_decision_maker
+  research_assisted_operation_advice: true
+  no_broker: true
+  no_auto_trade: true
+  allow_user_facing_buy_sell_add_reduce_with_thresholds: true
+  no_profit_guarantee: true
+notes:
+  - "DeepSeek API uses OpenAI-compatible chat completions."
+  - "Project agents call DeepSeek through the API; Codex only builds and tests the local project."
+  - "Use JSON output for decision cards and validate schema locally before saving ledgers."
+  - "Backtest training uses deepseek-v4-flash by default to support more stocks and epochs; final acceptance and formal user-facing inference use deepseek-v4-pro."
+
+

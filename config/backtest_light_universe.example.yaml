@@ -1,0 +1,26 @@
+# 轻量回测股票池示例。
+# 使用时复制为 config/backtest_light_universe.yaml，并替换为实际 15 支训练股 + 5 支 test 股。
+# 注意：test 集只在最终权重锁定后运行，不能参与调参。
+
+train:
+  - code: "600888"
+    name: "新疆众和"
+    board: "main"
+    sector_group: "nonferrous_materials"
+    industry: "铝"
+    selected_reason: "有色/材料训练样本示例；实际运行前需确认数据不少于 240 个交易日"
+  - code: "688001"
+    name: "科创样本1"
+    board: "star"
+    sector_group: "star_technology"
+    industry: "半导体/硬科技"
+    selected_reason: "科创训练样本占位，请替换为真实股票"
+
+test:
+  - code: "688002"
+    name: "科创测试样本1"
+    board: "star"
+    sector_group: "star_technology"
+    industry: "半导体/硬科技"
+    selected_reason: "test 集占位，只用于最终验收，请替换为真实股票"
+

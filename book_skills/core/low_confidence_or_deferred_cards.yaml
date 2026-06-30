@@ -1,0 +1,990 @@
+- strategy_id: PPS-M-008
+  name: 信用扩张会压低市场利率、制造错误投资和虚假繁荣；后续收缩会带来衰退或资产重估。
+  category: macro
+  priority: 1
+  skill_type: 宏观策略和思想
+  task_fit:
+  - market_regime
+  - single_stock_analysis
+  - strategy_check
+  - trend_analysis
+  - user_discussion
+  source:
+    book: 专业投机原理
+    chapter: 专业投机原理第10章、第15章、第20章
+    page_range: OCR_PAGE 0140-0168、0227-0249、0294-0307，书内页码线索133-161、220-242、287-300，策略ID=PPS-M-008，提取方式=系统通读OCR；页码需人工复核。
+    raw_source: 《专业投机原理》第10章、第15章、第20章，OCR_PAGE 0140-0168、0227-0249、0294-0307，书内页码线索133-161、220-242、287-300，策略ID=PPS-M-008，提取方式=系统通读OCR；页码需人工复核。
+    extraction_method: full_ocr_txt_deep_dive
+    confidence: medium
+  principle: 信用扩张会压低市场利率、制造错误投资和虚假繁荣；后续收缩会带来衰退或资产重估。
+  computable_rules:
+  - 观察信用增速、货币供应、实际利率、通胀、资产价格背离、行业产能扩张。
+  manual_checks:
+  - 判断信用扩张是进入实体生产、地产链、股市估值还是短期套利。
+  invalid_conditions:
+  - 金融监管、结构性政策、外部需求或技术创新抵消信用收缩影响。
+  a_share_adaptation:
+  - A 股可用于市场环境标签：宽信用/紧信用/结构性信用，不直接给仓位指令。
+  formal_status: 候选
+  report_sentence_template: 本判断参考《专业投机原理》的 PPS-M-008：信用扩张会压低市场利率、制造错误投资和虚假繁荣；后续收缩会带来衰退或资产重估。
+- strategy_id: PPS-M-010
+  name: 市场经常先于经济数据变化；股票市场在历史样本中常领先经济周期。
+  category: macro
+  priority: 1
+  skill_type: 宏观策略和思想
+  task_fit:
+  - market_regime
+  - single_stock_analysis
+  - strategy_check
+  - trend_analysis
+  - user_discussion
+  source:
+    book: 专业投机原理
+    chapter: 专业投机原理第25章
+    page_range: OCR_PAGE 0333-0353，书内页码线索326-346，策略ID=PPS-M-010，提取方式=系统通读OCR；页码需人工复核。
+    raw_source: 《专业投机原理》第25章，OCR_PAGE 0333-0353，书内页码线索326-346，策略ID=PPS-M-010，提取方式=系统通读OCR；页码需人工复核。
+    extraction_method: full_ocr_txt_deep_dive
+    confidence: medium
+  principle: 市场经常先于经济数据变化；股票市场在历史样本中常领先经济周期。
+  computable_rules:
+  - 对比宽基指数趋势拐点与工业增加值、PMI、利润周期等滞后数据；记录领先/同步/滞后。
+  manual_checks:
+  - A 股制度、政策底、估值底、盈利底可能不同步。
+  invalid_conditions:
+  - 政治/战争/货币财政意外会扭曲领先关系；样本来自美股，不能直接套用。
+  a_share_adaptation:
+  - 作为宏观观察规则进入策略卡，但必须要求 A 股本地回测。
+  formal_status: 候选
+  report_sentence_template: 本判断参考《专业投机原理》的 PPS-M-010：市场经常先于经济数据变化；股票市场在历史样本中常领先经济周期。
+- strategy_id: PPS-M-011
+  name: 识别建立在错误前提上的趋势：可以观察趋势延续，但必须在错误前提暴露前退出研究假设。
+  category: macro
+  priority: 1
+  skill_type: 宏观策略和思想
+  task_fit:
+  - market_regime
+  - single_stock_analysis
+  - strategy_check
+  - trend_analysis
+  - user_discussion
+  source:
+    book: 专业投机原理
+    chapter: 专业投机原理第19章
+    page_range: OCR_PAGE 0282-0293，书内页码线索275-286，策略ID=PPS-M-011，提取方式=系统通读OCR；页码需人工复核。
+    raw_source: 《专业投机原理》第19章，OCR_PAGE 0282-0293，书内页码线索275-286，策略ID=PPS-M-011，提取方式=系统通读OCR；页码需人工复核。
+    extraction_method: full_ocr_txt_deep_dive
+    confidence: medium
+  principle: 识别建立在错误前提上的趋势：可以观察趋势延续，但必须在错误前提暴露前退出研究假设。
+  computable_rules:
+  - 记录流行叙事、关键假设、可验证反证；跟踪价格是否仍确认叙事。
+  manual_checks:
+  - 判断叙事何时从“未证伪”转向“已暴露”；避免过早唱反调。
+  invalid_conditions:
+  - 叙事被真实盈利持续验证；政策进一步强化趋势。
+  a_share_adaptation:
+  - A 股主题投资可用：主线仍强则观察，反证出现则降级，不输出交易指令。
+  formal_status: 候选
+  report_sentence_template: 本判断参考《专业投机原理》的 PPS-M-011：识别建立在错误前提上的趋势：可以观察趋势延续，但必须在错误前提暴露前退出研究假设。
+- strategy_id: PPS-M-016
+  name: GNP/产出波动与股市波动的直接预测关系在书中检验未获显著支持。
+  category: macro
+  priority: 1
+  skill_type: 宏观策略和思想
+  task_fit:
+  - market_regime
+  - single_stock_analysis
+  - strategy_check
+  - trend_analysis
+  - user_discussion
+  source:
+    book: 专业投机原理
+    chapter: 专业投机原理第24章
+    page_range: OCR_PAGE 0324-0332，书内页码线索316-325，策略ID=PPS-M-016，提取方式=系统通读OCR；页码需人工复核。
+    raw_source: 《专业投机原理》第24章，OCR_PAGE 0324-0332，书内页码线索316-325，策略ID=PPS-M-016，提取方式=系统通读OCR；页码需人工复核。
+    extraction_method: full_ocr_txt_deep_dive
+    confidence: low
+  principle: GNP/产出波动与股市波动的直接预测关系在书中检验未获显著支持。
+  computable_rules:
+  - 不把 GDP/GNP 波动率单独作为市场波动预测因子；若使用需本地样本检验。
+  manual_checks:
+  - 区分宏观增长水平、增长波动、流动性、估值四类变量。
+  invalid_conditions:
+  - 发现 A 股本地统计显著关系前，不能写入正式量化信号。
+  a_share_adaptation:
+  - 标为“暂不纳入正式策略卡”，只保留为反证提醒。
+  formal_status: 否
+  report_sentence_template: 本判断参考《专业投机原理》的 PPS-M-016：GNP/产出波动与股市波动的直接预测关系在书中检验未获显著支持。
+- strategy_id: PPS-Q-004
+  name: 牛熊市场平均寿命和幅度可作为风险收益背景，不可作为确定预测。
+  category: technical
+  priority: 1
+  skill_type: 具体定量策略和分析标准
+  task_fit:
+  - backtest_strategy
+  - single_stock_analysis
+  - strategy_check
+  - trend_analysis
+  source:
+    book: 专业投机原理
+    chapter: 专业投机原理第4章
+    page_range: OCR_PAGE 0055-0061，书内页码线索48-54，策略ID=PPS-Q-004，提取方式=系统通读OCR；页码需人工复核。
+    raw_source: 《专业投机原理》第4章，OCR_PAGE 0055-0061，书内页码线索48-54，策略ID=PPS-Q-004，提取方式=系统通读OCR；页码需人工复核。
+    extraction_method: full_ocr_txt_deep_dive
+    confidence: medium
+  principle: 牛熊市场平均寿命和幅度可作为风险收益背景，不可作为确定预测。
+  computable_rules:
+  - 书中美股样本：熊市平均跌幅约29.4%，75%在20.4%-47.1%，平均1.1年；牛市平均涨幅约77.5%，平均2.33年，75%超过657天，67%在1.8-4.1年。
+  manual_checks:
+  - 样本来自海外历史；需判断当前制度、估值和政策差异。
+  invalid_conditions:
+  - 把历史均值当作目标价；市场制度改变。
+  a_share_adaptation:
+  - A 股只能作为“寿命/幅度分位”方法启发，需本地重算。
+  formal_status: 候选
+  report_sentence_template: 本判断参考《专业投机原理》的 PPS-Q-004：牛熊市场平均寿命和幅度可作为风险收益背景，不可作为确定预测。
+- strategy_id: PPS-Q-007
+  name: 趋势线画法：上升趋势线连接最低点与最高点之前的后续低点，不能穿越中间价格；下降趋势线
+  category: technical
+  priority: 1
+  skill_type: 具体定量策略和分析标准
+  task_fit:
+  - backtest_strategy
+  - single_stock_analysis
+  - strategy_check
+  - trend_analysis
+  source:
+    book: 专业投机原理
+    chapter: 专业投机原理第7章、第27章
+    page_range: OCR_PAGE 0086-0097、0364-0385，书内页码线索79-90、357-378，策略ID=PPS-Q-007，提取方式=系统通读OCR；页码需人工复核。
+    raw_source: 《专业投机原理》第7章、第27章，OCR_PAGE 0086-0097、0364-0385，书内页码线索79-90、357-378，策略ID=PPS-Q-007，提取方式=系统通读OCR；页码需人工复核。
+    extraction_method: full_ocr_txt_deep_dive
+    confidence: medium
+  principle: 趋势线画法：上升趋势线连接最低点与最高点之前的后续低点，不能穿越中间价格；下降趋势线连接最高点与最低点之前的后续高点，不能穿越中间价格。
+  computable_rules:
+  - 程序化可枚举 swing 点，选择不穿越价格序列且连接极值前次级点的线。
+  manual_checks:
+  - swing 点识别、影线处理、复权缺口处理。
+  invalid_conditions:
+  - 趋势线被有效跌破/突破；线本身由事后点位硬凑。
+  a_share_adaptation:
+  - 可作为图形解释辅助，不能单独定级。
+  formal_status: 候选
+  report_sentence_template: 本判断参考《专业投机原理》的 PPS-Q-007：趋势线画法：上升趋势线连接最低点与最高点之前的后续低点，不能穿越中间价格；下降趋势线连接最高点与最低点之前的后续高点，不能穿越中间价格。
+- strategy_id: PPS-Q-010
+  name: '2B 交易化约束：若按 2B 观察反转，失效点通常设在 2B 新高/新低外侧；中期 '
+  category: technical
+  priority: 1
+  skill_type: 具体定量策略和分析标准
+  task_fit:
+  - backtest_strategy
+  - single_stock_analysis
+  - strategy_check
+  - trend_analysis
+  source:
+    book: 专业投机原理
+    chapter: 专业投机原理第27章
+    page_range: OCR_PAGE 0364-0385，书内页码线索357-378，策略ID=PPS-Q-010，提取方式=系统通读OCR；页码需人工复核。
+    raw_source: 《专业投机原理》第27章，OCR_PAGE 0364-0385，书内页码线索357-378，策略ID=PPS-Q-010，提取方式=系统通读OCR；页码需人工复核。
+    extraction_method: full_ocr_txt_deep_dive
+    confidence: medium
+  principle: 2B 交易化约束：若按 2B 观察反转，失效点通常设在 2B 新高/新低外侧；中期 2B 常有较高报酬/风险比。
+  computable_rules:
+  - 上升趋势 2B 转弱：反穿前高后，失效参考为2B高点上方；下降趋势相反。原书称中期趋势报酬/风险常可超过5:1。
+  manual_checks:
+  - 目标位不能凭空设定，需来自前波段、平均寿命或支撑阻力。
+  invalid_conditions:
+  - 连续假信号；相关指数不确认；突破有高成交和基本面支撑。
+  a_share_adaptation:
+  - 进入策略卡时只写“失效区/观察区”，不写自动下单。
+  formal_status: 候选
+  report_sentence_template: 本判断参考《专业投机原理》的 PPS-Q-010：2B 交易化约束：若按 2B 观察反转，失效点通常设在 2B
+    新高/新低外侧；中期 2B 常有较高报酬/风险比。
+- strategy_id: PPS-Q-011
+  name: ABC 次级修正：BC 段成交萎缩时，突破 BC 趋势线可提示修正结束；止错参考 A
+  category: technical
+  priority: 1
+  skill_type: 具体定量策略和分析标准
+  task_fit:
+  - backtest_strategy
+  - single_stock_analysis
+  - strategy_check
+  - trend_analysis
+  source:
+    book: 专业投机原理
+    chapter: 专业投机原理第7章
+    page_range: OCR_PAGE 0096-0097，书内页码线索89-90，策略ID=PPS-Q-011，提取方式=系统通读OCR；页码需人工复核。
+    raw_source: 《专业投机原理》第7章，OCR_PAGE 0096-0097，书内页码线索89-90，策略ID=PPS-Q-011，提取方式=系统通读OCR；页码需人工复核。
+    extraction_method: full_ocr_txt_deep_dive
+    confidence: medium
+  principle: ABC 次级修正：BC 段成交萎缩时，突破 BC 趋势线可提示修正结束；止错参考 A/C 中较低点或较高点。
+  computable_rules:
+  - 识别A下跌/反弹、B反弹/回落、C再测试；BC 段量缩；突破BC趋势线；保护点设在A/C极值之外。
+  manual_checks:
+  - ABC 划分较主观；成交量萎缩是否真实。
+  invalid_conditions:
+  - 突破无成交确认；C点被有效跌破/突破；主趋势也转向。
+  a_share_adaptation:
+  - 可作为人工复核图形，不宜完全自动化。
+  formal_status: 候选
+  report_sentence_template: 本判断参考《专业投机原理》的 PPS-Q-011：ABC 次级修正：BC 段成交萎缩时，突破 BC 趋势线可提示修正结束；止错参考
+    A/C 中较低点或较高点。
+- strategy_id: PPS-Q-013
+  name: 仓位/风险资本约束：早期示例为首笔头寸不超过总资本10%，止损使总风险约1%-2%；
+  category: technical
+  priority: 1
+  skill_type: 具体定量策略和分析标准
+  task_fit:
+  - backtest_strategy
+  - single_stock_analysis
+  - strategy_check
+  - trend_analysis
+  source:
+    book: 专业投机原理
+    chapter: 专业投机原理第3章、第18章
+    page_range: OCR_PAGE 0038-0044、0275-0281，书内页码线索31-37、268-274，策略ID=PPS-Q-013，提取方式=系统通读OCR；页码需人工复核。
+    raw_source: 《专业投机原理》第3章、第18章，OCR_PAGE 0038-0044、0275-0281，书内页码线索31-37、268-274，策略ID=PPS-Q-013，提取方式=系统通读OCR；页码需人工复核。
+    extraction_method: full_ocr_txt_deep_dive
+    confidence: medium
+  principle: 仓位/风险资本约束：早期示例为首笔头寸不超过总资本10%，止损使总风险约1%-2%；后文实战原则强调新期间单笔风险资本约2%-3%。
+  computable_rules:
+  - 初始风险预算：`position <= 10% capital` 且 `risk <= 1%-2% capital`；第18章：单笔风险资本不超过约2%-3%。盈利后保留一半利润不再冒险。
+  manual_checks:
+  - 不同章节口径对应“头寸规模”和“风险资本”，需避免混淆。
+  invalid_conditions:
+  - 连续亏损后仍维持原风险；把全部浮盈继续冒险。
+  a_share_adaptation:
+  - 本项目不做仓位建议，可转译为“风险暴露提醒”和“连续错误降权”。
+  formal_status: 候选
+  report_sentence_template: 本判断参考《专业投机原理》的 PPS-Q-013：仓位/风险资本约束：早期示例为首笔头寸不超过总资本10%，止损使总风险约1%-2%；后文实战原则强调新期间单笔风险资本约2%-3%。
+- strategy_id: PPS-Q-014
+  name: 已有利润不应回吐超过约50%；利润出现后要用移动止错保护部分成果。
+  category: technical
+  priority: 1
+  skill_type: 具体定量策略和分析标准
+  task_fit:
+  - backtest_strategy
+  - single_stock_analysis
+  - strategy_check
+  - trend_analysis
+  source:
+    book: 专业投机原理
+    chapter: 专业投机原理第3章
+    page_range: OCR_PAGE 0038-0044，书内页码线索31-37，策略ID=PPS-Q-014，提取方式=系统通读OCR；页码需人工复核。
+    raw_source: 《专业投机原理》第3章，OCR_PAGE 0038-0044，书内页码线索31-37，策略ID=PPS-Q-014，提取方式=系统通读OCR；页码需人工复核。
+    extraction_method: full_ocr_txt_deep_dive
+    confidence: medium
+  principle: 已有利润不应回吐超过约50%；利润出现后要用移动止错保护部分成果。
+  computable_rules:
+  - 若浮盈从峰值回撤超过50%，触发利润保护复核；保护线可用前低/均线/ATR。
+  manual_checks:
+  - 区分短期波动与趋势破坏；止错线如何设置。
+  invalid_conditions:
+  - 趋势强但正常回撤；保护线过紧导致噪声触发。
+  a_share_adaptation:
+  - A 股可作风险提示，不输出卖出指令。
+  formal_status: 候选
+  report_sentence_template: 本判断参考《专业投机原理》的 PPS-Q-014：已有利润不应回吐超过约50%；利润出现后要用移动止错保护部分成果。
+- strategy_id: PPS-Q-016
+  name: 牛市次级修正 odds 示例：95%持续超过14天，98%回撤至少20%；68%回撤
+  category: technical
+  priority: 1
+  skill_type: 具体定量策略和分析标准
+  task_fit:
+  - backtest_strategy
+  - single_stock_analysis
+  - strategy_check
+  - trend_analysis
+  source:
+    book: 专业投机原理
+    chapter: 专业投机原理第26章
+    page_range: OCR_PAGE 0354-0363，书内页码线索347-356，策略ID=PPS-Q-016，提取方式=系统通读OCR；页码需人工复核。
+    raw_source: 《专业投机原理》第26章，OCR_PAGE 0354-0363，书内页码线索347-356，策略ID=PPS-Q-016，提取方式=系统通读OCR；页码需人工复核。
+    extraction_method: full_ocr_txt_deep_dive
+    confidence: medium
+  principle: 牛市次级修正 odds 示例：95%持续超过14天，98%回撤至少20%；68%回撤25%-75%且持续16-79天；超过75%且超过约74天时做多
+    odds 明显变差。
+  computable_rules:
+  - 计算修正回撤比例和持续天数；落入极端区间则标记“主趋势存疑”。原文对 odds 有翻译/算术脚注冲突，需复核。
+  manual_checks:
+  - 当前是否确属牛市内次级修正；样本是否适合 A 股。
+  invalid_conditions:
+  - 跌破关键结构、相关指数确认熊市；基本面/政策反转。
+  a_share_adaptation:
+  - 可作为宽基指数修正深度观察，不直接用于个股结论。
+  formal_status: 候选
+  report_sentence_template: 本判断参考《专业投机原理》的 PPS-Q-016：牛市次级修正 odds 示例：95%持续超过14天，98%回撤至少20%；68%回撤25%-75%且持续16-79天；超过75%且超过约74天时做多
+    odds 明显变差。
+- strategy_id: PPS-Q-018
+  name: 10周/30周均线交叉：10周上穿30周且两线斜率向上、价格在两线之上为转强辅助；反
+  category: technical
+  priority: 1
+  skill_type: 具体定量策略和分析标准
+  task_fit:
+  - backtest_strategy
+  - single_stock_analysis
+  - strategy_check
+  - trend_analysis
+  source:
+    book: 专业投机原理
+    chapter: 专业投机原理第8章
+    page_range: OCR_PAGE 0098-0118，书内页码线索91-111，策略ID=PPS-Q-018，提取方式=系统通读OCR；页码需人工复核。
+    raw_source: 《专业投机原理》第8章，OCR_PAGE 0098-0118，书内页码线索91-111，策略ID=PPS-Q-018，提取方式=系统通读OCR；页码需人工复核。
+    extraction_method: full_ocr_txt_deep_dive
+    confidence: medium
+  principle: 10周/30周均线交叉：10周上穿30周且两线斜率向上、价格在两线之上为转强辅助；反向为转弱辅助。
+  computable_rules:
+  - 周线计算10WMA、30WMA、斜率、收盘价位置；四条件同时满足。
+  manual_checks:
+  - 复权与周线切分；是否处于横盘。
+  invalid_conditions:
+  - 假交叉、成交不足、相关指数不确认。
+  a_share_adaptation:
+  - 适合中期趋势筛选，不能单独升级为积极结论。
+  formal_status: 候选
+  report_sentence_template: 本判断参考《专业投机原理》的 PPS-Q-018：10周/30周均线交叉：10周上穿30周且两线斜率向上、价格在两线之上为转强辅助；反向为转弱辅助。
+- strategy_id: PPS-Q-021
+  name: 价格震荡指标：5日价格差的10日移动和/净移动和用于提示短期极端，但不能单独交易。
+  category: technical
+  priority: 1
+  skill_type: 具体定量策略和分析标准
+  task_fit:
+  - backtest_strategy
+  - single_stock_analysis
+  - strategy_check
+  - trend_analysis
+  source:
+    book: 专业投机原理
+    chapter: 专业投机原理第8章
+    page_range: OCR_PAGE 0098-0118，书内页码线索91-111，策略ID=PPS-Q-021，提取方式=系统通读OCR；页码需人工复核。
+    raw_source: 《专业投机原理》第8章，OCR_PAGE 0098-0118，书内页码线索91-111，策略ID=PPS-Q-021，提取方式=系统通读OCR；页码需人工复核。
+    extraction_method: full_ocr_txt_deep_dive
+    confidence: medium
+  principle: 价格震荡指标：5日价格差的10日移动和/净移动和用于提示短期极端，但不能单独交易。
+  computable_rules:
+  - 计算5日价差，再做10日累计/平滑；识别极端分位。
+  manual_checks:
+  - 指标参数是否适合 A 股；极端值在趋势市会钝化。
+  invalid_conditions:
+  - 趋势强劲导致超买持续；波动制度变化。
+  a_share_adaptation:
+  - 可作为短期风险提示，不进核心策略卡或仅作为辅助字段。
+  formal_status: 候选
+  report_sentence_template: 本判断参考《专业投机原理》的 PPS-Q-021：价格震荡指标：5日价格差的10日移动和/净移动和用于提示短期极端，但不能单独交易。
+- strategy_id: PPS-Q-023
+  name: 四日法则：中期走势在高/低点附近出现连续四天下跌/上涨，常提示趋势可能改变；反向第一
+  category: technical
+  priority: 1
+  skill_type: 具体定量策略和分析标准
+  task_fit:
+  - backtest_strategy
+  - single_stock_analysis
+  - strategy_check
+  - trend_analysis
+  source:
+    book: 专业投机原理
+    chapter: 专业投机原理第27章
+    page_range: OCR_PAGE 0364-0385，书内页码线索357-378，策略ID=PPS-Q-023，提取方式=系统通读OCR；页码需人工复核。
+    raw_source: 《专业投机原理》第27章，OCR_PAGE 0364-0385，书内页码线索357-378，策略ID=PPS-Q-023，提取方式=系统通读OCR；页码需人工复核。
+    extraction_method: full_ocr_txt_deep_dive
+    confidence: medium
+  principle: 四日法则：中期走势在高/低点附近出现连续四天下跌/上涨，常提示趋势可能改变；反向第一天也有提示价值。
+  computable_rules:
+  - 统计连续4个交易日同向K线或收盘变动；书中1926-1985样本：约25%立即反转，41%在6天内，75%在24天内，约10%无有效四日形态。
+  manual_checks:
+  - 是否处于“相当大的中期趋势”之后；同向天数定义用收盘还是高低点。
+  invalid_conditions:
+  - 重大趋势行情中连续同向只是加速而非反转；无指数确认。
+  a_share_adaptation:
+  - A 股需本地回测后作为短期风险警报。
+  formal_status: 候选
+  report_sentence_template: 本判断参考《专业投机原理》的 PPS-Q-023：四日法则：中期走势在高/低点附近出现连续四天下跌/上涨，常提示趋势可能改变；反向第一天也有提示价值。
+- strategy_id: PPS-Q-024
+  name: 缺口穿越趋势线可能代表重大信息变化，需视为潜在趋势改变信号，但要确认。
+  category: technical
+  priority: 1
+  skill_type: 具体定量策略和分析标准
+  task_fit:
+  - backtest_strategy
+  - single_stock_analysis
+  - strategy_check
+  - trend_analysis
+  source:
+    book: 专业投机原理
+    chapter: 专业投机原理第28章
+    page_range: OCR_PAGE 0386-0404，书内页码线索379-397，策略ID=PPS-Q-024，提取方式=系统通读OCR；页码需人工复核。
+    raw_source: 《专业投机原理》第28章，OCR_PAGE 0386-0404，书内页码线索379-397，策略ID=PPS-Q-024，提取方式=系统通读OCR；页码需人工复核。
+    extraction_method: full_ocr_txt_deep_dive
+    confidence: medium
+  principle: 缺口穿越趋势线可能代表重大信息变化，需视为潜在趋势改变信号，但要确认。
+  computable_rules:
+  - 检测开盘缺口直接越过趋势线；记录缺口方向、是否回补、成交量、相关指数。
+  manual_checks:
+  - 缺口来自除权、停牌补跌、公告、指数调整还是真实信息。
+  invalid_conditions:
+  - 缺口迅速回补且未破结构；除权缺口未处理。
+  a_share_adaptation:
+  - A 股需强制复权和公告检查；只作人工复核信号。
+  formal_status: 候选
+  report_sentence_template: 本判断参考《专业投机原理》的 PPS-Q-024：缺口穿越趋势线可能代表重大信息变化，需视为潜在趋势改变信号，但要确认。
+- strategy_id: PPS-Q-025
+  name: 三日高低价规则：价格反转后突破最近三日高/低可作为短线方向确认，第三日极值可作失效参
+  category: technical
+  priority: 1
+  skill_type: 具体定量策略和分析标准
+  task_fit:
+  - backtest_strategy
+  - single_stock_analysis
+  - strategy_check
+  - trend_analysis
+  source:
+    book: 专业投机原理
+    chapter: 专业投机原理第28章
+    page_range: OCR_PAGE 0386-0404，书内页码线索379-397，策略ID=PPS-Q-025，提取方式=系统通读OCR；页码需人工复核。
+    raw_source: 《专业投机原理》第28章，OCR_PAGE 0386-0404，书内页码线索379-397，策略ID=PPS-Q-025，提取方式=系统通读OCR；页码需人工复核。
+    extraction_method: full_ocr_txt_deep_dive
+    confidence: medium
+  principle: 三日高低价规则：价格反转后突破最近三日高/低可作为短线方向确认，第三日极值可作失效参考。
+  computable_rules:
+  - 取最近3日高点/低点；向上突破3日高点为转强观察，向下跌破3日低点为转弱观察；失效参考为第三日相反极值。
+  manual_checks:
+  - 需先有趋势反转背景和其他确认；日内高低点是否被极端影线污染。
+  invalid_conditions:
+  - 震荡市假突破；涨跌停限制；成交不足。
+  a_share_adaptation:
+  - 可作为短线辅助，因 A 股 T+1 不宜直接交易化。
+  formal_status: 候选
+  report_sentence_template: 本判断参考《专业投机原理》的 PPS-Q-025：三日高低价规则：价格反转后突破最近三日高/低可作为短线方向确认，第三日极值可作失效参考。
+- strategy_id: PPS-Q-026
+  name: 日内跳空规则：开盘缺口若10-15分钟内不回补，原书称当日延续缺口方向的概率很高；尾
+  category: technical
+  priority: 1
+  skill_type: 具体定量策略和分析标准
+  task_fit:
+  - backtest_strategy
+  - single_stock_analysis
+  - strategy_check
+  - trend_analysis
+  source:
+    book: 专业投机原理
+    chapter: 专业投机原理第30章
+    page_range: OCR_PAGE 0429-0445，书内页码线索422-438，策略ID=PPS-Q-026，提取方式=系统通读OCR；页码需人工复核。
+    raw_source: 《专业投机原理》第30章，OCR_PAGE 0429-0445，书内页码线索422-438，策略ID=PPS-Q-026，提取方式=系统通读OCR；页码需人工复核。
+    extraction_method: full_ocr_txt_deep_dive
+    confidence: low
+  principle: 日内跳空规则：开盘缺口若10-15分钟内不回补，原书称当日延续缺口方向的概率很高；尾盘约3:10后方向延续到收盘概率约80%。
+  computable_rules:
+  - 需分钟数据：开盘缺口、10-15分钟是否回补、尾盘方向。
+  manual_checks:
+  - 原书为美国日内交易环境；A 股集合竞价、T+1、午休、涨跌停差异很大。
+  invalid_conditions:
+  - A 股制度不适配；缺口来自公告或停牌；流动性不足。
+  a_share_adaptation:
+  - 不建议进正式 A 股策略卡，最多做“开盘异常观察”。
+  formal_status: 否
+  report_sentence_template: 本判断参考《专业投机原理》的 PPS-Q-026：日内跳空规则：开盘缺口若10-15分钟内不回补，原书称当日延续缺口方向的概率很高；尾盘约3:10后方向延续到收盘概率约80%。
+- strategy_id: PPS-Q-027
+  name: 七项短线评分：高点、开盘、收盘、收盘位置、收盘相对开盘、低点、收盘是否超过前高/前低
+  category: technical
+  priority: 1
+  skill_type: 具体定量策略和分析标准
+  task_fit:
+  - backtest_strategy
+  - single_stock_analysis
+  - strategy_check
+  - trend_analysis
+  source:
+    book: 专业投机原理
+    chapter: 专业投机原理第30章
+    page_range: OCR_PAGE 0429-0445，书内页码线索422-438，策略ID=PPS-Q-027，提取方式=系统通读OCR；页码需人工复核。
+    raw_source: 《专业投机原理》第30章，OCR_PAGE 0429-0445，书内页码线索422-438，策略ID=PPS-Q-027，提取方式=系统通读OCR；页码需人工复核。
+    extraction_method: full_ocr_txt_deep_dive
+    confidence: medium
+  principle: 七项短线评分：高点、开盘、收盘、收盘位置、收盘相对开盘、低点、收盘是否超过前高/前低，用于预测次日倾向。
+  computable_rules:
+  - 多头项：高点高于前高、开盘高于前收、收盘高于前收、收盘在日内上半区、收盘高于开盘、低点高于前低、收盘高于前高；空头相反。全7项多头时，原书称次日高于今日高约90%、收盘高于今日收约80%。
+  manual_checks:
+  - 样本市场与时期差异；评分是短期倾向，不是交易指令。
+  invalid_conditions:
+  - A 股隔夜公告、涨跌停、T+1、量化资金影响。
+  a_share_adaptation:
+  - 可作为 A 股短线情绪特征候选，需大样本回测后再入库。
+  formal_status: 候选
+  report_sentence_template: 本判断参考《专业投机原理》的 PPS-Q-027：七项短线评分：高点、开盘、收盘、收盘位置、收盘相对开盘、低点、收盘是否超过前高/前低，用于预测次日倾向。
+- strategy_id: PPS-Q-028
+  name: 牛市中期上升背景下，连续下跌天数越多，次日上涨概率在原书样本中越高。
+  category: technical
+  priority: 1
+  skill_type: 具体定量策略和分析标准
+  task_fit:
+  - backtest_strategy
+  - single_stock_analysis
+  - strategy_check
+  - trend_analysis
+  source:
+    book: 专业投机原理
+    chapter: 专业投机原理第30章
+    page_range: OCR_PAGE 0429-0445，书内页码线索422-438，策略ID=PPS-Q-028，提取方式=系统通读OCR；页码需人工复核。
+    raw_source: 《专业投机原理》第30章，OCR_PAGE 0429-0445，书内页码线索422-438，策略ID=PPS-Q-028，提取方式=系统通读OCR；页码需人工复核。
+    extraction_method: full_ocr_txt_deep_dive
+    confidence: medium
+  principle: 牛市中期上升背景下，连续下跌天数越多，次日上涨概率在原书样本中越高。
+  computable_rules:
+  - 原书给出：中期上升背景下，1天下跌后次日上涨约60.0%，2天下跌后约85.9%，3天下跌后约94.4%。
+  manual_checks:
+  - 必须先确认处于牛市/中期上升；样本是否适用于 A 股。
+  invalid_conditions:
+  - 大盘趋势已变、政策利空、连续跌停、流动性危机。
+  a_share_adaptation:
+  - 仅可作为回测候选，不能直接用于个股结论。
+  formal_status: 候选
+  report_sentence_template: 本判断参考《专业投机原理》的 PPS-Q-028：牛市中期上升背景下，连续下跌天数越多，次日上涨概率在原书样本中越高。
+- strategy_id: PPS-Q-029
+  name: 期权策略要求更高风险收益：至少1:3，原书更偏好1:5；单一期权头寸风险需严格限制。
+  category: technical
+  priority: 1
+  skill_type: 具体定量策略和分析标准
+  task_fit:
+  - backtest_strategy
+  - single_stock_analysis
+  - strategy_check
+  - trend_analysis
+  source:
+    book: 专业投机原理
+    chapter: 专业投机原理第29章
+    page_range: OCR_PAGE 0407-0428，书内页码线索400-421，策略ID=PPS-Q-029，提取方式=系统通读OCR；页码需人工复核。
+    raw_source: 《专业投机原理》第29章，OCR_PAGE 0407-0428，书内页码线索400-421，策略ID=PPS-Q-029，提取方式=系统通读OCR；页码需人工复核。
+    extraction_method: full_ocr_txt_deep_dive
+    confidence: low
+  principle: 期权策略要求更高风险收益：至少1:3，原书更偏好1:5；单一期权头寸风险需严格限制。
+  computable_rules:
+  - 期权潜在收益/权利金风险至少>=5更优；单一期权风险资本处存在OCR冲突：前文多处强调1%-3%、不超过10%，末尾出现不超过30%，需人工复核，保守采用更低约束。
+  manual_checks:
+  - A 股期权标的有限，ETF期权与个股研究不同；隐含波动率和流动性要单独评估。
+  invalid_conditions:
+  - 权利金过高、事件风险已充分定价、卖方无限/大风险。
+  a_share_adaptation:
+  - 本项目不做期权指令；暂不进入普通 A 股股票策略卡。
+  formal_status: 否
+  report_sentence_template: 本判断参考《专业投机原理》的 PPS-Q-029：期权策略要求更高风险收益：至少1:3，原书更偏好1:5；单一期权头寸风险需严格限制。
+- strategy_id: CANDLE_MACRO_012
+  name: 技术分析度量市场心理；价格已经综合公开和非公开信息，但仍须防止情绪化解释。
+  category: macro
+  priority: 1
+  skill_type: 宏观策略和思想
+  task_fit:
+  - market_regime
+  - single_stock_analysis
+  - strategy_check
+  - trend_analysis
+  - user_discussion
+  source:
+    book: 日本蜡烛图技术
+    chapter: 第一章、第三章
+    page_range: OCR_PAGE_0030-0032、0045-0046；书内页码约10-12、25-26；页码需人工复核；full_ocr_txt
+    raw_source: 第一章、第三章，OCR_PAGE_0030-0032、0045-0046；书内页码约10-12、25-26；页码需人工复核；full_ocr_txt
+    extraction_method: full_ocr_txt_deep_dive
+    confidence: medium
+  principle: 技术分析度量市场心理；价格已经综合公开和非公开信息，但仍须防止情绪化解释。
+  computable_rules:
+  - 结合价格对消息/公告后的反应、量价与K线结构。
+  manual_checks:
+  - 判断价格反应是否已充分消化信息。
+  invalid_conditions:
+  - 基本面重大变化与技术信号冲突时，技术信号降权。
+  a_share_adaptation:
+  - A股研究中需同时拉公告/新闻流，不得只看K线。
+  formal_status: 可作为宏观原则合并
+  report_sentence_template: 本判断参考《日本蜡烛图技术》的 CANDLE_MACRO_012：技术分析度量市场心理；价格已经综合公开和非公开信息，但仍须防止情绪化解释。
+- strategy_id: CANDLE_Q_012
+  name: 平头顶部/底部：两根或多根蜡烛几乎同高/同低；本身较弱，若同时构成锤子、十字孕线、吞
+  category: technical
+  priority: 1
+  skill_type: 具体定量策略和分析标准
+  task_fit:
+  - backtest_strategy
+  - single_stock_analysis
+  - strategy_check
+  - trend_analysis
+  source:
+    book: 日本蜡烛图技术
+    chapter: 第六章、术语表A
+    page_range: OCR_PAGE_0111-0118、0332；书内页码约91-98、312；页码需人工复核；full_ocr_txt
+    raw_source: 第六章、术语表A，OCR_PAGE_0111-0118、0332；书内页码约91-98、312；页码需人工复核；full_ocr_txt
+    extraction_method: full_ocr_txt_deep_dive
+    confidence: high
+  principle: 平头顶部/底部：两根或多根蜡烛几乎同高/同低；本身较弱，若同时构成锤子、十字孕线、吞没等则分量增加。
+  computable_rules:
+  - 高点/低点差距在容忍范围内；记录是否叠加其它形态。
+  manual_checks:
+  - “几乎相同”的价差阈值需按ATR/最小价位设置。
+  invalid_conditions:
+  - 突破平头高/低点并有效收盘。
+  a_share_adaptation:
+  - A股可用作前高/前低试探，不单独作为正式卡。
+  formal_status: 可合并
+  report_sentence_template: 本判断参考《日本蜡烛图技术》的 CANDLE_Q_012：平头顶部/底部：两根或多根蜡烛几乎同高/同低；本身较弱，若同时构成锤子、十字孕线、吞没等则分量增加。
+- strategy_id: CANDLE_Q_013
+  name: 捉腰带线：低价区长白且开盘在最低点附近为看涨；高价区长黑且开盘在最高点附近为看跌；越
+  category: technical
+  priority: 1
+  skill_type: 具体定量策略和分析标准
+  task_fit:
+  - backtest_strategy
+  - single_stock_analysis
+  - strategy_check
+  - trend_analysis
+  source:
+    book: 日本蜡烛图技术
+    chapter: 第六章、术语表A
+    page_range: OCR_PAGE_0119-0121、0319；书内页码约99-101、299；页码需人工复核；full_ocr_txt
+    raw_source: 第六章、术语表A，OCR_PAGE_0119-0121、0319；书内页码约99-101、299；页码需人工复核；full_ocr_txt
+    extraction_method: full_ocr_txt_deep_dive
+    confidence: high
+  principle: 捉腰带线：低价区长白且开盘在最低点附近为看涨；高价区长黑且开盘在最高点附近为看跌；越长越重要。
+  computable_rules:
+  - 看涨：长白、无/短下影；看跌：长黑、无/短上影；要求处于低价区/高价区。
+  manual_checks:
+  - 高低价区判定；长实体分位。
+  invalid_conditions:
+  - 看涨捉腰带后收盘跌破该白线；看跌捉腰带后收盘升破该黑线。
+  a_share_adaptation:
+  - A股长阳/长阴需结合涨跌停、量能、板块。
+  formal_status: 可合并
+  report_sentence_template: 本判断参考《日本蜡烛图技术》的 CANDLE_Q_013：捉腰带线：低价区长白且开盘在最低点附近为看涨；高价区长黑且开盘在最高点附近为看跌；越长越重要。
+- strategy_id: CANDLE_Q_014
+  name: 向上跳空二只乌鸦：上升中长白后跳空出现两根黑实体，第二黑开盘高于第一黑、收盘低于第一
+  category: technical
+  priority: 1
+  skill_type: 具体定量策略和分析标准
+  task_fit:
+  - backtest_strategy
+  - single_stock_analysis
+  - strategy_check
+  - trend_analysis
+  source:
+    book: 日本蜡烛图技术
+    chapter: 第六章、术语表A
+    page_range: OCR_PAGE_0121-0125、0333；书内页码约101-105、313；页码需人工复核；full_ocr_txt
+    raw_source: 第六章、术语表A，OCR_PAGE_0121-0125、0333；书内页码约101-105、313；页码需人工复核；full_ocr_txt
+    extraction_method: full_ocr_txt_deep_dive
+    confidence: high
+  principle: 向上跳空二只乌鸦：上升中长白后跳空出现两根黑实体，第二黑开盘高于第一黑、收盘低于第一黑，属于顶部风险信号。
+  computable_rules:
+  - 三线结构；两黑实体相对关系；前有上升趋势和向上跳空。
+  manual_checks:
+  - 稀有形态，需人工复核是否为铺垫形态。
+  invalid_conditions:
+  - 后续向上收复第二黑高点或形成铺垫形态。
+  a_share_adaptation:
+  - A股缺口受涨停影响强，需结合开板行为。
+  formal_status: 可合并
+  report_sentence_template: 本判断参考《日本蜡烛图技术》的 CANDLE_Q_014：向上跳空二只乌鸦：上升中长白后跳空出现两根黑实体，第二黑开盘高于第一黑、收盘低于第一黑，属于顶部风险信号。
+- strategy_id: CANDLE_Q_016
+  name: 反击线：两根颜色相反蜡烛收盘价相同或接近；第二天开盘沿原趋势大幅跳空后收回前收盘，表
+  category: technical
+  priority: 1
+  skill_type: 具体定量策略和分析标准
+  task_fit:
+  - backtest_strategy
+  - single_stock_analysis
+  - strategy_check
+  - trend_analysis
+  source:
+    book: 日本蜡烛图技术
+    chapter: 第六章、术语表A
+    page_range: OCR_PAGE_0127-0130、0320；书内页码约107-110、300；页码需人工复核；full_ocr_txt
+    raw_source: 第六章、术语表A，OCR_PAGE_0127-0130、0320；书内页码约107-110、300；页码需人工复核；full_ocr_txt
+    extraction_method: full_ocr_txt_deep_dive
+    confidence: high
+  principle: 反击线：两根颜色相反蜡烛收盘价相同或接近；第二天开盘沿原趋势大幅跳空后收回前收盘，表示双方胶着；弱于刺透/乌云。
+  computable_rules:
+  - 上升后白线+高开黑线收回前收盘为看跌研究信号；下降后黑线+低开白线收回前收盘为看涨研究信号。
+  manual_checks:
+  - 收盘“相同”的容忍范围。
+  invalid_conditions:
+  - 后续沿原趋势突破跳空方向极值。
+  a_share_adaptation:
+  - A股跳空常由消息驱动，需查公告/新闻。
+  formal_status: 可合并
+  report_sentence_template: 本判断参考《日本蜡烛图技术》的 CANDLE_Q_016：反击线：两根颜色相反蜡烛收盘价相同或接近；第二天开盘沿原趋势大幅跳空后收回前收盘，表示双方胶着；弱于刺透/乌云。
+- strategy_id: CANDLE_Q_018
+  name: 圆形顶/平底锅底：圆弧状小实体后需向下/向上窗口验证；塔形顶/底由长实体-整固-反向
+  category: technical
+  priority: 1
+  skill_type: 具体定量策略和分析标准
+  task_fit:
+  - backtest_strategy
+  - single_stock_analysis
+  - strategy_check
+  - trend_analysis
+  source:
+    book: 日本蜡烛图技术
+    chapter: 第六章、术语表A
+    page_range: OCR_PAGE_0137-0142、0321-0322、0331-0332；书内页码约117-122、301-302、311-312；页码需人工复核；full_ocr_txt
+    raw_source: 第六章、术语表A，OCR_PAGE_0137-0142、0321-0322、0331-0332；书内页码约117-122、301-302、311-312；页码需人工复核；full_ocr_txt
+    extraction_method: full_ocr_txt_deep_dive
+    confidence: high
+  principle: 圆形顶/平底锅底：圆弧状小实体后需向下/向上窗口验证；塔形顶/底由长实体-整固-反向长实体组成，是主要反转结构。
+  computable_rules:
+  - 识别多日圆弧、小实体群、验证窗口；塔形要求两侧长实体。
+  manual_checks:
+  - 圆弧/塔形结构需人工确认。
+  invalid_conditions:
+  - 无验证窗口或反向长实体，结构未完成。
+  a_share_adaptation:
+  - A股可作中期结构观察，需排除停牌缺口。
+  formal_status: 可合并
+  report_sentence_template: 本判断参考《日本蜡烛图技术》的 CANDLE_Q_018：圆形顶/平底锅底：圆弧状小实体后需向下/向上窗口验证；塔形顶/底由长实体-整固-反向长实体组成，是主要反转结构。
+- strategy_id: CANDLE_Q_020
+  name: 8-10个新记录高点/低点、三空形态：趋势中连续8-10个新高/新低或3个窗口后，若
+  category: technical
+  priority: 1
+  skill_type: 具体定量策略和分析标准
+  task_fit:
+  - backtest_strategy
+  - single_stock_analysis
+  - strategy_check
+  - trend_analysis
+  source:
+    book: 日本蜡烛图技术
+    chapter: 第七章、术语表A
+    page_range: OCR_PAGE_0152-0154、0321、0330；书内页码约132-134、301、310；页码需人工复核；full_ocr_txt
+    raw_source: 第七章、术语表A，OCR_PAGE_0152-0154、0321、0330；书内页码约132-134、301、310；页码需人工复核；full_ocr_txt
+    extraction_method: full_ocr_txt_deep_dive
+    confidence: high
+  principle: 8-10个新记录高点/低点、三空形态：趋势中连续8-10个新高/新低或3个窗口后，若再出现反向蜡烛信号，提示动力耗尽。
+  computable_rules:
+  - 计数连续新高/新低；计数同方向窗口；等待反向蜡烛确认。
+  manual_checks:
+  - “有意义调整”如何定义。
+  invalid_conditions:
+  - 计数后继续放量沿趋势突破，且无反向蜡烛确认。
+  a_share_adaptation:
+  - A股连续涨停/跌停需单独标为情绪极端，不机械套用。
+  formal_status: 可合并
+  report_sentence_template: 本判断参考《日本蜡烛图技术》的 CANDLE_Q_020：8-10个新记录高点/低点、三空形态：趋势中连续8-10个新高/新低或3个窗口后，若再出现反向蜡烛信号，提示动力耗尽。
+- strategy_id: CANDLE_Q_021
+  name: 跳空并列阴阳线、跳空并列白色线：均为稀有持续形态，关键在窗口未被关闭；向上形态偏看涨
+  category: technical
+  priority: 1
+  skill_type: 具体定量策略和分析标准
+  task_fit:
+  - backtest_strategy
+  - single_stock_analysis
+  - strategy_check
+  - trend_analysis
+  source:
+    book: 日本蜡烛图技术
+    chapter: 第七章、术语表A
+    page_range: OCR_PAGE_0154-0161、0328-0329；书内页码约134-141、308-309；页码需人工复核；full_ocr_txt
+    raw_source: 第七章、术语表A，OCR_PAGE_0154-0161、0328-0329；书内页码约134-141、308-309；页码需人工复核；full_ocr_txt
+    extraction_method: full_ocr_txt_deep_dive
+    confidence: low
+  principle: 跳空并列阴阳线、跳空并列白色线：均为稀有持续形态，关键在窗口未被关闭；向上形态偏看涨延续，向下并列白线偏看跌延续。
+  computable_rules:
+  - 识别窗口后相邻实体颜色、大小、开盘相近；监测窗口是否回补。
+  manual_checks:
+  - 稀有形态需人工确认。
+  invalid_conditions:
+  - 窗口被关闭且反向压力延续。
+  a_share_adaptation:
+  - A股建议仅作为辅助标签，不单独入正式卡。
+  formal_status: 暂缓
+  report_sentence_template: 本判断参考《日本蜡烛图技术》的 CANDLE_Q_021：跳空并列阴阳线、跳空并列白色线：均为稀有持续形态，关键在窗口未被关闭；向上形态偏看涨延续，向下并列白线偏看跌延续。
+- strategy_id: CANDLE_Q_025
+  name: 分手线：趋势中两根颜色相反蜡烛开盘价相同，第二根沿原趋势方向收盘，属于持续信号。
+  category: technical
+  priority: 1
+  skill_type: 具体定量策略和分析标准
+  task_fit:
+  - backtest_strategy
+  - single_stock_analysis
+  - strategy_check
+  - trend_analysis
+  source:
+    book: 日本蜡烛图技术
+    chapter: 第七章、术语表A
+    page_range: OCR_PAGE_0173-0174、0327；书内页码约153-154、307；页码需人工复核；full_ocr_txt
+    raw_source: 第七章、术语表A，OCR_PAGE_0173-0174、0327；书内页码约153-154、307；页码需人工复核；full_ocr_txt
+    extraction_method: full_ocr_txt_deep_dive
+    confidence: low
+  principle: 分手线：趋势中两根颜色相反蜡烛开盘价相同，第二根沿原趋势方向收盘，属于持续信号。
+  computable_rules:
+  - 上升中黑线后同开盘白线；下降中白线后同开盘黑线。
+  manual_checks:
+  - 开盘相同容忍度；A股开盘价噪声。
+  invalid_conditions:
+  - 第二根后无法延续原趋势，反向突破第一根区间。
+  a_share_adaptation:
+  - 稀有，暂缓正式卡。
+  formal_status: 暂缓
+  report_sentence_template: 本判断参考《日本蜡烛图技术》的 CANDLE_Q_025：分手线：趋势中两根颜色相反蜡烛开盘价相同，第二根沿原趋势方向收盘，属于持续信号。
+- strategy_id: CANDLE_Q_034
+  name: 随机指数：%K/%D；%D <=25附近且正背离、%K上穿%D为看涨验证；反向为看跌
+  category: technical
+  priority: 1
+  skill_type: 具体定量策略和分析标准
+  task_fit:
+  - backtest_strategy
+  - single_stock_analysis
+  - strategy_check
+  - trend_analysis
+  source:
+    book: 日本蜡烛图技术
+    chapter: 第十四章
+    page_range: OCR_PAGE_0262-0266；书内页码约242-246；页码需人工复核；full_ocr_txt
+    raw_source: 第十四章，OCR_PAGE_0262-0266；书内页码约242-246；页码需人工复核；full_ocr_txt
+    extraction_method: full_ocr_txt_deep_dive
+    confidence: high
+  principle: 随机指数：%K/%D；%D <=25附近且正背离、%K上穿%D为看涨验证；反向为看跌验证。
+  computable_rules:
+  - '`%K=(close-N日低)/(N日高-N日低)*100`；常见N为9/14/21；检测K/D交叉。'
+  manual_checks:
+  - 超买超卖阈值可因市场调整。
+  invalid_conditions:
+  - 趋势强劲时随机指标钝化。
+  a_share_adaptation:
+  - A股短线波动大，需结合成交额和趋势线。
+  formal_status: 可合并
+  report_sentence_template: 本判断参考《日本蜡烛图技术》的 CANDLE_Q_034：随机指数：%K/%D；%D <=25附近且正背离、%K上穿%D为看涨验证；反向为看跌验证。
+- strategy_id: CANDLE_Q_035
+  name: 动力指数：当前收盘与N日前收盘之差；价格创新高但动力不确认，提示趋势减速；上穿/下穿
+  category: technical
+  priority: 1
+  skill_type: 具体定量策略和分析标准
+  task_fit:
+  - backtest_strategy
+  - single_stock_analysis
+  - strategy_check
+  - trend_analysis
+  source:
+    book: 日本蜡烛图技术
+    chapter: 第十四章
+    page_range: OCR_PAGE_0267-0269；书内页码约247-249；页码需人工复核；full_ocr_txt
+    raw_source: 第十四章，OCR_PAGE_0267-0269；书内页码约247-249；页码需人工复核；full_ocr_txt
+    extraction_method: full_ocr_txt_deep_dive
+    confidence: high
+  principle: 动力指数：当前收盘与N日前收盘之差；价格创新高但动力不确认，提示趋势减速；上穿/下穿零线提供方向验证。
+  computable_rules:
+  - '`momentum = close_t - close_t-N`；检测背离、零线穿越、极端正负值。'
+  manual_checks:
+  - N值选择、极端值阈值。
+  invalid_conditions:
+  - 趋势加速且动力同步创新高/低。
+  a_share_adaptation:
+  - 可作为A股量价动能辅助项。
+  formal_status: 可合并
+  report_sentence_template: 本判断参考《日本蜡烛图技术》的 CANDLE_Q_035：动力指数：当前收盘与N日前收盘之差；价格创新高但动力不确认，提示趋势减速；上穿/下穿零线提供方向验证。
+- strategy_id: CANDLE_Q_038
+  name: 艾略特/市场剖面图/期权/保值章节：蜡烛图可用于波浪终点、价值区异常、波动率变化和保
+  category: technical
+  priority: 1
+  skill_type: 具体定量策略和分析标准
+  task_fit:
+  - backtest_strategy
+  - multi_stock_comparison
+  - single_stock_analysis
+  - strategy_check
+  - trend_analysis
+  source:
+    book: 日本蜡烛图技术
+    chapter: 第十六至十九章
+    page_range: OCR_PAGE_0282-0308；书内页码约262-288；页码需人工复核；full_ocr_txt
+    raw_source: 第十六至十九章，OCR_PAGE_0282-0308；书内页码约262-288；页码需人工复核；full_ocr_txt
+    extraction_method: full_ocr_txt_deep_dive
+    confidence: low
+  principle: 艾略特/市场剖面图/期权/保值章节：蜡烛图可用于波浪终点、价值区异常、波动率变化和保值时点的确认，但这些不是A股普通个股首要落地规则。
+  computable_rules:
+  - 可记录为辅助验证：波浪目标附近有蜡烛信号、价值区缩窄与流星/十字同现、波动率低位叠加底部形态。
+  manual_checks:
+  - 工具专业门槛高，且A股个股数据不一定齐全。
+  invalid_conditions:
+  - 辅助工具与价格行为相互否定。
+  a_share_adaptation:
+  - 暂不进入普通A股策略卡；可作为高级研究备注。
+  formal_status: 暂缓
+  report_sentence_template: 本判断参考《日本蜡烛图技术》的 CANDLE_Q_038：艾略特/市场剖面图/期权/保值章节：蜡烛图可用于波浪终点、价值区异常、波动率变化和保值时点的确认，但这些不是A股普通个股首要落地规则。
+- strategy_id: DOW-B-005
+  name: 可读正文统计：全部主要趋势运动平均约100.1个交易日后出现重大次级反应；次级反应平
+  category: technical
+  priority: 1
+  skill_type: 具体定量策略和分析标准
+  task_fit:
+  - backtest_strategy
+  - single_stock_analysis
+  - strategy_check
+  - trend_analysis
+  source:
+    book: 道氏理论
+    chapter: 道氏理论/第10章/OCR_PAGE 106-108；提取方式：OCR正文通读
+    page_range: OCR_PAGE 106-108；提取方式：OCR正文通读，表格 OCR 错乱未直接采用；页码需人工复核
+    raw_source: 《道氏理论》/第10章/OCR_PAGE 106-108；提取方式：OCR正文通读，表格 OCR 错乱未直接采用；页码需人工复核
+    extraction_method: full_ocr_txt_deep_dive
+    confidence: medium
+  principle: 可读正文统计：全部主要趋势运动平均约100.1个交易日后出现重大次级反应；次级反应平均52.2天，平均调整57.6%。73%在55个交易日内完成，60%在25-55天结束。
+  computable_rules:
+  - 作为历史先验分布，不作为交易阈值；记录当前次级反应运行天数、回撤比例、所处分位。
+  manual_checks:
+  - 统计样本是1897-1931年美股工业/铁路指数，A股制度不同。
+  invalid_conditions:
+  - 直接拿平均值预测结束日；忽略样本时代差异。
+  a_share_adaptation:
+  - 可进入研究卡的“参考分布”，正式应用需用A股历史重新回测。
+  formal_status: 部分：quantitative/reference
+  report_sentence_template: 本判断参考《道氏理论》的 DOW-B-005：可读正文统计：全部主要趋势运动平均约100.1个交易日后出现重大次级反应；次级反应平均52.2天，平均调整57.6%。73%在55个交易日内完成，60%在25-55天结束。
+- strategy_id: DOW-B-006
+  name: 次级回撤分布：7.1%在10%-25%结束；25.4%在25%-40%；18.8%在
+  category: technical
+  priority: 1
+  skill_type: 具体定量策略和分析标准
+  task_fit:
+  - backtest_strategy
+  - single_stock_analysis
+  - strategy_check
+  - trend_analysis
+  source:
+    book: 道氏理论
+    chapter: 第10章
+    page_range: OCR_PAGE 108；提取方式：OCR正文通读；页码需人工复核
+    raw_source: 《道氏理论》/第10章/OCR_PAGE 108；提取方式：OCR正文通读；页码需人工复核
+    extraction_method: full_ocr_txt_deep_dive
+    confidence: medium
+  principle: 次级回撤分布：7.1%在10%-25%结束；25.4%在25%-40%；18.8%在40%-55%；26.7%在55%-70%；8.5%在70%-85%；14%超过85%。
+  computable_rules:
+  - 计算当前回撤区间，输出“仍在常见次级范围/已接近深回撤/需反转确认”。
+  manual_checks:
+  - 样本和OCR页码需复核；超过85%不必然就是反转。
+  invalid_conditions:
+  - 把超过66%自动判主要反转；忽略双指数新高/新低确认。
+  a_share_adaptation:
+  - A股需重新统计，但可先用于报告解释“深回撤仍可能是次级反应”。
+  formal_status: 部分：quantitative/reference
+  report_sentence_template: 本判断参考《道氏理论》的 DOW-B-006：次级回撤分布：7.1%在10%-25%结束；25.4%在25%-40%；18.8%在40%-55%；26.7%在55%-70%；8.5%在70%-85%；14%超过85%。
+- strategy_id: DOW-B-014
+  name: 熊市底部常见：60-90天内平均指数波动在3%以内，另有少数约5%；成交量前期下降；
+  category: technical
+  priority: 1
+  skill_type: 具体定量策略和分析标准
+  task_fit:
+  - backtest_strategy
+  - single_stock_analysis
+  - strategy_check
+  - trend_analysis
+  source:
+    book: 道氏理论
+    chapter: 第8章
+    page_range: OCR_PAGE 71-74；提取方式：OCR正文通读；页码需人工复核
+    raw_source: 《道氏理论》/第8章/OCR_PAGE 71-74；提取方式：OCR正文通读；页码需人工复核
+    extraction_method: full_ocr_txt_deep_dive
+    confidence: medium
+  principle: 熊市底部常见：60-90天内平均指数波动在3%以内，另有少数约5%；成交量前期下降；坏消息钝化。但这只是历史观察，不是抓底公式。
+  computable_rules:
+  - 检查底部横盘天数、区间宽度、坏消息反应、成交量趋势；输出“底部候选/仍需确认”。
+  manual_checks:
+  - 是否只是熊市中继平台。
+  invalid_conditions:
+  - 向下突破底部区间且双指数确认；成交量随下跌放大；反弹失败。
+  a_share_adaptation:
+  - A股底部候选需要结合政策、估值分位和行业广度，但必须等待价格突破确认。
+  formal_status: 部分：quantitative/reference
+  report_sentence_template: 本判断参考《道氏理论》的 DOW-B-014：熊市底部常见：60-90天内平均指数波动在3%以内，另有少数约5%；成交量前期下降；坏消息钝化。但这只是历史观察，不是抓底公式。

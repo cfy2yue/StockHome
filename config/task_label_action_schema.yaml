@@ -1,0 +1,142 @@
+schema_version: task_label_action_schema_v1
+updated_at: "2026-06-26"
+research_only: true
+no_broker: true
+no_auto_trade: true
+no_investment_instruction: true
+
+purpose: >
+  Define offline training labels and internal research actions for the hybrid
+  Quant Tool + Agent loop. Labels may use future outcomes only inside tool
+  training and evaluation. They must never be copied into DeepSeek evidence
+  packs, memory prompts, user-facing raw material, or Book Skill cards.
+
+user_visible_grades:
+  - 继续深挖
+  - 放入观察
+  - 暂时剔除
+  - 信息不足
+
+internal_research_actions:
+  - 增加研究暴露
+  - 保持观察
+  - 降低研究暴露
+  - 转入现金
+  - 信息不足不动作
+
+forbidden_user_surface:
+  - do_not_output_trade_instruction
+  - do_not_output_strong_recommendation
+  - do_not_output_guaranteed_target_price
+
+cash_baseline:
+  annual_rate: 0.03
+  approx_20_trading_day_return_pct: 0.2381
+  approx_10_trading_day_return_pct: 0.1190
+  approx_5_trading_day_return_pct: 0.0595
+
+single_stock_watch:
+  label_horizon: 20_trading_days
+  labels:
+    increase_research:
+      maps_to_user_grade: 继续深挖
+      maps_to_internal_action: 增加研究暴露
+      offline_condition: >
+        future 20-day result clearly exceeds cash baseline and short-horizon
+        5/10-day downside is not severe.
+      initial_thresholds:
+        excess_20d_vs_cash_pct: ">=2.0"
+        min_5d_return_pct: ">-4.0"
+    watch:
+      maps_to_user_grade: 放入观察
+      maps_to_internal_action: 保持观察
+      offline_condition: >
+        future result is near baseline, evidence is mixed, or calibrated tool
+        confidence is not high enough.
+    reduce_or_exclude:
+      maps_to_user_grade: 暂时剔除
+      maps_to_internal_action: 降低研究暴露
+      offline_condition: >
+        future 5/10/20-day result is materially weak or drawdown risk dominates.
+      initial_thresholds:
+        return_20d_pct: "<=-5.0"
+        return_5d_pct: "<=-4.0"
+    insufficient:
+      maps_to_user_grade: 信息不足
+      maps_to_internal_action: 信息不足不动作
+      offline_condition: >
+        missing future window for evaluation, unreliable as-of data, missing
+        disclosure date for a required financial field, or insufficient source
+        provenance.
+
+portfolio_pool_optimize:
+  label_horizon: 20_trading_days
+  labels:
+    top_candidate:
+      maps_to_internal_action: 增加研究暴露
+      offline_condition: top cross-sectional future result within each decision date
+      initial_percentile_rule: top_20_percent_per_decision_date
+    neutral:
+      maps_to_internal_action: 保持观察
+      offline_condition: middle cross-sectional result or conflicting evidence
+    avoid:
+      maps_to_internal_action: 降低研究暴露
+      offline_condition: bottom cross-sectional result or high risk
+      initial_percentile_rule: bottom_30_percent_per_decision_date
+    skip_date_to_cash:
+      maps_to_internal_action: 转入现金
+      offline_condition: date-level gate indicates broad weak opportunity or high uncertainty
+
+quant_tool_outputs_allowed_for_agent:
+  - tool_id
+  - tool_version
+  - task_mode
+  - policy_profile
+  - decision_frequency
+  - feature_group
+  - selection_mode
+  - score
+  - score_quantile
+  - confidence
+  - action_hint
+  - usable_in_agent_default
+  - top_features
+  - missing_flags
+  - counter_evidence
+  - source_ref_ids
+  - train_valid_test_blocks
+  - promotion_status
+
+decision_card_required_agent_fields:
+  - accepted_quant_tool_ids
+  - quant_tool_adoption_decision
+  - quant_tool_override_reasons
+
+quant_tool_adoption_decision_values:
+  - adopted
+  - partially_adopted
+  - not_adopted_counter_evidence
+  - not_applicable
+
+future_fields_forbidden_in_agent_inputs:
+  - return_5d
+  - return_10d
+  - return_20d
+  - future_return_5d
+  - future_return_10d
+  - future_return_20d
+  - gt_status
+  - gt_pass
+  - offline_label
+  - hindsight_label
+  - realized_result
+
+promotion_gates:
+  - train_validation_target_time_order_must_hold
+  - latest_block_positive_rate_threshold_checked
+  - historical_block_floor_checked
+  - sample_count_floor_checked
+  - stock_concentration_checked
+  - date_concentration_checked
+  - ablation_against_baseline_reported
+  - no_future_fields_in_agent_evidence

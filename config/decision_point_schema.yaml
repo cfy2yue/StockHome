@@ -1,0 +1,203 @@
+schema_version: decision_point_schema_v1
+updated_at: "2026-06-26"
+research_only: true
+no_broker: true
+no_auto_trade: true
+no_investment_instruction: true
+
+purpose: >
+  Define which stock-date rows become Agent decision points before any DeepSeek
+  call. The sampler is a training and routing tool: it reduces decision-point
+  explosion, preserves ordinary scheduled baselines, and marks high-value
+  review points without using future labels.
+
+allowed_decision_point_types:
+  - scheduled
+  - event_triggered
+  - portfolio_rebalance
+  - user_requested
+
+policy_profiles:
+  long_horizon_review:
+    cadence: monthly_or_event
+    primary_channels:
+      - financial_report
+      - official_disclosure
+      - book_skill
+      - long_kline
+      - industry_cycle
+    allowed_trigger_types:
+      - event_triggered
+      - user_requested
+  mid_horizon_research:
+    cadence: weekly_twice_weekly_every_2_weeks
+    primary_channels:
+      - multiscale_kline
+      - peer_context
+      - news_announcement
+      - financial_report
+      - date_regime_gate
+      - book_skill
+    allowed_trigger_types:
+      - scheduled
+      - event_triggered
+      - portfolio_rebalance
+      - user_requested
+  fast_event_digest:
+    cadence: event_digest_to_next_daily_decision
+    primary_channels:
+      - official_disclosure
+      - high_risk_news
+      - source_quality
+      - data_missing
+    allowed_trigger_types:
+      - event_triggered
+      - user_requested
+    note: >
+      Current project data is daily/as-of. Fast digest is not high-frequency
+      trading; it only routes material events to the next valid daily decision.
+
+implemented_decision_frequencies:
+  twice_weekly:
+    description: all existing Tue/Fri-style source decision dates
+    default_profile: mid_horizon_research
+  weekly_friday:
+    description: source rows whose decision date is Friday
+    default_profile: mid_horizon_research
+  weekly_tuesday:
+    description: source rows whose decision date is Tuesday
+    default_profile: mid_horizon_research
+  every_2_weeks:
+    description: every fourth source decision date, because the base calendar is approximately twice weekly
+    default_profile: mid_horizon_research
+  key_points_only:
+    description: only rows selected by event/price/peer/source-quality triggers
+    default_profile: mid_horizon_research
+  scheduled_plus_key:
+    description: scheduled twice_weekly rows plus key points, deduplicated by stock-date
+    default_profile: mid_horizon_research
+
+required_fields:
+  - date
+  - code
+  - name
+  - time_block
+  - decision_point_id
+  - decision_frequency
+  - policy_profile
+  - decision_point_type
+  - decision_priority
+  - normal_or_key_point
+  - trigger_channel
+  - trigger_reason
+  - trigger_strength
+  - available_at
+  - source_ref_ids
+  - cooldown_group
+  - sampling_weight
+  - research_only
+  - not_investment_instruction
+
+priority_scale:
+  0: ordinary scheduled baseline
+  1: low-risk review or weak source-quality issue
+  2: material review candidate or multi-channel conflict
+  3: high-priority risk/material event, may override cooldown
+
+initial_trigger_rules:
+  financial_report:
+    priority: 3
+    rules:
+      - field: financial_report_materiality_score
+        op: ">="
+        threshold: 0.6
+      - field: financial_quality_risk_score
+        op: ">="
+        threshold: 0.6
+      - field: financial_surprise_score
+        op: "<="
+        threshold: -0.4
+      - field: financial_disclosure_quality_score
+        op: "<="
+        threshold: 0.3
+        requires_any_positive:
+          - financial_report_event_count
+  news_announcement:
+    priority: 2
+    rules:
+      - field: news_warning_score
+        op: ">="
+        threshold: 0.6
+      - field: news_conflict_intensity_30d
+        op: ">="
+        threshold: 1.0
+      - field: news_missing_rate
+        op: ">="
+        threshold: 0.8
+      - field: announcement_materiality_score
+        op: ">="
+        threshold: 0.6
+  price_structure:
+    priority: 2
+    rules:
+      - field: prior_return_20d
+        op: "<="
+        threshold: -10.1231
+      - field: prior_return_20d
+        op: ">="
+        threshold: 60.0
+      - field: rsi14
+        op: ">="
+        threshold: 80.0
+      - field: rsi14
+        op: "<="
+        threshold: 25.0
+      - field: atr20_pct
+        op: ">="
+        threshold: 4.0
+      - field: drawdown60
+        op: "<="
+        threshold: -16.9912
+  peer_context:
+    priority: 2
+    rules:
+      - compound: industry_breadth_weak_and_target_lagging
+        fields:
+          tushare_industry_positive_breadth_20d: "<=0.4"
+          tushare_industry_relative_return_20d: "<0"
+      - compound: original_peer_breadth_weak_and_target_lagging
+        fields:
+          peer_group_positive_breadth_20d: "<=0.4"
+          peer_relative_to_group_20d: "<0"
+      - field: tushare_industry_news_attention_gap
+        op: "<="
+        threshold: -0.3
+  source_quality:
+    priority: 1
+    rules:
+      - field: news_timestamp_quality
+        op: "<="
+        threshold: 0.3
+      - field: news_evidence_quality
+        op: "<="
+        threshold: 0.3
+      - field: financial_report_missing_rate
+        op: ">="
+        threshold: 0.8
+
+cooldown_policy:
+  non_major_key_point_per_stock_per_week: 1
+  major_priority_override_min_priority: 3
+  same_day_same_stock_merge: true
+  same_source_same_event_merge: true
+
+future_fields_forbidden_in_decision_table:
+  - return_5d
+  - return_10d
+  - return_20d
+  - future_return_5d
+  - future_return_10d
+  - future_return_20d
+  - gt_status
+  - gt_pass
+  - rating

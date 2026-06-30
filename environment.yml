@@ -1,0 +1,27 @@
+name: stock-agent
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.11
+  - pip
+  - pip:
+      - akshare
+      - pandas
+      - numpy
+      - openpyxl
+      - pyyaml
+      - requests
+      - beautifulsoup4
+      - lxml
+      - tqdm
+      - python-dateutil
+      - matplotlib
+      - pymupdf
+      - pdfplumber
+      - jinja2
+      - pytest
+      - baostock
+      - efinance
+      - mootdx
+      - tushare

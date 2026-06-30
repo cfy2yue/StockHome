@@ -1,0 +1,85 @@
+tiers:
+  official_disclosure:
+    description: "官方公开披露，例如交易所公告、巨潮公告、上市公司公告。"
+    reliability: "high"
+    realtime: false
+  historical_structured:
+    description: "免费结构化历史数据，例如 BaoStock。"
+    reliability: "medium_high"
+    realtime: false
+  quote_protocol:
+    description: "行情软件协议或行情服务器，例如 mootdx/pytdx 通达信。"
+    reliability: "medium"
+    realtime: true
+  public_aggregator:
+    description: "公开聚合接口，例如 AKShare、efinance、东方财富公开 API。"
+    reliability: "medium"
+    realtime: "depends"
+  paid_standardized:
+    description: "用户已合法授权的付费/会员/标准化数据源，例如 Tushare Pro、Wind、Choice、iFinD、同花顺会员。"
+    reliability: "high_if_cached_and_audited"
+    realtime: "depends"
+  model_estimate:
+    description: "模型估算数据，例如主力资金流、大单净额。"
+    reliability: "reference_only"
+    realtime: "depends"
+  cache:
+    description: "本地缓存或测试数据。"
+    reliability: "test_only"
+    realtime: false
+sources:
+  baostock:
+    tier: "historical_structured"
+    github_or_site: "https://www.baostock.com/"
+    planned_use: ["历史K线", "指数", "财务指标", "估值指标", "轻量回测"]
+  mootdx:
+    tier: "quote_protocol"
+    github_or_site: "https://github.com/mootdx/mootdx"
+    planned_use: ["实时行情", "通达信K线", "行情软件相似体验"]
+  pytdx:
+    tier: "quote_protocol"
+    github_or_site: "https://github.com/topics/pytdx"
+    planned_use: ["通达信行情协议备用"]
+  efinance:
+    tier: "public_aggregator"
+    github_or_site: "https://github.com/Micro-sheep/efinance"
+    planned_use: ["东方财富口径行情", "批量行情", "补充数据"]
+  akshare:
+    tier: "public_aggregator"
+    github_or_site: "https://github.com/akfamily/akshare"
+    planned_use: ["新闻", "行情", "财务", "公告", "资金流"]
+  eastmoney_moneyflow:
+    tier: "model_estimate"
+    github_or_site: "https://data.eastmoney.com/"
+    planned_use: ["主力资金流参考", "大单净额参考"]
+  tushare_pro:
+    tier: "paid_standardized"
+    github_or_site: "https://tushare.pro/"
+    planned_use: ["交易日历", "股票列表", "日线", "复权因子", "停复牌", "涨跌停", "财务披露日", "行业地域概念", "筹码和券商金股"]
+    requires_authorization: true
+    cache_first: true
+    rate_limit: "100 requests/minute maximum; project default >=0.7s interval"
+  wind:
+    tier: "paid_standardized"
+    github_or_site: "authorized user terminal/API"
+    planned_use: ["标准化行情", "财务披露日", "行业分类", "指数成分", "公告新闻辅助"]
+    requires_authorization: true
+    cache_first: true
+  choice:
+    tier: "paid_standardized"
+    github_or_site: "authorized user terminal/API"
+    planned_use: ["标准化行情", "财务披露日", "行业分类", "公告新闻辅助"]
+    requires_authorization: true
+    cache_first: true
+  ifind:
+    tier: "paid_standardized"
+    github_or_site: "authorized user terminal/API"
+    planned_use: ["标准化行情", "财务披露日", "行业分类", "公告新闻辅助"]
+    requires_authorization: true
+    cache_first: true
+  ths_member:
+    tier: "paid_standardized"
+    github_or_site: "authorized member data"
+    planned_use: ["同花顺会员数据辅助", "公告新闻辅助", "行业概念辅助"]
+    requires_authorization: true
+    cache_first: true

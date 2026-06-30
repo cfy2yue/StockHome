@@ -1,0 +1,7 @@
+query_name: "新疆合众"
+assumed_match:
+  code: "600888"
+  name: "新疆众和"
+note: "用户输入可能为错别字；系统应提示确认。测试阶段以新疆众和作为候选匹配。"
+task: "single_stock_analysis"
+output_dir: "reports/test_runs/xinjiang_hezong"

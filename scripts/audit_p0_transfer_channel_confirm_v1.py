@@ -1,0 +1,859 @@
+"""Audit channel confirmations on top of P0 small-entry transfer candidates.
+
+This no-DeepSeek experiment starts from the yellow-only transfer confirmer
+variants and asks a narrower question: can news/financial/peer/BookSkill/chip
+context make those small-entry candidates more date-generalizable?
+
+Future 20-day returns are used only for offline evaluation. Agent preview rows
+are field-whitelisted and contain no future labels or returns.
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import math
+import sys
+import warnings
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Any
+
+import numpy as np
+import pandas as pd
+
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from scripts.audit_p0_decision_stack_v1 import (  # noqa: E402
+    FINAL_OOT,
+    MIN_TARGET_ROWS,
+    MIN_TRAIN_ROWS,
+    MIN_VALID_ROWS,
+    TARGET_BLOCKS,
+    apply_frequency,
+    build_scored_target,
+    load_stack_frame,
+    safe_float,
+    safe_prefix,
+    stable_hash_int,
+)
+from scripts.audit_p0_small_entry_transfer_confirmer_v1 import (  # noqa: E402
+    apply_train_cohort,
+    block_index,
+    cohort_specs,
+    enrich_candidate_frame,
+    feature_sets_for,
+    forbidden_field,
+    prior_tail_train_validation,
+    variant_id,
+)
+from scripts.audit_p0_small_entry_ml_confirmer_v1 import (  # noqa: E402
+    fit_logistic,
+    model_specs,
+    predict_score,
+    validation_threshold,
+)
+from scripts.audit_single_stock_review_quality import _rolling_split  # noqa: E402
+
+
+REPORT_DIR = ROOT / "reports" / "date_generalization"
+JOINED_CACHE = ROOT / "data" / "date_generalization_cache" / "market_5000" / "joined_ground_truth_combined_news.csv"
+DEFAULT_SUMMARY = REPORT_DIR / "p0_small_entry_transfer_confirmer_v1_summary.csv"
+DEFAULT_PREFIX = "p0_transfer_channel_confirm_v1"
+PANEL_SIZE = 100
+PANEL_SEEDS = 12
+MIN_GATE_PRIOR_BLOCKS = 3
+MIN_GATE_PRIOR_SELECTED_ROWS_MEAN = 20
+MIN_GATE_H2026_ROWS = 30
+
+
+@dataclass(frozen=True)
+class TransferConfig:
+    frequency: str
+    variant: str
+    cohort: str
+    feature_set: str
+    model_name: str
+    confirm_quantile: float
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Audit non-price confirmations for transfer small-entry candidates.")
+    parser.add_argument("--transfer-summary", type=Path, default=DEFAULT_SUMMARY)
+    parser.add_argument("--joined-cache", type=Path, default=JOINED_CACHE)
+    parser.add_argument("--output-prefix", default=DEFAULT_PREFIX)
+    parser.add_argument("--kline-feature-group", default="kline_peer_chip_news_risk")
+    parser.add_argument("--max-hgb-train-rows", type=int, default=60000)
+    parser.add_argument("--panel-size", type=int, default=PANEL_SIZE)
+    parser.add_argument("--panel-seeds", type=int, default=PANEL_SEEDS)
+    parser.add_argument("--preview-max-rows", type=int, default=500)
+    return parser.parse_args()
+
+
+def main() -> None:
+    warnings.filterwarnings("ignore", category=FutureWarning, module="sklearn")
+    warnings.filterwarnings("ignore", message="Skipping features without any observed values.*", module="sklearn")
+    warnings.filterwarnings("ignore", message="Inconsistent values: penalty=.*", module="sklearn")
+
+    args = parse_args()
+    REPORT_DIR.mkdir(parents=True, exist_ok=True)
+    configs = load_transfer_configs(args.transfer_summary)
+    if not configs:
+        raise RuntimeError("no yellow transfer configs found; run p0_small_entry_transfer_confirmer_v1 first")
+    frequencies = sorted({cfg.frequency for cfg in configs})
+
+    frame, feature_groups, notes = load_stack_frame()
+    channel_extra = load_channel_extra(args.joined_cache)
+
+    candidate_blocks: list[pd.DataFrame] = []
+    hygiene_rows: list[dict[str, Any]] = []
+    for frequency in frequencies:
+        freq_frame = apply_frequency(frame, frequency)
+        for target_block in TARGET_BLOCKS:
+            train, validation, target = _rolling_split(freq_frame, target_block)
+            if len(train) < MIN_TRAIN_ROWS or len(validation) < MIN_VALID_ROWS or len(target) < MIN_TARGET_ROWS:
+                hygiene_rows.append(
+                    {
+                        "frequency": frequency,
+                        "target_block": target_block,
+                        "stage": "base_stack",
+                        "status": "skip_insufficient_stack_rows",
+                        "train_rows": len(train),
+                        "validation_rows": len(validation),
+                        "target_rows": len(target),
+                    }
+                )
+                continue
+            scored = build_scored_target(
+                train,
+                validation,
+                target,
+                feature_groups,
+                kline_feature_group=args.kline_feature_group,
+                max_hgb_train_rows=args.max_hgb_train_rows,
+            )
+            if scored.empty:
+                hygiene_rows.append(
+                    {
+                        "frequency": frequency,
+                        "target_block": target_block,
+                        "stage": "base_stack",
+                        "status": "skip_stack_model_unavailable",
+                        "train_rows": len(train),
+                        "validation_rows": len(validation),
+                        "target_rows": len(target),
+                    }
+                )
+                continue
+            enriched = enrich_candidate_frame(scored, target, frequency, target_block)
+            enriched = attach_extra_channel_columns(enriched, channel_extra)
+            enriched = add_channel_flags(enriched)
+            candidate_blocks.append(enriched)
+
+    candidates = pd.concat(candidate_blocks, ignore_index=True) if candidate_blocks else pd.DataFrame()
+    if candidates.empty:
+        raise RuntimeError("no candidates produced")
+
+    metric_rows: list[dict[str, Any]] = []
+    panel_rows: list[dict[str, Any]] = []
+    preview_rows: list[dict[str, Any]] = []
+    for cfg in configs:
+        cfg_candidates = candidates[candidates["frequency"].eq(cfg.frequency)].copy()
+        feature_set = next((item for item in feature_sets_for(cfg_candidates) if item.feature_set == cfg.feature_set), None)
+        model_spec = next((item for item in model_specs() if item.model_name == cfg.model_name), None)
+        if feature_set is None or model_spec is None:
+            hygiene_rows.append(
+                {
+                    "frequency": cfg.frequency,
+                    "target_block": "ALL",
+                    "stage": "transfer_config",
+                    "status": "skip_missing_feature_or_model",
+                    "variant": cfg.variant,
+                }
+            )
+            continue
+        for target_block in sorted(cfg_candidates["target_block"].dropna().unique(), key=block_index):
+            prior = cfg_candidates[cfg_candidates["target_block"].map(block_index) < block_index(target_block)].copy()
+            target_all = cfg_candidates[cfg_candidates["target_block"].eq(target_block)].copy()
+            target_small = target_all[target_all["operation_action"].astype(str).eq("small_buy_hold")].copy()
+            if target_small.empty:
+                continue
+            train, validation, split_context = prior_tail_train_validation(prior)
+            train_cohort = apply_train_cohort(train, cfg.cohort)
+            validation_cohort = apply_train_cohort(validation, cfg.cohort)
+            if len(train_cohort) < 800 or len(validation_cohort) < 200:
+                hygiene_rows.append(
+                    {
+                        "frequency": cfg.frequency,
+                        "target_block": target_block,
+                        "stage": "transfer_score",
+                        "status": "skip_insufficient_transfer_rows",
+                        "variant": cfg.variant,
+                        "train_rows": len(train_cohort),
+                        "validation_rows": len(validation_cohort),
+                        "target_small_rows": len(target_small),
+                    }
+                )
+                continue
+            fitted = fit_logistic(train_cohort, feature_set.columns, model_spec)
+            if fitted is None:
+                continue
+            validation_scores = predict_score(fitted, validation_cohort, feature_set.columns)
+            target_scores = predict_score(fitted, target_small, feature_set.columns)
+            validation_scored = validation_cohort.assign(_transfer_score=validation_scores)
+            target_scored = target_small.assign(_transfer_score=target_scores)
+            threshold = validation_threshold(validation_scored["_transfer_score"], cfg.confirm_quantile)
+            transfer_selected = target_scored[target_scored["_transfer_score"] >= threshold].copy()
+            transfer_selected["_transfer_threshold"] = threshold
+            target_scored["_transfer_threshold"] = threshold
+
+            for gate_id, selected in apply_channel_gates(transfer_selected).items():
+                metric_rows.append(
+                    evaluate_gate(
+                        branch_base=target_small,
+                        transfer_base=transfer_selected,
+                        selected=selected,
+                        cfg=cfg,
+                        target_block=target_block,
+                        gate_id=gate_id,
+                        threshold=threshold,
+                        validation_context=split_context,
+                    )
+                )
+                if target_block == FINAL_OOT:
+                    panel_rows.extend(
+                        panel_stability(
+                            target_scored,
+                            transfer_selected=transfer_selected,
+                            gate_id=gate_id,
+                            cfg=cfg,
+                            threshold=threshold,
+                            panel_size=args.panel_size,
+                            panel_seeds=args.panel_seeds,
+                        )
+                    )
+
+            if target_block == FINAL_OOT:
+                preview_rows.extend(build_preview_rows(transfer_selected, cfg=cfg, max_rows=args.preview_max_rows))
+
+    metrics = pd.DataFrame(metric_rows)
+    summary = summarize(metrics)
+    panel_detail = pd.DataFrame(panel_rows)
+    panel_summary = summarize_panels(panel_detail)
+    preview = pd.DataFrame(preview_rows).drop_duplicates(["date", "code", "variant", "gate_id"])
+    hygiene = pd.DataFrame(hygiene_rows)
+
+    prefix = safe_prefix(args.output_prefix)
+    paths = {
+        "metrics": REPORT_DIR / f"{prefix}_metrics.csv",
+        "summary": REPORT_DIR / f"{prefix}_summary.csv",
+        "panel_detail": REPORT_DIR / f"{prefix}_h2026_panel_detail.csv",
+        "panel_summary": REPORT_DIR / f"{prefix}_h2026_panel_summary.csv",
+        "preview": REPORT_DIR / f"{prefix}_agent_preview_no_gt.jsonl",
+        "hygiene": REPORT_DIR / f"{prefix}_hygiene.csv",
+        "report": REPORT_DIR / f"{prefix}.md",
+    }
+    metrics.to_csv(paths["metrics"], index=False, encoding="utf-8-sig")
+    summary.to_csv(paths["summary"], index=False, encoding="utf-8-sig")
+    panel_detail.to_csv(paths["panel_detail"], index=False, encoding="utf-8-sig")
+    panel_summary.to_csv(paths["panel_summary"], index=False, encoding="utf-8-sig")
+    hygiene.to_csv(paths["hygiene"], index=False, encoding="utf-8-sig")
+    write_jsonl(paths["preview"], preview)
+    paths["report"].write_text(render_report(notes, configs, summary, metrics, panel_summary, hygiene, paths), encoding="utf-8")
+
+    print("A股研究Agent")
+    print(f"configs={len(configs)} candidates={len(candidates)} metrics={len(metrics)} summary={len(summary)}")
+    print(f"report={paths['report']}")
+
+
+def load_transfer_configs(
+    path: Path,
+    *,
+    status_regex: str = "yellow",
+    max_configs: int | None = None,
+) -> list[TransferConfig]:
+    frame = pd.read_csv(path, low_memory=False, encoding="utf-8-sig")
+    yellow = frame[frame["promotion_status"].astype(str).str.contains(status_regex, regex=True, na=False)].copy()
+    yellow = yellow.sort_values(["frequency", "rank_score"], ascending=[True, False])
+    if max_configs and max_configs > 0:
+        yellow = yellow.head(max_configs)
+    rows: list[TransferConfig] = []
+    for _, row in yellow.iterrows():
+        rows.append(
+            TransferConfig(
+                frequency=str(row["frequency"]),
+                variant=str(row["variant"]),
+                cohort=str(row["cohort"]),
+                feature_set=str(row["feature_set"]),
+                model_name=str(row["model_name"]),
+                confirm_quantile=float(row["confirm_quantile"]),
+            )
+        )
+    return rows
+
+
+def load_channel_extra(path: Path) -> pd.DataFrame:
+    wanted = {
+        "date",
+        "code",
+        "financial_report_join_status",
+        "financial_report_missing_rate",
+        "financial_quality_risk_score",
+        "financial_surprise_score",
+        "news_count_30d",
+        "news_missing_rate",
+        "news_warning_score",
+        "news_opportunity_score",
+        "official_confirmation_score",
+        "announcement_materiality_score",
+        "peer_group_positive_breadth_20d",
+        "peer_relative_to_group_20d",
+        "tushare_industry_positive_breadth_20d",
+        "tushare_industry_relative_return_20d",
+        "tushare_area_positive_breadth_20d",
+        "prior_return_20d",
+        "rsi14",
+        "drawdown60",
+        "close_above_ma200",
+        "lower_support",
+        "upper_overhang",
+        "winner_rate_pct",
+    }
+    frame = pd.read_csv(path, dtype={"code": str}, usecols=lambda col: col in wanted, low_memory=False)
+    frame.columns = [str(col).lstrip("\ufeff") for col in frame.columns]
+    frame["date"] = pd.to_datetime(frame["date"], errors="coerce").dt.date.astype(str)
+    frame["code"] = frame["code"].astype(str).str.zfill(6)
+    return frame.drop_duplicates(["date", "code"], keep="first")
+
+
+def attach_extra_channel_columns(frame: pd.DataFrame, extra: pd.DataFrame) -> pd.DataFrame:
+    out = frame.copy()
+    out["date"] = pd.to_datetime(out["date"], errors="coerce").dt.date.astype(str)
+    out["code"] = out["code"].astype(str).str.zfill(6)
+    cols = [col for col in extra.columns if col not in {"date", "code"} and col not in out.columns]
+    if not cols:
+        return out
+    return out.merge(extra[["date", "code", *cols]], on=["date", "code"], how="left")
+
+
+def add_channel_flags(frame: pd.DataFrame) -> pd.DataFrame:
+    out = frame.copy()
+    triggered = out.get("triggered_skills", pd.Series("", index=out.index)).fillna("").astype(str)
+    out["pps_q017_triggered"] = triggered.str.contains("PPS-Q-017", regex=False)
+    out["pps_m003_triggered"] = triggered.str.contains("PPS-M-003", regex=False)
+    out["bookskill_any_triggered_bool"] = triggered.str.len().gt(0)
+
+    out["news_available"] = (num(out, "news_count_30d") > 0) & (num(out, "news_missing_rate") < 1)
+    out["news_low_warning"] = out["news_available"] & (num(out, "news_warning_score") <= 0.4)
+    out["news_high_warning"] = out["news_available"] & (num(out, "news_warning_score") >= 0.6)
+    out["news_positive_or_official"] = out["news_available"] & (
+        (num(out, "news_opportunity_score") >= 0.4)
+        | (num(out, "official_confirmation_score") > 0)
+        | (num(out, "announcement_materiality_score") > 0)
+    )
+
+    status = out.get("financial_report_join_status", pd.Series("", index=out.index)).fillna("").astype(str)
+    out["financial_event_matched"] = status.eq("event_window_matched") | (num(out, "financial_report_event_count") > 0)
+    out["financial_no_recent_event"] = status.eq("no_event_in_window")
+    out["financial_missing"] = (num(out, "financial_report_missing_rate") >= 1) & ~out["financial_no_recent_event"]
+    out["financial_high_risk_event"] = out["financial_event_matched"] & (
+        (num(out, "financial_quality_risk_score") >= 0.6) | (num(out, "financial_surprise_score") <= -0.4)
+    )
+
+    out["peer_breadth_ok"] = (
+        (num(out, "peer_group_positive_breadth_20d") >= 0.5)
+        | (num(out, "tushare_industry_positive_breadth_20d") >= 0.5)
+        | (num(out, "tushare_area_positive_breadth_20d") >= 0.5)
+    )
+    out["peer_relative_positive"] = (
+        (num(out, "peer_relative_to_group_20d") > 0) | (num(out, "tushare_industry_relative_return_20d") > 0)
+    )
+    out["peer_weak_false_veto_zone"] = ~out["peer_breadth_ok"] & ~out["peer_relative_positive"]
+
+    out["kline_deep_pullback"] = (num(out, "prior_return_20d") <= -5) | (num(out, "drawdown60") <= -10)
+    out["kline_not_overheated"] = num(out, "rsi14") <= 70
+    out["chip_support_visible"] = num(out, "lower_support") >= 0.1
+    out["chip_low_overhang"] = num(out, "upper_overhang") <= 0.25
+
+    support_flags = [
+        out["pps_q017_triggered"],
+        out["chip_support_visible"],
+        out["financial_no_recent_event"],
+        out["news_positive_or_official"] & out["news_low_warning"],
+        out["peer_breadth_ok"] | out["peer_relative_positive"],
+    ]
+    hard_flags = [
+        out["news_high_warning"],
+        out["financial_high_risk_event"],
+        out["bookskill_any_triggered_bool"] & (num(out, "book_score") < -0.4),
+    ]
+    soft_gap_flags = [
+        out["financial_missing"],
+        ~out["news_available"],
+        ~out["bookskill_any_triggered_bool"],
+    ]
+    out["channel_support_count"] = sum(flag.astype(int) for flag in support_flags)
+    out["channel_hard_counter_count"] = sum(flag.astype(int) for flag in hard_flags)
+    out["channel_soft_gap_count"] = sum(flag.astype(int) for flag in soft_gap_flags)
+    return out
+
+
+def apply_channel_gates(transfer_selected: pd.DataFrame) -> dict[str, pd.DataFrame]:
+    if transfer_selected.empty:
+        return {
+            "transfer_only": transfer_selected,
+            "no_hard_counter": transfer_selected,
+            "support_min1_no_hard": transfer_selected,
+            "support_min2_no_hard": transfer_selected,
+            "pps_q017_fin_or_chip_no_hard": transfer_selected,
+            "news_financial_clean_no_hard": transfer_selected,
+            "chip_support_no_overheat_no_hard": transfer_selected,
+        }
+    no_hard = num(transfer_selected, "channel_hard_counter_count") == 0
+    support_count = num(transfer_selected, "channel_support_count")
+    pps_q017_context = transfer_selected["pps_q017_triggered"].fillna(False) & (
+        transfer_selected["financial_no_recent_event"].fillna(False)
+        | transfer_selected["chip_support_visible"].fillna(False)
+    )
+    news_financial_clean = transfer_selected["news_low_warning"].fillna(False) & (
+        transfer_selected["financial_no_recent_event"].fillna(False)
+        | (~transfer_selected["financial_high_risk_event"].fillna(False) & ~transfer_selected["financial_missing"].fillna(False))
+    )
+    chip_support_clean = transfer_selected["chip_support_visible"].fillna(False) & transfer_selected[
+        "kline_not_overheated"
+    ].fillna(False)
+    return {
+        "transfer_only": transfer_selected.copy(),
+        "no_hard_counter": transfer_selected[no_hard].copy(),
+        "support_min1_no_hard": transfer_selected[no_hard & (support_count >= 1)].copy(),
+        "support_min2_no_hard": transfer_selected[no_hard & (support_count >= 2)].copy(),
+        "pps_q017_fin_or_chip_no_hard": transfer_selected[no_hard & pps_q017_context].copy(),
+        "news_financial_clean_no_hard": transfer_selected[no_hard & news_financial_clean].copy(),
+        "chip_support_no_overheat_no_hard": transfer_selected[no_hard & chip_support_clean].copy(),
+    }
+
+
+def evaluate_gate(
+    *,
+    branch_base: pd.DataFrame,
+    transfer_base: pd.DataFrame,
+    selected: pd.DataFrame,
+    cfg: TransferConfig,
+    target_block: str,
+    gate_id: str,
+    threshold: float,
+    validation_context: str,
+) -> dict[str, Any]:
+    branch_ret = pd.to_numeric(branch_base.get("return_20d"), errors="coerce").dropna()
+    transfer_ret = pd.to_numeric(transfer_base.get("return_20d"), errors="coerce").dropna()
+    ret = pd.to_numeric(selected.get("return_20d"), errors="coerce").dropna()
+    excluded = transfer_base[~transfer_base.index.isin(selected.index)].copy()
+    excluded_ret = pd.to_numeric(excluded.get("return_20d"), errors="coerce").dropna()
+    return {
+        "frequency": cfg.frequency,
+        "target_block": target_block,
+        "variant": cfg.variant,
+        "cohort": cfg.cohort,
+        "feature_set": cfg.feature_set,
+        "model_name": cfg.model_name,
+        "confirm_quantile": round(float(cfg.confirm_quantile), 4),
+        "transfer_threshold": round(float(threshold), 8),
+        "gate_id": gate_id,
+        "validation_context": validation_context,
+        "branch_rows": int(len(branch_base)),
+        "transfer_rows": int(len(transfer_base)),
+        "selected_rows": int(len(selected)),
+        "selected_rate_vs_transfer": round(float(len(selected) / max(1, len(transfer_base))), 6),
+        "branch_pos20": positive_rate(branch_ret),
+        "branch_avg20": mean_value(branch_ret),
+        "branch_loss_gt5": rate_le(branch_ret, -5),
+        "transfer_pos20": positive_rate(transfer_ret),
+        "transfer_avg20": mean_value(transfer_ret),
+        "transfer_loss_gt5": rate_le(transfer_ret, -5),
+        "selected_pos20": positive_rate(ret),
+        "selected_avg20": mean_value(ret),
+        "selected_loss_gt5": rate_le(ret, -5),
+        "delta_pos_vs_transfer": delta(positive_rate(ret), positive_rate(transfer_ret)),
+        "delta_avg_vs_transfer": delta(mean_value(ret), mean_value(transfer_ret)),
+        "delta_loss_vs_transfer": delta(rate_le(ret, -5), rate_le(transfer_ret, -5)),
+        "delta_pos_vs_branch": delta(positive_rate(ret), positive_rate(branch_ret)),
+        "delta_avg_vs_branch": delta(mean_value(ret), mean_value(branch_ret)),
+        "missed_transfer_positive_rows": int(pd.to_numeric(excluded_ret, errors="coerce").gt(0).sum()),
+        "captured_transfer_loss_gt5_rows": int(pd.to_numeric(ret, errors="coerce").le(-5).sum()),
+        "avg_channel_support_count": mean_value(pd.to_numeric(selected.get("channel_support_count"), errors="coerce")),
+        "avg_channel_hard_counter_count": mean_value(pd.to_numeric(selected.get("channel_hard_counter_count"), errors="coerce")),
+    }
+
+
+def summarize(metrics: pd.DataFrame) -> pd.DataFrame:
+    if metrics.empty:
+        return pd.DataFrame()
+    rows: list[dict[str, Any]] = []
+    for (frequency, variant, gate_id), group in metrics.groupby(["frequency", "variant", "gate_id"], sort=True):
+        h = group[group["target_block"].eq(FINAL_OOT)]
+        prior = group[~group["target_block"].eq(FINAL_OOT)]
+        if h.empty:
+            continue
+        h_row = h.iloc[0]
+        prior_rows = pd.to_numeric(prior.get("selected_rows"), errors="coerce") if not prior.empty else pd.Series(dtype=float)
+        prior_delta_pos = pd.to_numeric(prior.get("delta_pos_vs_transfer"), errors="coerce") if not prior.empty else pd.Series(dtype=float)
+        prior_delta_avg = pd.to_numeric(prior.get("delta_avg_vs_transfer"), errors="coerce") if not prior.empty else pd.Series(dtype=float)
+        row = {
+            "frequency": frequency,
+            "variant": variant,
+            "gate_id": gate_id,
+            "prior_blocks": int(prior["target_block"].nunique()) if not prior.empty else 0,
+            "prior_selected_rows_mean": mean_value(prior_rows),
+            "prior_delta_pos_vs_transfer_mean": mean_value(prior_delta_pos),
+            "prior_delta_avg_vs_transfer_mean": mean_value(prior_delta_avg),
+            "prior_delta_pos_hit": positive_rate(prior_delta_pos),
+            "prior_delta_avg_hit": positive_rate(prior_delta_avg),
+            "h2026_branch_rows": h_row.get("branch_rows"),
+            "h2026_transfer_rows": h_row.get("transfer_rows"),
+            "h2026_selected_rows": h_row.get("selected_rows"),
+            "h2026_selected_rate_vs_transfer": h_row.get("selected_rate_vs_transfer"),
+            "h2026_branch_pos20": h_row.get("branch_pos20"),
+            "h2026_transfer_pos20": h_row.get("transfer_pos20"),
+            "h2026_selected_pos20": h_row.get("selected_pos20"),
+            "h2026_selected_avg20": h_row.get("selected_avg20"),
+            "h2026_selected_loss_gt5": h_row.get("selected_loss_gt5"),
+            "h2026_delta_pos_vs_transfer": h_row.get("delta_pos_vs_transfer"),
+            "h2026_delta_avg_vs_transfer": h_row.get("delta_avg_vs_transfer"),
+            "h2026_delta_pos_vs_branch": h_row.get("delta_pos_vs_branch"),
+            "h2026_delta_avg_vs_branch": h_row.get("delta_avg_vs_branch"),
+            "h2026_missed_transfer_positive_rows": h_row.get("missed_transfer_positive_rows"),
+            "h2026_captured_transfer_loss_gt5_rows": h_row.get("captured_transfer_loss_gt5_rows"),
+            "h2026_avg_channel_support_count": h_row.get("avg_channel_support_count"),
+            "h2026_avg_channel_hard_counter_count": h_row.get("avg_channel_hard_counter_count"),
+        }
+        row["promotion_status"] = gate_status(row)
+        row["rank_score"] = rank_score(row)
+        rows.append(row)
+    out = pd.DataFrame(rows)
+    if not out.empty:
+        out = out.sort_values(["promotion_status", "rank_score"], ascending=[True, False])
+    return out.round(6)
+
+
+def gate_status(row: dict[str, Any]) -> str:
+    if str(row.get("gate_id")) == "transfer_only":
+        return "transfer_reference"
+    h_rows = safe_float(row.get("h2026_selected_rows"))
+    prior_blocks = safe_float(row.get("prior_blocks"))
+    prior_rows = safe_float(row.get("prior_selected_rows_mean"))
+    prior_pos_hit = safe_float(row.get("prior_delta_pos_hit"))
+    prior_avg_hit = safe_float(row.get("prior_delta_avg_hit"))
+    h_pos = safe_float(row.get("h2026_selected_pos20"))
+    h_avg = safe_float(row.get("h2026_selected_avg20"))
+    h_loss = safe_float(row.get("h2026_selected_loss_gt5"))
+    h_delta_pos = safe_float(row.get("h2026_delta_pos_vs_transfer"))
+    h_delta_avg = safe_float(row.get("h2026_delta_avg_vs_transfer"))
+
+    if h_rows < 15:
+        return "reject_too_sparse"
+    if (
+        h_rows >= 50
+        and prior_blocks >= MIN_GATE_PRIOR_BLOCKS
+        and prior_rows >= 30
+        and prior_pos_hit >= 0.75
+        and prior_avg_hit >= 0.75
+        and h_pos >= 0.70
+        and h_avg >= 5.0
+        and h_loss <= 0.15
+        and h_delta_pos >= 0.03
+        and h_delta_avg >= 0
+    ):
+        return "green_candidate_for_ds_confirmation"
+    if (
+        h_rows >= MIN_GATE_H2026_ROWS
+        and prior_blocks >= MIN_GATE_PRIOR_BLOCKS
+        and prior_rows >= MIN_GATE_PRIOR_SELECTED_ROWS_MEAN
+        and prior_pos_hit >= 0.50
+        and h_pos >= 0.65
+        and h_avg >= 4.0
+        and h_delta_pos >= 0
+    ):
+        return "yellow_candidate_needs_fresh_panel"
+    if h_delta_pos < 0 or h_delta_avg < 0:
+        return "reject_or_false_filter_risk"
+    return "observe_diagnostic_only"
+
+
+def panel_stability(
+    target_scored: pd.DataFrame,
+    *,
+    transfer_selected: pd.DataFrame,
+    gate_id: str,
+    cfg: TransferConfig,
+    threshold: float,
+    panel_size: int,
+    panel_seeds: int,
+) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    codes = sorted(target_scored["code"].astype(str).str.zfill(6).unique())
+    selected_index = set(transfer_selected.index)
+    for seed in range(max(1, panel_seeds)):
+        ordered = sorted(codes, key=lambda code: stable_hash_int("p0_transfer_channel_panel", seed, cfg.variant, gate_id, code))
+        selected_codes = set(ordered[: min(panel_size, len(ordered))])
+        panel = target_scored[target_scored["code"].astype(str).str.zfill(6).isin(selected_codes)].copy()
+        panel_transfer = panel[panel.index.isin(selected_index)].copy()
+        panel_gate = apply_channel_gates(panel_transfer).get(gate_id, panel_transfer.iloc[0:0].copy())
+        row = evaluate_gate(
+            branch_base=panel,
+            transfer_base=panel_transfer,
+            selected=panel_gate,
+            cfg=cfg,
+            target_block=FINAL_OOT,
+            gate_id=gate_id,
+            threshold=threshold,
+            validation_context="H2025_2_panel",
+        )
+        row["panel_seed"] = seed
+        row["panel_size_codes"] = len(selected_codes)
+        rows.append(row)
+    return rows
+
+
+def summarize_panels(panels: pd.DataFrame) -> pd.DataFrame:
+    if panels.empty:
+        return pd.DataFrame()
+    rows: list[dict[str, Any]] = []
+    for (frequency, variant, gate_id), group in panels.groupby(["frequency", "variant", "gate_id"], sort=True):
+        rows.append(
+            {
+                "frequency": frequency,
+                "variant": variant,
+                "gate_id": gate_id,
+                "panels": int(group["panel_seed"].nunique()),
+                "selected_rows_mean": round(float(pd.to_numeric(group["selected_rows"], errors="coerce").mean()), 3),
+                "selected_rate_vs_transfer_mean±std": fmt_mean_std(group, "selected_rate_vs_transfer"),
+                "selected_pos20_mean±std": fmt_mean_std(group, "selected_pos20"),
+                "selected_avg20_mean±std": fmt_mean_std(group, "selected_avg20"),
+                "selected_loss_gt5_mean±std": fmt_mean_std(group, "selected_loss_gt5"),
+                "delta_pos_vs_transfer_mean±std": fmt_mean_std(group, "delta_pos_vs_transfer"),
+                "delta_avg_vs_transfer_mean±std": fmt_mean_std(group, "delta_avg_vs_transfer"),
+            }
+        )
+    return pd.DataFrame(rows)
+
+
+def build_preview_rows(frame: pd.DataFrame, *, cfg: TransferConfig, max_rows: int) -> list[dict[str, Any]]:
+    if frame.empty:
+        return []
+    rows: list[dict[str, Any]] = []
+    gated = apply_channel_gates(frame)
+    for gate_id, gate_frame in gated.items():
+        if gate_id == "transfer_only" or gate_frame.empty:
+            continue
+        ordered = gate_frame.sort_values("_transfer_score", ascending=False).head(max(1, max_rows // max(1, len(gated) - 1)))
+        for _, row in ordered.iterrows():
+            rows.append(
+                {
+                    "date": str(row.get("date")),
+                    "code": str(row.get("code")).zfill(6),
+                    "time_block": str(row.get("target_block")),
+                    "tool_id": "p0_transfer_channel_confirm_v1",
+                    "frequency": cfg.frequency,
+                    "base_branch": "branch_stack_v1.small_buy_hold",
+                    "variant": cfg.variant,
+                    "gate_id": gate_id,
+                    "operation_action_cn": "小仓试探/持有",
+                    "position_cap_hint": 0.10,
+                    "transfer_score": preview_num(row.get("_transfer_score")),
+                    "transfer_threshold": preview_num(row.get("_transfer_threshold")),
+                    "channel_support_count": preview_num(row.get("channel_support_count")),
+                    "channel_hard_counter_count": preview_num(row.get("channel_hard_counter_count")),
+                    "news_low_warning": bool(row.get("news_low_warning", False)),
+                    "news_high_warning": bool(row.get("news_high_warning", False)),
+                    "financial_no_recent_event": bool(row.get("financial_no_recent_event", False)),
+                    "financial_high_risk_event": bool(row.get("financial_high_risk_event", False)),
+                    "pps_q017_triggered": bool(row.get("pps_q017_triggered", False)),
+                    "chip_support_visible": bool(row.get("chip_support_visible", False)),
+                    "peer_breadth_ok": bool(row.get("peer_breadth_ok", False)),
+                    "agent_instruction": "use as channel confirmation for transfer-trained small-entry candidate; still require semantic news/financial/BookSkill review and fresh-panel confirmation before raising exposure",
+                    "auto_trade": False,
+                }
+            )
+    return rows
+
+
+def render_report(
+    notes: list[str],
+    configs: list[TransferConfig],
+    summary: pd.DataFrame,
+    metrics: pd.DataFrame,
+    panel_summary: pd.DataFrame,
+    hygiene: pd.DataFrame,
+    paths: dict[str, Path],
+) -> str:
+    h2026 = metrics[metrics["target_block"].eq(FINAL_OOT)].copy() if not metrics.empty else pd.DataFrame()
+    non_reference = summary[~summary["promotion_status"].astype(str).eq("transfer_reference")].copy() if not summary.empty else pd.DataFrame()
+    promoted_like = non_reference[non_reference["promotion_status"].astype(str).str.contains("green|yellow", regex=True)]
+    lines = [
+        "# P0 Transfer Channel Confirmation v1",
+        "",
+        "本实验不调用 DeepSeek，不读取 API key/token。它只在上轮 yellow transfer confirmer 变体上叠加少量预注册非价格确认/反证 gate，检验是否值得进入下一轮 DS Flash/Pro on/off。",
+        "",
+        "## Setup",
+        "",
+        f"- transfer_configs: `{len(configs)}` yellow variants from `p0_small_entry_transfer_confirmer_v1_summary.csv`",
+        "- gates: transfer_only, no_hard_counter, support_min1_no_hard, support_min2_no_hard, pps_q017_fin_or_chip_no_hard, news_financial_clean_no_hard, chip_support_no_overheat_no_hard.",
+        "- H2026_1 is final OOT; prior blocks are used only for train/validation and promotion gates.",
+        "- Future returns are used only in offline metrics; preview JSONL excludes future/GT/result/label fields.",
+        "",
+        "## Coverage Notes",
+        "",
+    ]
+    lines.extend([f"- {note}" for note in notes[-6:]])
+    lines.extend(
+        [
+            "",
+            "## Main Verdict",
+            "",
+        ]
+    )
+    if promoted_like.empty:
+        lines.append("- 没有 channel gate 从 yellow transfer 进一步晋级。非价格确认层暂不应作为默认硬过滤。")
+    else:
+        green = int(promoted_like["promotion_status"].astype(str).str.contains("green").sum())
+        yellow = int(promoted_like["promotion_status"].astype(str).str.contains("yellow").sum())
+        lines.append(f"- 出现 {green} 个 green、{yellow} 个 yellow channel-confirmed 候选；仍必须先过 fresh panel 和 DS Flash/Pro on/off。")
+    lines.extend(
+        [
+            "- 如果某个 gate 只提高 H2026、但 prior hit 不足或 missed positive 过高，必须写作假设/复核问题，不能写成买入硬阈值。",
+            "",
+            "## Summary",
+            "",
+            markdown_table(summary.head(80)),
+            "",
+            "## H2026 Detail",
+            "",
+            markdown_table(h2026.sort_values(["selected_pos20", "selected_avg20"], ascending=[False, False]).head(80)),
+            "",
+            "## H2026 Panel Stability",
+            "",
+            markdown_table(panel_summary.head(80)),
+            "",
+            "## Hygiene",
+            "",
+            markdown_table(hygiene) if not hygiene.empty else "_empty_",
+            "",
+            "## Decision Rules",
+            "",
+            "- channel gate 只能作为 Agent 问卷/反证检查材料；不能绕过新闻/公告/财报/同行/BookSkill 语义复核。",
+            "- `financial_no_recent_event` 是 soft-gap/无近期事件，不等于财报优秀；它只能降低“坏消息刚披露”的担忧。",
+            "- `news_high_warning`、`financial_high_risk_event` 是降置信/复核触发，不是自动卖出；仍需语义判断。",
+            "",
+            "## Artifacts",
+            "",
+            *[f"- `{path}`" for path in paths.values()],
+            "",
+        ]
+    )
+    return "\n".join(lines)
+
+
+def rank_score(row: dict[str, Any]) -> float:
+    return (
+        25 * safe_float(row.get("h2026_selected_pos20"))
+        + safe_float(row.get("h2026_selected_avg20"))
+        + 80 * safe_float(row.get("h2026_delta_pos_vs_transfer"))
+        + 0.4 * safe_float(row.get("h2026_delta_avg_vs_transfer"))
+        + 4 * safe_float(row.get("prior_delta_pos_hit"))
+        + 3 * safe_float(row.get("prior_delta_avg_hit"))
+        - 8 * safe_float(row.get("h2026_selected_loss_gt5"))
+        - 0.02 * safe_float(row.get("h2026_missed_transfer_positive_rows"))
+    )
+
+
+def positive_rate(values: pd.Series) -> float:
+    values = pd.to_numeric(values, errors="coerce").dropna()
+    if values.empty:
+        return np.nan
+    return round(float((values > 0).mean()), 6)
+
+
+def mean_value(values: pd.Series | Any) -> float:
+    values = pd.to_numeric(values, errors="coerce").dropna()
+    if values.empty:
+        return np.nan
+    return round(float(values.mean()), 6)
+
+
+def rate_le(values: pd.Series, threshold: float) -> float:
+    values = pd.to_numeric(values, errors="coerce").dropna()
+    if values.empty:
+        return np.nan
+    return round(float((values <= threshold).mean()), 6)
+
+
+def delta(value: float, base: float) -> float:
+    if pd.isna(value) or pd.isna(base):
+        return np.nan
+    return round(float(value - base), 6)
+
+
+def num(frame: pd.DataFrame, column: str) -> pd.Series:
+    if column not in frame:
+        return pd.Series(0.0, index=frame.index)
+    return pd.to_numeric(frame[column], errors="coerce").fillna(0.0)
+
+
+def preview_num(value: Any) -> float | None:
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        return None
+    if math.isnan(number):
+        return None
+    return round(number, 6)
+
+
+def fmt_mean_std(frame: pd.DataFrame, column: str) -> str:
+    vals = pd.to_numeric(frame.get(column), errors="coerce").dropna()
+    if vals.empty:
+        return ""
+    return f"{float(vals.mean()):.4f}±{float(vals.std() if len(vals) > 1 else 0.0):.4f}"
+
+
+def markdown_table(frame: pd.DataFrame) -> str:
+    if frame.empty:
+        return "_No rows available._"
+    safe = frame.copy()
+    cols = [col for col in safe.columns if not forbidden_field(col)]
+    safe = safe[cols].fillna("")
+    rows = safe.astype(str).values.tolist()
+    return "\n".join(
+        [
+            "| " + " | ".join(cols) + " |",
+            "| " + " | ".join(["---"] * len(cols)) + " |",
+            *["| " + " | ".join(row) + " |" for row in rows],
+        ]
+    )
+
+
+def write_jsonl(path: Path, frame: pd.DataFrame) -> None:
+    forbidden = [col for col in frame.columns if forbidden_field(col)]
+    if forbidden:
+        raise ValueError(f"preview contains forbidden fields: {forbidden}")
+    with path.open("w", encoding="utf-8") as handle:
+        for record in frame.to_dict(orient="records"):
+            handle.write(json.dumps(json_safe(record), ensure_ascii=False, default=str) + "\n")
+
+
+def json_safe(value: Any) -> Any:
+    if isinstance(value, dict):
+        return {key: json_safe(item) for key, item in value.items()}
+    if isinstance(value, list):
+        return [json_safe(item) for item in value]
+    try:
+        if pd.isna(value):
+            return None
+    except (TypeError, ValueError):
+        pass
+    return value
+
+
+if __name__ == "__main__":
+    main()

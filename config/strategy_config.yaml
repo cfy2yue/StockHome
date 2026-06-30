@@ -1,0 +1,12 @@
+allowed_final_ratings:
+  - "继续深挖"
+  - "放入观察"
+  - "暂时剔除"
+  - "信息不足"
+forbidden_words:
+  - "确定买入"
+  - "确定卖出"
+  - "强烈推荐买入"
+  - "目标价必达"
+source_required: true
+low_confidence_allowed_in_formal_judgment: false

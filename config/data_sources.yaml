@@ -1,0 +1,21 @@
+primary:
+  provider: "AKShare"
+  type: "public_free"
+  requires_login: false
+  paid: false
+policy:
+  allowed_paid_standardized:
+    - "Tushare Pro"
+    - "Wind"
+    - "Choice"
+    - "iFinD"
+    - "同花顺会员"
+  paid_standardized_rules:
+    - "必须基于用户合法授权"
+    - "凭证只能由代码从本地未提交文件或环境变量读取"
+    - "token/key 不得写入代码、日志、报告、prompt、ledger、缓存元数据或 Git"
+    - "回测和 DeepSeek 决策点优先只读本地离线缓存"
+    - "报告和 coverage 必须标注 paid_standardized 来源"
+  retry_times: 2
+  cache_enabled: true
+  timeout_seconds: 12

@@ -1,0 +1,98 @@
+financial_report_channel_schema_version: financial_report_channel_v1
+updated_at: "2026-06-26"
+role: "High-confidence news-like event subchannel for financial reports, earnings forecasts, express reports, audit opinions, and inquiry replies."
+leakage_guard: "Only records with available_at <= decision_time may enter a decision pack. Report period and disclosure date must remain separate."
+source_policy:
+  official_disclosure:
+    priority: 1
+    examples:
+      - cninfo
+      - sse_announcement
+      - szse_announcement
+      - bse_announcement
+      - listed_company_pdf
+    use_for: "Final source audit, original title, original document URL, and manual review evidence."
+  paid_standardized:
+    priority: 2
+    examples:
+      - tushare_pro
+      - wind
+      - choice
+      - ifind
+      - tonghuashun_member
+    use_for: "Large-scale offline cache, structured fields, disclosure-date coverage audit."
+  public_aggregator:
+    priority: 3
+    examples:
+      - akshare
+      - eastmoney
+      - efinance
+    use_for: "Gap filling and cross-check only. If disclosure date or original source is missing, the field may only raise uncertainty."
+required_event_fields:
+  - field_name: source_type
+    range: official_disclosure | paid_standardized | public_aggregator
+    required: true
+    missing_policy: "disable_event_for_directional_judgment"
+  - field_name: source_name
+    range: string
+    required: true
+    missing_policy: "disable_event_for_directional_judgment"
+  - field_name: source_url_or_interface
+    range: string
+    required: true
+    missing_policy: "allow_standardized_interface_name; otherwise disable original-source claim"
+  - field_name: report_period
+    range: YYYYMMDD or YYYY-MM-DD
+    required: true
+    missing_policy: "event may enter uncertainty only"
+  - field_name: available_at
+    range: timestamp
+    required: true
+    missing_policy: "disable_event_for_walk_forward"
+  - field_name: event_type
+    range: annual_report | semi_annual_report | quarterly_report | performance_forecast | performance_express | financial_correction | audit_report | inquiry_reply | financial_metrics
+    required: true
+    missing_policy: "event_type_unknown"
+  - field_name: asof_safe
+    range: true | false
+    required: true
+    missing_policy: false
+derived_features:
+  - feature_name: financial_report_event_count
+    range: integer >= 0
+    calculation: "Number of as-of-safe financial-report events in the decision window."
+    enter_evidence_pack: true
+  - feature_name: financial_report_materiality_score
+    range: 0-1
+    calculation: "Event type, title/materiality keywords, earnings movement, corrections, audit/inquiry severity; cap if only public aggregator evidence exists."
+    enter_evidence_pack: true
+  - feature_name: financial_quality_risk_score
+    range: 0-1
+    calculation: "Cash-flow mismatch, negative earnings surprise, impairment, debt stress, receivables/inventory pressure, non-standard audit, repeated corrections."
+    enter_evidence_pack: true
+  - feature_name: financial_surprise_score
+    range: -1..1
+    calculation: "Deviation versus prior period, forecast/express report, peer group, or trusted expectation. If comparison is unavailable, use 0 and raise missing/uncertainty."
+    enter_evidence_pack: true
+  - feature_name: financial_disclosure_quality_score
+    range: 0-1
+    calculation: "Timely official disclosure, complete report period, low correction/inquiry/audit concern, original source present."
+    enter_evidence_pack: true
+  - feature_name: financial_report_missing_rate
+    range: 0-1
+    calculation: "Missing required fields / required fields."
+    enter_evidence_pack: true
+decision_policy:
+  default_role: "review_risk_uncertainty"
+  not_allowed: "Do not treat positive financial surprise as stand-alone positive alpha before cross-block ablation proves lift."
+  current_evidence:
+    local_strata_report: reports/date_generalization/financial_report_local_stratified_analysis.md
+    matched_rows: 3558
+    unique_stocks: 110
+    conclusion: "High quality-risk and weak-context positive-surprise strata look risky but are stock-concentrated; multi-report review is broad but only mildly better."
+  candidate_rules:
+    - financial_report_matched_clears_missing_flag_v1
+    - financial_negative_surprise_overheat_guard_v1
+    - financial_positive_surprise_not_alpha_v1
+    - financial_quality_risk_high_guard_v1
+    - financial_multi_report_review_v1

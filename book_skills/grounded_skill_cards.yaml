@@ -1,0 +1,120 @@
+- strategy_id: PPS-Q-017
+  source_book: 专业投机原理
+  chapter: 专业投机原理第8章、第27章
+  page_range: OCR_PAGE 0098-0118、0364-0385，书内页码线索91-111、357-378，策略ID=PPS-Q-017，提取方式=系统通读OCR；页码需人工复核。
+  extraction_method: full_ocr_txt_deep_dive
+  confidence: high
+  source_status: grounded
+  validation_status: observe
+  trigger_count: 92968
+  sample_count: 92968
+  raw_positive_20d_rate: 0.4907
+  raw_avg_return_20d: 1.3664
+  applicable_condition: 仅在 evidence pack 同时存在量价、同行、新闻或财务披露证据时作为辅助证据。
+  failure_condition: 下一时间块失效、缺页码 grounding、或与强反证冲突时降权。
+  user_output_boundary: 只能辅助研究分级，不能生成交易指令。
+- strategy_id: DOW-B-004
+  source_book: 道氏理论
+  chapter: 第2章
+  page_range: OCR_PAGE 20-21；第10章/OCR_PAGE 91-104；第13章/OCR_PAGE 147；提取方式：OCR正文通读；页码需人工复核
+  extraction_method: full_ocr_txt_deep_dive
+  confidence: high
+  source_status: grounded
+  validation_status: observe
+  trigger_count: 53504
+  sample_count: 53504
+  raw_positive_20d_rate: 0.4764
+  raw_avg_return_20d: 0.9392
+  applicable_condition: 仅在 evidence pack 同时存在量价、同行、新闻或财务披露证据时作为辅助证据。
+  failure_condition: 下一时间块失效、缺页码 grounding、或与强反证冲突时降权。
+  user_output_boundary: 只能辅助研究分级，不能生成交易指令。
+- strategy_id: PPS-Q-019
+  source_book: 专业投机原理
+  chapter: 专业投机原理第8章、第27章、第28章
+  page_range: OCR_PAGE 0098-0118、0364-0404，书内页码线索91-111、357-397，策略ID=PPS-Q-019，提取方式=系统通读OCR；页码需人工复核。
+  extraction_method: full_ocr_txt_deep_dive
+  confidence: high
+  source_status: grounded
+  validation_status: observe
+  trigger_count: 50401
+  sample_count: 50401
+  raw_positive_20d_rate: 0.4535
+  raw_avg_return_20d: 0.5925
+  applicable_condition: 仅在 evidence pack 同时存在量价、同行、新闻或财务披露证据时作为辅助证据。
+  failure_condition: 下一时间块失效、缺页码 grounding、或与强反证冲突时降权。
+  user_output_boundary: 只能辅助研究分级，不能生成交易指令。
+- strategy_id: DOW-B-017
+  source_book: 道氏理论
+  chapter: 第17章
+  page_range: OCR_PAGE 185-186；第19章/OCR_PAGE 209；提取方式：OCR正文通读；页码需人工复核
+  extraction_method: full_ocr_txt_deep_dive
+  confidence: high
+  source_status: grounded
+  validation_status: observe
+  trigger_count: 40711
+  sample_count: 40711
+  raw_positive_20d_rate: 0.4533
+  raw_avg_return_20d: 0.5558
+  applicable_condition: 仅在 evidence pack 同时存在量价、同行、新闻或财务披露证据时作为辅助证据。
+  failure_condition: 下一时间块失效、缺页码 grounding、或与强反证冲突时降权。
+  user_output_boundary: 只能辅助研究分级，不能生成交易指令。
+- strategy_id: PPS-M-003
+  source_book: 专业投机原理
+  chapter: 专业投机原理第3章、第18章
+  page_range: OCR_PAGE 0038-0044、0275-0281，书内页码线索31-37、268-274，策略ID=PPS-M-003，提取方式=系统通读OCR；页码需人工复核。
+  extraction_method: full_ocr_txt_deep_dive
+  confidence: high
+  source_status: grounded
+  validation_status: observe
+  trigger_count: 14115
+  sample_count: 14115
+  raw_positive_20d_rate: 0.5658
+  raw_avg_return_20d: 3.8146
+  applicable_condition: 仅在 evidence pack 同时存在量价、同行、新闻或财务披露证据时作为辅助证据。
+  failure_condition: 下一时间块失效、缺页码 grounding、或与强反证冲突时降权。
+  user_output_boundary: 只能辅助研究分级，不能生成交易指令。
+- strategy_id: PPS-Q-023
+  source_book: 专业投机原理
+  chapter: needs_grounding
+  page_range: needs_grounding
+  extraction_method: needs_grounding
+  confidence: low
+  source_status: needs_grounding
+  validation_status: weak_until_grounded
+  trigger_count: 13827
+  sample_count: 13827
+  raw_positive_20d_rate: 0.5209
+  raw_avg_return_20d: 1.8439
+  applicable_condition: 仅在 evidence pack 同时存在量价、同行、新闻或财务披露证据时作为辅助证据。
+  failure_condition: 下一时间块失效、缺页码 grounding、或与强反证冲突时降权。
+  user_output_boundary: 只能辅助研究分级，不能生成交易指令。
+- strategy_id: PPS-Q-009
+  source_book: 专业投机原理
+  chapter: 专业投机原理第7章、第27章
+  page_range: OCR_PAGE 0090-0093、0364-0385，书内页码线索83-86、357-378，策略ID=PPS-Q-009，提取方式=系统通读OCR；页码需人工复核。
+  extraction_method: full_ocr_txt_deep_dive
+  confidence: high
+  source_status: grounded
+  validation_status: observe
+  trigger_count: 13417
+  sample_count: 13417
+  raw_positive_20d_rate: 0.4783
+  raw_avg_return_20d: 0.8205
+  applicable_condition: 仅在 evidence pack 同时存在量价、同行、新闻或财务披露证据时作为辅助证据。
+  failure_condition: 下一时间块失效、缺页码 grounding、或与强反证冲突时降权。
+  user_output_boundary: 只能辅助研究分级，不能生成交易指令。
+- strategy_id: CANDLE_MACRO_002
+  source_book: 日本蜡烛图技术
+  chapter: 第四章反转形态
+  page_range: OCR_PAGE_0048-0050；书内页码约28-30；页码需人工复核；full_ocr_txt
+  extraction_method: full_ocr_txt_deep_dive
+  confidence: high
+  source_status: grounded
+  validation_status: observe
+  trigger_count: 3214
+  sample_count: 3214
+  raw_positive_20d_rate: 0.4536
+  raw_avg_return_20d: 0.9111
+  applicable_condition: 仅在 evidence pack 同时存在量价、同行、新闻或财务披露证据时作为辅助证据。
+  failure_condition: 下一时间块失效、缺页码 grounding、或与强反证冲突时降权。
+  user_output_boundary: 只能辅助研究分级，不能生成交易指令。

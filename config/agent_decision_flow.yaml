@@ -1,0 +1,34 @@
+﻿policy_version: agent_policy_v0
+purpose: "Agent 综合决策流程；Python 只提供证据层"
+research_only: true
+no_broker: true
+no_auto_trade: true
+user_output_grades:
+  - 继续深挖
+  - 放入观察
+  - 暂时剔除
+  - 信息不足
+internal_simulated_actions:
+  - 增加研究暴露
+  - 降低研究暴露
+  - 保持观察
+  - 转入现金
+  - 信息不足不动作
+channel_priority:
+  hard_blocks:
+    - data_missing_critical
+    - future_information_risk
+    - paid_data_source_required
+  evidence_channels:
+    - python_quant_signal
+    - news_and_announcement_signal
+    - book_skill_signal
+    - memory_experience_signal
+    - counter_evidence_signal
+conflict_resolution:
+  - "重大数据缺失或披露日不安全 -> 信息不足或暂时剔除"
+  - "新闻风险强且证据质量高 -> 降低研究暴露"
+  - "Python 强但 memory 反证命中 -> 降低置信度，不允许满暴露"
+  - "Book Skill 触发但缺来源页码 -> 只能作为弱证据"
+  - "多通道共振且无强反证 -> 继续深挖或增加研究暴露"
+version_freeze_rule: "每个 walk-forward step 验证前冻结 agent_policy_version，不得用验证块反向修改"
