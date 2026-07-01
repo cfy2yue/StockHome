@@ -13,14 +13,16 @@ the server workspace on 2026-07-01.
 |---|---|---|---|---|---|
 | `README.md` | `cfy2yue/StockHome` | `https://github.com/cfy2yue/StockHome/blob/main/README.md` | Project entrypoint | yes | Server/GitHub/Windows split. |
 | `AGENTS.md` | `cfy2yue/StockHome` | `https://github.com/cfy2yue/StockHome/blob/main/AGENTS.md` | Stock agent rules | yes | User-facing Chinese protocol. |
-| `goal.md` | `cfy2yue/StockHome` | `https://github.com/cfy2yue/StockHome/blob/main/goal.md` | Current product/research goal | yes | Top of file is current authority. |
+| `goal.md` | `cfy2yue/StockHome` | `https://github.com/cfy2yue/StockHome/blob/main/goal.md` | Durable product/research goal | yes | Final target and hard boundaries. |
+| `local_goal.md` | `cfy2yue/StockHome` | `https://github.com/cfy2yue/StockHome/blob/main/local_goal.md` | Local-audited next remote goal | yes | Active manual workflow file. |
+| `local_audit.md` | `cfy2yue/StockHome` | `https://github.com/cfy2yue/StockHome/blob/main/local_audit.md` | Local audit evidence and risks | yes | Active manual workflow file. |
+| `local_suggestion.md` | `cfy2yue/StockHome` | `https://github.com/cfy2yue/StockHome/blob/main/local_suggestion.md` | Local next-step suggestions and gates | yes | Active manual workflow file. |
 | `.gitignore` | `cfy2yue/StockHome` | `https://github.com/cfy2yue/StockHome/blob/main/.gitignore` | Git exclusion policy | yes | Already excludes secrets/caches. |
 | `docs/START_HERE.md` | `cfy2yue/StockHome` | `https://github.com/cfy2yue/StockHome/blob/main/docs/START_HERE.md` | Short onboarding | yes | Current entrypoint. |
 | `docs/PROJECT_ENTRY.md` | `cfy2yue/StockHome` | `https://github.com/cfy2yue/StockHome/blob/main/docs/PROJECT_ENTRY.md` | Agent/engineer entry | yes | Keep concise. |
 | `docs/GIT_AND_COLLABORATION.md` | `cfy2yue/StockHome` | `https://github.com/cfy2yue/StockHome/blob/main/docs/GIT_AND_COLLABORATION.md` | Git and ownership rules | yes | Created for collaboration. |
 | `docs/GITHUB_FILE_MAP.md` | `cfy2yue/StockHome` | `https://github.com/cfy2yue/StockHome/blob/main/docs/GITHUB_FILE_MAP.md` | File URL map | yes | This file. |
-| `docs/LOCAL_CODEX_DRY_RUN.md` | `cfy2yue/StockHome` | `https://github.com/cfy2yue/StockHome/blob/main/docs/LOCAL_CODEX_DRY_RUN.md` | Local Codex dry-run notes | yes | Supports workflow testing before normal CC flow. |
-| `docs/CC_CODEX_COOPERATION_PROTOCOL.md` | `cfy2yue/StockHome` | `https://github.com/cfy2yue/StockHome/blob/main/docs/CC_CODEX_COOPERATION_PROTOCOL.md` | CC/local and remote Codex operating protocol | yes | Read before parallel local/remote work. |
+| `docs/archive/legacy_auto_coordination_20260701/` | `cfy2yue/StockHome` | `https://github.com/cfy2yue/StockHome/tree/main/docs/archive/legacy_auto_coordination_20260701` | Historical auto-coordination archive | yes | Evidence only; not active instructions. |
 | `docs/USER_GUIDE.md` | `cfy2yue/StockHome` | `https://github.com/cfy2yue/StockHome/blob/main/docs/USER_GUIDE.md` | User guide | yes | User-facing docs. |
 | `docs/RESPONSE_PROTOCOL.md` | `cfy2yue/StockHome` | `https://github.com/cfy2yue/StockHome/blob/main/docs/RESPONSE_PROTOCOL.md` | Answer protocol | yes | Must match `AGENTS.md`. |
 | `docs/DATA_SOURCE_POLICY.md` | `cfy2yue/StockHome` | `https://github.com/cfy2yue/StockHome/blob/main/docs/DATA_SOURCE_POLICY.md` | Data-source and credential policy | yes | No tokens. |

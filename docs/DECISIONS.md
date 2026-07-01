@@ -22,7 +22,8 @@ leakage-free time-out RankIC accuracy metric + an IC-gate** so the agent auto-do
 exposure when the edge collapses. Re-scope success from "chase a 20d +rate ≥0.60" (a
 divergence trap) to "publish honest OOT accuracy of a frozen, gateable score"; put the
 main alpha expectation on P1 (ranking), not P0 (absolute timing). First Codex execution
-step specified in `docs/CC_AUDIT_AND_HANDOFF_20260701_frozen_score.md`.
+step was recorded in the historical archived note
+`docs/archive/legacy_auto_coordination_20260701/CC_AUDIT_AND_HANDOFF_20260701_frozen_score.md`.
 
 ## 2026-07-01: RESULT (round 2) — P0 Latest NOT Confirmed; Keep MVP + Regime-Drift Caveat
 
@@ -77,8 +78,10 @@ validating it is the highest-value bounded step and the gate for any promotion.
 The two legacy docs still stated "do not output definite buy/sell", which no
 longer matches the approved action-advice protocol.
 
-Consequence: see `docs/CC_AUDIT_AND_HANDOFF_20260701.md` for the full goal +
-ownership. CC owns goal/decision/handoff docs; Codex owns code/runs/RUN_STATUS.
+Consequence: historical goal/handoff note archived at
+`docs/archive/legacy_auto_coordination_20260701/CC_AUDIT_AND_HANDOFF_20260701.md`.
+Use current `local_goal.md`, `local_audit.md`, and `local_suggestion.md` for
+new remote execution.
 
 ## 2026-07-01: Initialize StockHome As Its Own Repo
 
