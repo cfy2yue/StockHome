@@ -1,6 +1,6 @@
 # StockHome Remote Execution Packet
 
-Updated: 2026-07-01
+Updated: 2026-07-02
 
 Status: local-authored remote execution packet for the manual workflow
 `CC/Codex local audit -> user manual GitHub sync -> remote Codex execution`.
@@ -125,17 +125,40 @@ caveat. The latest H2026_1 block did not confirm the frozen P0: 20d positive
 rate was `0.6667` versus frozen `0.8434`, and `exposure_cards=0` means the
 result is defensive behavior, not stock-picking skill.
 
-The next strategic direction is the user's preferred route: converge scattered
-scorers into one frozen, reproducible, leakage-free cross-sectional score with
-a unified out-of-time RankIC metric and an IC/exposure gate. The goal is honest,
-auditable score accuracy and automatic exposure downgrade when the edge
-collapses.
+State update (2026-07-02 local audit, verified by SSH): the prior stage — the
+signal inventory — is DONE remotely (server-local `runs/stock_signal_inventory_20260701/`
++ `reports/date_generalization/stock_signal_inventory_20260701/`). Remote then
+autonomously pre-registered and evaluated 7 new signal families; ALL failed
+strict target60 (best H2026_1 win rate ties at `0.6000` with negative net decile
+spread). The `frozen_quant_score_v1` model already exists, is leakage PASS, but
+is weak and single-block-dependent (only H2026_1 is clearly positive; H2024_2 and
+H2025_2 RankIC are negative) and its after-cost top-bottom decile spread is
+NEGATIVE. Root cause (from `feature_rank_ic_audit.csv` and
+`supervised_ranker_experiment_v2.md`): the project's implicit alpha is
+cross-sectional reversal, which collapsed to ~zero RankIC on H2026_1, and after a
+1.5% round-trip cost essentially no model has a positive top-decile net spread.
 
-Lightweight execution is preferred: first fix one auditable quant score/ranker
-as the agent's decision anchor, then let P0/P1 reasoning use that score with
-evidence, counter-evidence, and downgrade gates. Small quantitative
-information-aggregation or decision-support networks are allowed only after the
-inventory/leakage audit identifies clean decision-time inputs and an OOT gate.
+So the frozen-one-score goal is effectively already delivered at v1; what remains
+is NOT training more models but: relabel the frozen score honestly as an
+observe-grade P1 rank aid, wire it as the agent's ranking anchor behind a
+downgrade/exposure guard, and stop chasing a strict raw `>0.60` win rate that the
+current feature set cannot reach after costs without selection tricks.
+
+Re-scope note for the user's 60% target (advisory; `goal.md` body is NOT edited):
+"20 日正收益率 > 60%" means a 20-trading-day forward-return WIN RATE above 60%
+(not a 60% cumulative return; ground truth `return_20d = close[t+20]/close[t]-1`).
+Recommend the accepted acceptance form become: on the latest OOT block, an
+exposure-gated candidate whose win rate clears its block base rate AND whose
+after-cost (>=1.5% round-trip) top-decile net spread is non-negative AND whose
+RankIC/ICIR gate passes AND with no final-OOT selection. A raw >0.60 win rate
+alone is not accepted (gameable by base rate + tiny exposure).
+
+Lightweight execution is preferred: first fix one auditable quant score/ranker as
+the agent's decision anchor with a guard, then let P0/P1 reasoning use that score
+with evidence, counter-evidence, and downgrade gates. Small quantitative
+information-aggregation or decision-support networks stay deferred until an
+available-at/lag audit clears clean decision-time inputs (news/event and
+peer-cohesion families are currently `needs_leakage_audit`).
 
 ## Remote Next-Task Filling Rule
 
@@ -176,104 +199,134 @@ not as active instructions.
 
 ## Exact Next Task
 
-Date: 2026-07-01
+Date: 2026-07-02
 
-Route: StockHome remote dirty-signal and frozen-ranker consolidation audit.
+Route: P1 frozen-ranker integration with an honest downgrade/exposure guard, plus
+an after-cost reality check. This supersedes the completed signal-inventory task
+(done remotely as `stock_signal_inventory_20260701`) and the completed 7-family
+target60 search (done as `p0_target60_new_signal_family_20260701`, all failed).
+Do NOT re-run the inventory or start another new signal family this round.
 
-Hypothesis: the latest target60 attempt honestly failed under the pre-OOT
-selection rule, while `frozen_quant_score_v1` has a weak but usable P1 ranking
-signal by RankIC. Before trying another signal family, remote Codex should
-turn the current dirty remote workspace into a structured evidence map: which
-untracked scripts/tests/models exist, what each claims, which are leakage-safe,
-which are only research-only, and what single next goal should be proposed for
-local audit.
+Prior-stage results confirmed by local audit (do not redo, just build on):
+`frozen_quant_score_v1` is leakage PASS but weak/single-block (H2026_1 RankIC
+`0.0327`, ICIR `0.4233`, ic_pos `0.6316`; H2024_2 and H2025_2 RankIC negative) and
+its top-bottom decile NET spread is negative (`-2.5158pp`). target60 and all 7
+autonomous families failed strict `>0.60` (ceiling ties at `0.6000` with negative
+net spread). Root cause: implicit reversal alpha collapsed on H2026_1 and after a
+1.5% round-trip cost no model has a positive top-decile net spread
+(`supervised_ranker_experiment_v2.md`).
 
-The inventory must explicitly identify which files or feature families could
-become a frozen quant score v2 or a small aggregation/decision-support network,
-and which are unsafe because their available-at/leakage boundary is unclear.
+Hypothesis: the frozen ranker can be a useful P1 candidate-comparison ANCHOR only
+if a downgrade guard automatically suppresses active-buy / high-exposure language
+whenever any of {H2026_1 (or latest-block) RankIC, ICIR, coverage, after-cost
+net decile spread} weakens. The deliverable is a guarded, honest ranking aid, not
+a return promise and not a strict-`>0.60` chaser.
+
+Sub-goals (all read/CPU-only, offline caches only):
+
+1. After-cost reality check: for the frozen score AND the reversal_composite
+   baseline, recompute per-block (esp. H2026_1) top-decile and top-minus-bottom
+   NET decile spread at round-trip cost 1.5% (and a conservative flat 1.5% floor),
+   using existing offline `return_20d` labels for evaluation only. Confirm or
+   refute the negative-net-spread finding and report whether ANY decision-time
+   feature family reaches a non-negative H2026_1 net top-decile spread.
+2. Downgrade guard spec + wiring: define/verify a deterministic guard that maps
+   {latest-block RankIC, ICIR, coverage, net-spread sign, active_exposure} to a
+   tool grade in {`active_ok`, `observe_only`, `suppress`} and to user-facing
+   language (no active-buy / no high-exposure wording when suppressed). Wire the
+   frozen score through `src/agent_training/quant_tool_context.py` (sanitize) and
+   `date_regime_gate.py` (exposure) so the agent's P1 comparison consumes only the
+   guarded, sanitized score summary (no future/GT fields).
+3. Honest relabel proposal: recommend changing
+   `models/frozen/quant_score_v1/model_card.md` `usable_in_agent_default` from
+   `true` to `observe_only`/`limited_rank_reference` given the negative net spread
+   and single-block edge (propose in report; do not edit local_*.md).
+4. Optional (only if 1-3 done and time remains): one small candidate-set P1 dry
+   run on a user-style handful of stocks showing the guarded ranking output with
+   evidence, counter-evidence, exposure downgrade, and coverage — NO paid LLM/Pro
+   unless a later local task explicitly authorizes it.
 
 Allowed inputs:
 
 - the active first-read files listed above;
 - server-local context:
-  - `runs/frozen_quant_score_v1_20260701_145932/RUN_STATUS.md`;
-  - `reports/date_generalization/frozen_quant_score_v1_accuracy.md`;
-  - `models/frozen/quant_score_v1/model_card.md`;
-  - `runs/codex_goal_stock_20260701/RUN_STATUS.md`;
-  - `reports/date_generalization/p0_target60_codex_goal_stock_20260701/target60_report.md`;
-  - `runs/20260701_p0_p1_latest_revalidation_v1/RUN_STATUS.md` if present;
-  - current untracked `scripts/run_*_v1.py`, `scripts/train_frozen_quant_score_v1.py`,
-    `scripts/validate_p0_p1_latest_revalidation.py`, `tests/test_*_v1.py`,
-    and `models/frozen/quant_score_v1/*`;
-  - untracked roots/items `4599041`, `anthropic_financial_services/`, and
-    `models/`. External/reference directories should be registered in the
-    inventory but not deeply read unless they are required to explain a local
-    signal artifact.
+  - `models/frozen/quant_score_v1/model_card.md`, `feature_list.json`,
+    `train_blocks.json`, `model.joblib`;
+  - `reports/date_generalization/frozen_quant_score_v1_accuracy.md` (+ `.csv`);
+  - `reports/date_generalization/supervised_ranker_experiment_v2.md` (+ its
+    step/variant/aggregate CSVs);
+  - `reports/date_generalization/feature_rank_ic_audit.csv`;
+  - `reports/date_generalization/stock_signal_inventory_20260701/REPORT.md`,
+    `signal_family_triage.csv`, `recommended_next_goal.json`;
+  - `reports/date_generalization/p0_target60_new_signal_family_20260701/rolling_autonomy_summary_20260701.md`;
+  - `reports/date_generalization/20260701_p0_p1_latest_revalidation_v1_round2_flash_confirm/validation_summary.md`;
+  - the joined offline cache
+    `data/date_generalization_cache/market_5000/joined_ground_truth_combined_news.csv`
+    (read-only, for the after-cost recompute; labels are offline-eval only);
+  - modules `src/agent_training/quant_tool_context.py`, `date_regime_gate.py`,
+    `evidence_pack.py`, `decision_card.py`; `scripts/audit_feature_rank_ic.py`,
+    `scripts/run_supervised_ranker_experiment.py`,
+    `scripts/audit_kline_peer_chip_turnover_cost.py`.
 
 Allowed commands:
 
-- read-only inspection, `git status --short`, `git diff --stat`, and file
-  metadata summaries;
-- CPU-only syntax/AST checks first. Import/test collection checks are allowed
-  only if remote can prove they do not touch data caches, network, paid APIs,
-  secrets, broker/trading systems, or large rebuilds. If import collection would
-  trigger side effects, skip that check, record the reason in
-  `remote_decision.md`, and continue with static inspection;
+- read-only inspection, `git status --short`, `git diff --stat`, file metadata;
+- CPU-only pandas/sklearn recompute over the offline joined cache for the
+  after-cost spread and guard-grade tables; loading the frozen `model.joblib` for
+  scoring is allowed (it is a local artifact, no network);
+- CPU-only syntax/AST checks; running the existing `tests/test_date_regime_gate_exposure_guard.py`,
+  `tests/test_quant_agent_tools.py`, `tests/test_evidence_pack_leakage_audit.py`
+  is allowed only if it provably touches no network/paid API/secrets/large rebuild;
+  if a test would trigger side effects, skip it and record why in `remote_decision.md`;
 - write the status/report files below.
 
 Expected outputs:
 
-- `runs/stock_signal_inventory_20260701/RUN_STATUS.md`;
-- `reports/date_generalization/stock_signal_inventory_20260701/REPORT.md`;
-- optional small tables under that report directory:
-  - `dirty_file_inventory.csv`;
-  - `signal_family_triage.csv`;
-  - `recommended_next_goal.json`.
+- `runs/p1_ranker_guard_integration_20260702/RUN_STATUS.md`;
+- `reports/date_generalization/p1_ranker_guard_integration_20260702/validation_summary.md`;
+- small tables under that report dir:
+  - `after_cost_net_spread_by_block.csv`;
+  - `ranker_guard_grade_table.csv`;
+  - optional `p1_candidate_dryrun.csv` (only if sub-goal 4 runs).
 
 DONE criteria:
 
 - report branch/HEAD/dirty state and confirm no `local_*.md` edits;
-- summarize the target60 ceiling: selected pre-OOT strategy
-  `regime_gating__frozen_score__aggressive__all_dates__top10pct` reached
-  H2026_1 positive rate `0.2414`, exposure `0.6687`, avg20 `-3.6298`, net
-  decile spread `-2.9923`; do not promote OOT-selected alternatives;
-- summarize `frozen_quant_score_v1`: leakage PASS, H2026_1 RankIC mean
-  `0.0327`, ICIR `0.4233`, IC-positive fraction `0.6316`, but top-bottom net
-  spread negative;
-- include a separate "why not promoted" section covering target60 failure,
-  negative top-bottom net spread for frozen ranker, and the earlier P0/Flash
-  `exposure_cards=0` defensive-only caveat;
-- inventory every untracked signal/model/test file and classify it as
-  `ready_to_test`, `needs_leakage_audit`, `research_only`, `duplicate`, or
-  `do_not_use`;
-- list candidate clean inputs for a future frozen quant score v2 or small
-  aggregation network, including why each candidate is or is not decision-time
-  safe;
-- propose at least one next remote route and, if it is safe within the written
-  limits, continue into the best route after recording the decision in
-  `remote_decision.md`. Candidate routes include:
-  - P1 ranker integration with downgrade/exposure guard;
-  - frozen quant score v2 or a small aggregation network with strict OOT
-    RankIC/exposure/leakage gates;
-  - one pre-registered new low-risk signal family with strict leakage gates;
-  - closing target60 under current data and shifting the objective.
+- after-cost net decile spread reported per block incl. H2026_1 for frozen score
+  and reversal_composite, with an explicit yes/no on whether any decision-time
+  family clears a non-negative H2026_1 net top-decile spread;
+- a deterministic downgrade-guard grade table mapping metrics -> {active_ok,
+  observe_only, suppress} and the corresponding user-facing language rule;
+- proof (leakage audit `PASS`, hits=0) that the guarded score summary passed to
+  the agent contains NO future/GT fields (return_5/10/20d, future_*, gt_status,
+  positive_20d);
+- coverage/exposure reported; any low/zero exposure explicitly called
+  defensive/no-action, never stock-picking skill;
+- a "why not promoted" section: negative after-cost net spread, single-block
+  frozen-score edge, target60/7-family failure, P0 `exposure_cards=0`;
+- a recommendation on relabeling the model card to `observe_only` (proposed, not
+  applied to local_*.md);
+- exactly one proposed next stage (e.g. available-at/lag audit of the
+  `needs_leakage_audit` news/peer families, OR a small decision-support network
+  only after that audit, OR formally closing strict target60), tied back to the
+  long-horizon acceptance target.
 
 Resource limits:
 
-- CPU/read-mostly audit only, target 60 minutes, hard stop 90 minutes.
-- Writes are allowed only under:
-  - `runs/stock_signal_inventory_20260701/`;
-  - `reports/date_generalization/stock_signal_inventory_20260701/`.
-- No paid API, no online data pulls, no secrets, no broker/live trading, no
-  long backtests, no large cache rebuilds.
+- CPU/read-mostly, target 75 minutes, hard stop 120 minutes.
+- Writes allowed only under:
+  - `runs/p1_ranker_guard_integration_20260702/`;
+  - `reports/date_generalization/p1_ranker_guard_integration_20260702/`.
+- No paid API, no online data pulls, no secrets, no broker/live trading, no long
+  backtests, no GPU, no large cache rebuilds. Loading the existing local
+  `model.joblib` and reading the existing offline joined cache are allowed.
 - Do not commit, push, reset, delete, or clean files.
 
 Stop rules:
 
 - stop the current subtask, record a `SOFT_BLOCK` or `ROUTE_PIVOT` in
-  `remote_decision.md`, and continue with another safe route if required
-  reports are missing, untracked scripts require credentials/network to
-  understand, or leakage cannot yet be bounded;
+  `remote_decision.md`, and continue with another safe sub-goal if a required
+  report/cache is missing or a leakage boundary cannot be bounded;
 - mark hard `BLOCKED` only if every reasonable next route requires changing the
   user goal, paid/data permission, credential handling, broker/live-trading
   boundary, destructive operations, or an unapproved large rebuild.

@@ -1,6 +1,6 @@
 # StockHome Local Suggestions For Next Remote Round
 
-Updated: 2026-07-01
+Updated: 2026-07-02
 
 Status: local-authored remote execution guidance. This file is part of the
 remote execution packet: remote Codex reads it with `local_goal.md` and
@@ -17,19 +17,33 @@ It becomes executable only through the filled `Exact Next Task` in
 
 ## Top Priorities
 
-1. Freeze one reproducible, leakage-free score/ranker path and evaluate it with
-   out-of-time RankIC by block, especially H2026_1.
-2. Add or verify an IC/exposure gate that downgrades or blocks active exposure
-   when the score edge collapses.
-3. Keep the user's 20-day positive-return `>60%` ambition as a guarded
-   secondary target: it must be paired with exposure, net spread/return,
-   leakage, base-rate, and OOT checks.
-4. Keep P0/P1 user-facing action cards honest: action first, evidence and
-   counter-evidence second, with no future labels and no low-exposure spin.
-5. Preserve credential and generated-evidence hygiene: no secrets in Git,
-   prompts, reports, ledgers, or logs.
-6. For the current remote round, prefer P1 ranker integration with
-   downgrade/exposure guard over continuing to chase target60.
+Update 2026-07-02: the frozen score already exists (`frozen_quant_score_v1`,
+leakage PASS) and the inventory + 7 new signal families are already done remotely
+and all failed strict target60. So priority shifts from "train/freeze a score" to
+"integrate it honestly behind a guard and prove the after-cost reality".
+
+1. AFTER-COST FIRST (new binding constraint): the top-decile NET decile spread at
+   1.5% round-trip cost is negative for essentially every model on H2026_1
+   (`supervised_ranker_experiment_v2.md`; frozen score net top-bottom `-2.5158pp`).
+   Any next step must report after-cost numbers; gross-only comfort is misleading.
+2. Integrate `frozen_quant_score_v1` as a P1 ranking ANCHOR behind a deterministic
+   downgrade/exposure guard that suppresses active-buy/high-exposure language when
+   RankIC, ICIR, coverage, or net-spread weakens.
+3. Relabel the frozen score honestly: propose `usable_in_agent_default: true` ->
+   `observe_only`/`limited_rank_reference`, because its edge lives on a single OOT
+   block (H2026_1) and after-cost spread is negative.
+4. Re-scope the user's 60% target away from a raw `>0.60` win rate. It means a
+   20-trading-day forward-return WIN RATE (not 60% cumulative return). Accept it
+   only when exposure-gated, above the block base rate, after-cost net spread
+   non-negative, RankIC/ICIR gate passed, and no final-OOT selection. Stop chasing
+   strict `>0.60` on the current feature set (proven a divergence trap this round).
+5. Keep P0/P1 user-facing action cards honest: action first, evidence and
+   counter-evidence second, no future labels, no low-exposure spin.
+6. Preserve credential and generated-evidence hygiene: no secrets in Git, prompts,
+   reports, ledgers, or logs.
+7. Do NOT start another new signal family or a small aggregation network until the
+   `needs_leakage_audit` news/event and peer-cohesion families get an
+   available-at/lag audit proving decision-time safety.
 
 ## Suggestion Generation Rules
 
@@ -64,24 +78,37 @@ Every report should include a "why not promoted" note when relevant: target60
 failed under pre-OOT selection, frozen ranker net spread is negative, and
 zero/tiny exposure is defensive behavior rather than active skill.
 
-## Recommended Next Remote Task Pattern
+## Recommended Next Remote Task (this round: P1 ranker guard + after-cost)
 
-Use this pattern when the next audit fills `local_goal.md`:
+The filled `Exact Next Task` in `local_goal.md` this round is
+`P1 ranker guard integration + after-cost reality check`
+(`p1_ranker_guard_integration_20260702`). Pattern:
 
 ```text
 Read README.md, docs/START_HERE.md, goal.md, local_goal.md, local_audit.md,
-local_suggestion.md, AGENTS.md, docs/DECISIONS.md.
+local_suggestion.md, remote_decision.md, AGENTS.md, docs/DECISIONS.md.
 
-Task: perform one bounded remote step to freeze or audit the current best
-leakage-free StockHome score/ranker. Use only decision-time features for
-inference. Use future labels only for offline evaluation. Produce RankIC by
-date/block, H2026_1 out-of-time result, coverage, exposure, leakage audit, and
-a short RUN_STATUS.md. Do not run paid/large experiments unless explicitly
-allowed in local_goal.md.
+Task: do NOT run the inventory or a new signal family again (both already done,
+all target60 attempts failed). Instead:
+1. Recompute per-block (incl H2026_1) after-cost (1.5% round-trip + flat-1.5%
+   floor) top-decile and top-minus-bottom NET decile spread for frozen_quant_score_v1
+   and the reversal_composite baseline, using offline return_20d labels for eval
+   only. Report a clear yes/no: does ANY decision-time feature family reach a
+   non-negative H2026_1 net top-decile spread?
+2. Define + wire a deterministic downgrade guard mapping {latest-block RankIC,
+   ICIR, coverage, net-spread sign, active_exposure} -> {active_ok, observe_only,
+   suppress} and to user-facing language. Route the frozen score through
+   quant_tool_context sanitize + date_regime_gate exposure so the agent's P1
+   comparison sees only the guarded, sanitized summary (no future/GT fields).
+3. Recommend relabeling model_card usable_in_agent_default true -> observe_only.
+Produce after_cost_net_spread_by_block.csv, ranker_guard_grade_table.csv, a
+leakage PASS proof, coverage/exposure, a why-not-promoted section, and one next
+stage. CPU/offline only; loading local model.joblib and reading the offline
+joined cache is allowed; no paid API/network/GPU/large rebuild.
 ```
 
-The exact command and output paths must be filled by the next local audit after
-checking current server state.
+The exact inputs/outputs/limits are already written into `local_goal.md`
+`Exact Next Task`. Remote must not invent scope beyond it.
 
 ## Alternative Routes
 
@@ -138,18 +165,34 @@ Minimum metric set:
   as defensive/no-action, not skill;
 - RankIC: per-date and per-block cross-sectional RankIC, with H2026_1 reported
   separately;
-- baseline: compare to simple reversal baseline, block base rate, and prior
-  frozen score where applicable;
-- robustness: report turnover/cost or decision-frequency caveat when a strategy
-  implies portfolio action;
-- promotion: only promote a tool to default if OOT RankIC is positive or
-  materially better than baseline, leakage passes, coverage is adequate, and
-  exposure gate behavior is explainable.
+- AFTER-COST spread (now mandatory): top-decile and top-minus-bottom NET decile
+  spread at >=1.5% round-trip cost, per block incl. H2026_1. Gross-only spread is
+  not sufficient evidence for any portfolio/active claim;
+- baseline: compare to the parameter-free `reversal_composite` baseline, block
+  base rate, and prior frozen score where applicable;
+- robustness: report turnover/cost and decision-frequency; note that H2026_1 is a
+  single ~38-date block, so a lone positive RankIC is weak (recommend a daily-IC
+  t-stat / Newey-West check before any promotion);
+- promotion: promote a tool to default ONLY if OOT RankIC>0 AND ICIR>=0.30 AND
+  ic_pos>=0.55 AND after-cost top-decile net spread not materially negative AND
+  coverage adequate AND exposure behavior explainable. `frozen_quant_score_v1`
+  currently FAILS the after-cost leg -> `observe_only`, not default.
+
+Downgrade-guard grades (deterministic, for the P1 ranker anchor):
+
+- `active_ok`: latest-block RankIC>0, ICIR>=0.30, ic_pos>=0.55, after-cost net
+  top-decile spread >=0, coverage adequate -> ranking may inform active exposure;
+- `observe_only`: RankIC/ICIR gate passes but after-cost net spread <0 or coverage
+  thin -> ranking is reference-only, NO active-buy / NO high-exposure language;
+- `suppress`: latest-block RankIC<=0 or edge collapsed or exposure zero/tiny ->
+  no ranking-driven action; state defensive/no-action explicitly.
 
 Default stop/fail gates:
 
 - any future/GT field in decision-time evidence;
 - H2026_1 negative or near-zero RankIC without a documented downgrade gate;
+- after-cost net top-decile spread materially negative while language implies
+  active buy or portfolio profit;
 - missing coverage that changes the conclusion;
 - exposure zero/tiny while report language claims stock-picking success;
 - required secrets, paid calls, large rebuild, or SSH not explicitly approved.
@@ -158,14 +201,16 @@ Default stop/fail gates:
 
 Positive result:
 
-- If leakage passes, H2026_1/OOT RankIC is positive or better than baseline,
-  coverage is adequate, and exposure gate behavior is sane, keep the tool as
-  `observe` or cautiously `usable_default` depending on existing tests.
-- If positive-rate improves above `60%` but RankIC, net spread/return,
-  exposure, or leakage gates fail, do not promote it; record it as an
-  overfit/base-rate/selection-risk result.
-- Ask local audit to update `local_goal.md` with a next P0/P1 integration or
-  small user-facing dry-run task.
+- If leakage passes, latest-block RankIC>0 and beats reversal_composite baseline,
+  coverage adequate, AND after-cost net top-decile spread >=0, grade the tool
+  `active_ok`; if the after-cost leg fails, grade `observe_only` (reference-only).
+- If a raw win rate improves above `60%` but RankIC, after-cost net spread,
+  exposure, or leakage gates fail, do NOT promote it; record it as an
+  overfit/base-rate/selection-risk result (this is exactly what target60 and the
+  7 families produced this round: ceiling `0.6000` with negative net spread).
+- Ask local audit to update `local_goal.md` with the next stage: an available-at/
+  lag audit of the `needs_leakage_audit` news/peer families, or a small guarded
+  P1 candidate dry-run.
 
 Negative result:
 
