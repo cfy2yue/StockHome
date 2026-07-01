@@ -17,7 +17,7 @@ https://github.com/cfy2yue/StockHome
 服务器进入方式：
 
 ```bash
-ssh cyx-server-proxy-cfy
+ssh cyx-server-cfy
 cd /data/cyx/1030/stock
 ```
 

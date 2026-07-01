@@ -17,13 +17,13 @@
 
 服务器本地证据在 `reports/`、`runs/`、`memory/` 和 `docs/local_archive/` 中，
 这些目录默认不进入 GitHub。CC 本地 clone 后如果需要看这些证据，应通过
-`ssh cyx-server-proxy-cfy` 到服务器读取，不要在 Windows 本地伪造或重建。
+`ssh cyx-server-cfy` 到服务器读取，不要在 Windows 本地伪造或重建。
 
 ## 服务器与 GitHub
 
 - 服务器目录：`/data/cyx/1030/stock`
 - GitHub 目标仓库：`https://github.com/cfy2yue/StockHome`
-- 服务器登录：`ssh cyx-server-proxy-cfy`
+- 服务器登录：`ssh cyx-server-cfy`
 - Windows/CC 可 clone GitHub 仓库做文档、审计、代码 review 和小型本地测试；需要服务器缓存、凭证、长回测或大数据的任务必须交给服务器/Codex。
 
 ## 当前产品形态

@@ -6,7 +6,7 @@ Updated: 2026-07-01
 
 - Server directory: `/data/cyx/1030/stock`
 - GitHub target: `https://github.com/cfy2yue/StockHome`
-- SSH entry: `ssh cyx-server-proxy-cfy`, then `cd /data/cyx/1030/stock`
+- SSH entry: `ssh cyx-server-cfy`, then `cd /data/cyx/1030/stock`
 - Windows clone path may be `E:\stock` or another local clone chosen by CC
 - Shared biological dataset root is not used by default
 
@@ -37,7 +37,7 @@ credentials, or large backtests.
 If server inspection is required:
 
 ```bash
-ssh cyx-server-proxy-cfy
+ssh cyx-server-cfy
 cd /data/cyx/1030/stock
 ```
 

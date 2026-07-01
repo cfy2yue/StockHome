@@ -42,7 +42,7 @@ counter-evidence, position/risk limits, triggers, and review conditions.
 
 - Project root: `/data/cyx/1030/stock`.
 - Remote: `https://github.com/cfy2yue/StockHome`.
-- Server login: `ssh cyx-server-proxy-cfy`.
+- Server login: `ssh cyx-server-cfy`.
 - This project does not share `/data/cyx/1030/dataset` by default.
 - Local secrets such as `ds_api.txt` and `tushare_token.txt` stay ignored.
 

@@ -40,7 +40,7 @@ Use SSH only for lightweight status checks unless the user explicitly asks for
 server execution:
 
 ```powershell
-ssh cyx-server-proxy-cfy "cd /data/cyx/1030/stock && git status -sb && git remote -v"
+ssh cyx-server-cfy "cd /data/cyx/1030/stock && git status -sb && git remote -v"
 ```
 
 When handing a server/API/backtest task to Codex, include:
