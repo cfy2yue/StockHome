@@ -24,6 +24,8 @@ It becomes executable only through the filled `Exact Next Task` in
    counter-evidence second, with no future labels and no low-exposure spin.
 4. Preserve credential and generated-evidence hygiene: no secrets in Git,
    prompts, reports, ledgers, or logs.
+5. For the current remote round, prefer P1 ranker integration with
+   downgrade/exposure guard over continuing to chase target60.
 
 ## Suggestion Generation Rules
 
@@ -39,6 +41,21 @@ task that answers the current uncertainty. Prefer:
 Do not suggest broad experiments, paid LLM expansion, SSH-driven work, or
 multi-day searches unless the local audit has already written the hypothesis,
 resource cap, stop rule, and expected paths into `local_goal.md`.
+
+For dirty remote signal inventories, classify each file/family as one of:
+
+- `ready_to_test`: syntax/static checks pass, inputs are local/offline, leakage
+  boundary is explicit, and tests exist or are easy to collect safely;
+- `needs_leakage_audit`: plausible but future/availability/data-flow boundary
+  is not proven;
+- `research_only`: useful diagnostic or offline analysis, not a P0/P1 tool;
+- `duplicate`: overlaps an existing signal without clear incremental evidence;
+- `do_not_use`: uses future labels, secrets, network/paid data, broker actions,
+  or cannot be bounded.
+
+Every report should include a "why not promoted" note when relevant: target60
+failed under pre-OOT selection, frozen ranker net spread is negative, and
+zero/tiny exposure is defensive behavior rather than active skill.
 
 ## Recommended Next Remote Task Pattern
 

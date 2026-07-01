@@ -206,6 +206,54 @@ No experiments, tests, or remote/API calls were run in this pass. Future local
 audits may use SSH for read-only evidence checks when the local clone lacks
 server-local metadata.
 
+## First-Round Local Audit Update - 2026-07-01
+
+User context: first manual local-audit round for all three projects; no new
+remote `LOCAL_AUDIT_REQUEST` was provided. Local audit used SSH read-only
+checks on `/data/cyx/1030/stock` for server-local metrics and dirty state.
+
+Remote sync/state:
+
+- HEAD: `d9e5e09`.
+- Remote dirty state: 21 untracked entries. Key roots/items:
+  `4599041`, `anthropic_financial_services/`, `models/`,
+  `scripts/run_p0_target60_walkforward.py`,
+  `scripts/train_frozen_quant_score_v1.py`,
+  `scripts/validate_p0_p1_latest_revalidation.py`, seven new
+  `scripts/run_*_v1.py` signal-family scripts, and matching `tests/test_*_v1.py`
+  files.
+- These files must be inventoried and classified before any local docs treat
+  them as project source. External/reference directories should be registered
+  but not deeply read unless needed to explain a local signal artifact.
+
+Remote evidence verified:
+
+- `runs/frozen_quant_score_v1_20260701_145932/RUN_STATUS.md` finished with
+  leakage PASS and gate PASS under its ICIR/IC-positive rules.
+- `reports/date_generalization/frozen_quant_score_v1_accuracy.md`:
+  H2026_1 RankIC mean `0.0327`, ICIR `0.4233`, IC-positive fraction `0.6316`,
+  AUC `0.5253`, precision at top decile `0.3757`, and top-bottom decile net
+  spread `-2.5158pp`. Local interpretation: usable only as a limited P1 ranking
+  reference after human review; not a P0 buy signal or return-positive promise.
+- `reports/date_generalization/p0_target60_codex_goal_stock_20260701/target60_report.md`:
+  selected-by-pre-OOT strategy
+  `regime_gating__frozen_score__aggressive__all_dates__top10pct` reached
+  H2026_1 positive rate `0.2414`, active exposure `0.6687`, avg20 `-3.6298`,
+  net decile spread `-2.9923`. The report correctly marks `DECISION_NEEDED`
+  because using another H2026_1 row would be OOT selection.
+- Earlier P0/Flash `exposure_cards=0` remains a defensive/no-action result,
+  not evidence of stock-picking skill.
+
+Local subagent review:
+
+- StockHome independent subagent agreed the first remote goal is appropriate:
+  inventory and triage the dirty signal/model/test workspace, not another
+  target60 chase.
+- Required tightening from subagent has been applied to `local_goal.md`: only
+  the named run/report output directories may be written; import/test
+  collection must not trigger data/network/credential/large-compute side
+  effects; the untracked roots above must be covered.
+
 ## Open Questions For Next Local Audit
 
 - Which latest server report is authoritative if report paths differ from the

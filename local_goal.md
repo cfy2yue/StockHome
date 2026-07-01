@@ -36,6 +36,25 @@ Hard acceptance target for the product:
   override P0/P1 user-facing conclusions and must not be sold as live
   stock-picking skill when exposure is low or cash-heavy.
 
+Long-horizon acceptance target:
+
+- P0 action cards remain leakage-free, auditable, and conservative under regime
+  drift; they must never rely on future labels or hidden OOT selection.
+- P1 ranking support has a frozen, reproducible score/ranker with honest OOT
+  RankIC by block; a usable-default candidate should pass leakage audit,
+  coverage checks, and a predeclared IC/exposure gate such as ICIR `>=0.30` and
+  IC-positive fraction `>=0.55` on the latest OOT block, while reporting when
+  top-bottom net spread or exposure makes it only research-reference quality.
+- If a future local audit reactivates a target60-style objective, it must meet
+  the declared positive-rate/exposure/net-return gates without selecting on the
+  final OOT block; local ceiling reports are not final success.
+
+The `Exact Next Task` below is only the current stage toward that long-horizon
+product/scientific target. Completing an inventory or report is not project
+completion. Remote Codex must finish the stage by proposing exactly one next
+bounded stage, a blocker, or a local-audit decision point that still refers back
+to the long-horizon acceptance target.
+
 ## P0/P1/P2 Boundary
 
 - P0 current delivery path: single-stock watch/review with action, position cap,
@@ -98,13 +117,92 @@ not as active instructions.
 
 ## Exact Next Task
 
-NOT FILLED FOR ACTIVE REMOTE EXECUTION.
+Date: 2026-07-01
 
-The next local audit should fill this section after reviewing current remote
-status. Candidate direction, subject to that audit: a bounded documentation or
-small-code task to freeze one leakage-free score/ranker and publish its
-out-of-time RankIC plus IC-gate behavior. Do not start a remote goal from this
-candidate sentence alone.
+Route: StockHome remote dirty-signal and frozen-ranker consolidation audit.
+
+Hypothesis: the latest target60 attempt honestly failed under the pre-OOT
+selection rule, while `frozen_quant_score_v1` has a weak but usable P1 ranking
+signal by RankIC. Before trying another signal family, remote Codex should
+turn the current dirty remote workspace into a structured evidence map: which
+untracked scripts/tests/models exist, what each claims, which are leakage-safe,
+which are only research-only, and what single next goal should be proposed for
+local audit.
+
+Allowed inputs:
+
+- the active first-read files listed above;
+- server-local context:
+  - `runs/frozen_quant_score_v1_20260701_145932/RUN_STATUS.md`;
+  - `reports/date_generalization/frozen_quant_score_v1_accuracy.md`;
+  - `models/frozen/quant_score_v1/model_card.md`;
+  - `runs/codex_goal_stock_20260701/RUN_STATUS.md`;
+  - `reports/date_generalization/p0_target60_codex_goal_stock_20260701/target60_report.md`;
+  - `runs/20260701_p0_p1_latest_revalidation_v1/RUN_STATUS.md` if present;
+  - current untracked `scripts/run_*_v1.py`, `scripts/train_frozen_quant_score_v1.py`,
+    `scripts/validate_p0_p1_latest_revalidation.py`, `tests/test_*_v1.py`,
+    and `models/frozen/quant_score_v1/*`;
+  - untracked roots/items `4599041`, `anthropic_financial_services/`, and
+    `models/`. External/reference directories should be registered in the
+    inventory but not deeply read unless they are required to explain a local
+    signal artifact.
+
+Allowed commands:
+
+- read-only inspection, `git status --short`, `git diff --stat`, and file
+  metadata summaries;
+- CPU-only syntax/AST checks first. Import/test collection checks are allowed
+  only if remote can prove they do not touch data caches, network, paid APIs,
+  secrets, broker/trading systems, or large rebuilds. If import collection would
+  trigger side effects, stop and record `LOCAL_AUDIT_REQUEST`;
+- write the status/report files below.
+
+Expected outputs:
+
+- `runs/stock_signal_inventory_20260701/RUN_STATUS.md`;
+- `reports/date_generalization/stock_signal_inventory_20260701/REPORT.md`;
+- optional small tables under that report directory:
+  - `dirty_file_inventory.csv`;
+  - `signal_family_triage.csv`;
+  - `recommended_next_goal.json`.
+
+DONE criteria:
+
+- report branch/HEAD/dirty state and confirm no `local_*.md` edits;
+- summarize the target60 ceiling: selected pre-OOT strategy
+  `regime_gating__frozen_score__aggressive__all_dates__top10pct` reached
+  H2026_1 positive rate `0.2414`, exposure `0.6687`, avg20 `-3.6298`, net
+  decile spread `-2.9923`; do not promote OOT-selected alternatives;
+- summarize `frozen_quant_score_v1`: leakage PASS, H2026_1 RankIC mean
+  `0.0327`, ICIR `0.4233`, IC-positive fraction `0.6316`, but top-bottom net
+  spread negative;
+- include a separate "why not promoted" section covering target60 failure,
+  negative top-bottom net spread for frozen ranker, and the earlier P0/Flash
+  `exposure_cards=0` defensive-only caveat;
+- inventory every untracked signal/model/test file and classify it as
+  `ready_to_test`, `needs_leakage_audit`, `research_only`, `duplicate`, or
+  `do_not_use`;
+- propose exactly one next remote goal for local audit, choosing among:
+  - P1 ranker integration with downgrade/exposure guard;
+  - one pre-registered new low-risk signal family with strict leakage gates;
+  - closing target60 under current data and shifting the objective.
+
+Resource limits:
+
+- CPU/read-mostly audit only, target 60 minutes, hard stop 90 minutes.
+- Writes are allowed only under:
+  - `runs/stock_signal_inventory_20260701/`;
+  - `reports/date_generalization/stock_signal_inventory_20260701/`.
+- No paid API, no online data pulls, no secrets, no broker/live trading, no
+  long backtests, no large cache rebuilds.
+- Do not commit, push, reset, delete, or clean files.
+
+Stop rules:
+
+- stop and output `LOCAL_AUDIT_REQUEST` if required reports are missing, if
+  untracked scripts require credentials/network to understand, if leakage
+  cannot be bounded, or if the next action would require changing the user goal
+  rather than selecting an implementation route.
 
 ## DONE Criteria For Any Filled Remote Task
 
