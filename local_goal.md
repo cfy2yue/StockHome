@@ -62,6 +62,13 @@ final goal and long-horizon acceptance target as the objective. `Exact Next
 Task` is the current priority stage and starting direction, not a short-job
 completion condition.
 
+The current route is a hypothesis under the same final goal, not a step in a
+step-to-step decomposition. If the route fails, underperforms, or becomes
+unpromising, the right action is to record the evidence, audit/optimize the
+route, and continue toward the same final target or request local route
+optimization. Do not mark the goal complete merely because the current stage is
+done.
+
 Remote Codex should keep progressing until one of these happens:
 
 - `ACHIEVED`: the long-horizon acceptance target is actually met with evidence,
