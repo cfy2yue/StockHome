@@ -8,6 +8,22 @@ The full pre-slim chronological decision log is preserved server-local at:
 docs/local_archive/20260630_pre_slim/DECISIONS.md
 ```
 
+## 2026-07-01: CC Audit — P0 Failure = Reversal-Regime Collapse; Direction = Freeze One IC-Gated Score
+
+CC audit (via subagent) found, with direct evidence
+(`reports/date_generalization/feature_rank_ic_audit.csv`), that P0's implicit alpha is
+cross-sectional **reversal** (negative forward-20d RankIC on price/peer momentum), and
+that edge **collapsed in H2026_1** — so P0's latest-block failure is signal–regime
+coupling, not a bug, and the 0.8434 baseline was a high-base-rate artifact.
+
+Decision: pursue the user's preferred direction — **converge the 6+ scattered,
+never-serialized scorers into ONE frozen, reproducible cross-sectional score + a unified
+leakage-free time-out RankIC accuracy metric + an IC-gate** so the agent auto-downgrades
+exposure when the edge collapses. Re-scope success from "chase a 20d +rate ≥0.60" (a
+divergence trap) to "publish honest OOT accuracy of a frozen, gateable score"; put the
+main alpha expectation on P1 (ranking), not P0 (absolute timing). First Codex execution
+step specified in `docs/CC_AUDIT_AND_HANDOFF_20260701_frozen_score.md`.
+
 ## 2026-07-01: RESULT (round 2) — P0 Latest NOT Confirmed; Keep MVP + Regime-Drift Caveat
 
 Outcome of the approved bounded Flash confirmation (Codex round-2, P0 default only,
