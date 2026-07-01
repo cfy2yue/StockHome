@@ -1,16 +1,64 @@
-# A 股研究 Agent 协作规则
+# StockHome Agent Rules
 
-1. 面向用户回复不要求固定前缀；除非用户另行指定，不再使用旧固定前缀。
-2. 所有面向用户交流使用中文。
-3. 本项目输出研究辅助型操作建议，不自动交易，不接券商接口，不下单；用户端结论必须清晰、可执行、带依据和阈值。
-4. 允许使用用户已合法授权的公开、会员、付费或标准化数据源，包括 Tushare Pro、Wind、Choice、iFinD、同花顺会员等；必须标注来源类型、保护凭证、不把 token/key 写入代码/日志/报告/prompt/ledger/Git，回测优先使用本地离线缓存。
-5. 不删除、不移动、不覆盖 `E:\stock\ref` 中的原始书籍 PDF。
-6. 书籍策略必须基于真实提取文本或明确人工复核，不能编造。
-7. 使用书籍策略时必须标注来源：书名、章节、页码范围、策略 ID、提取方式。
-8. 扫描版 PDF 必须先尽量全书 OCR 成逐页 txt，再进行通读整理；只 OCR 少量页面时只能标注为 partial，不能宣称该书已系统覆盖。
-9. 数据接口失败时要跳过并报告，不得让整个流程崩溃。
-10. 用户端允许输出明确操作建议，例如买入、卖出、加仓、减仓、持有、等待、不操作、仓位上限、止损/复评阈值；但必须同时给出证据、反证、失效条件、数据缺口和风险提示，不得承诺收益、不得写“目标价必达/稳赚/必涨”，不得自动执行。
-11. 用户不懂技术时必须给选择题式引导，避免要求用户理解内部实现。
-12. 项目以 Markdown、YAML、Python、本地缓存和 Excel 报告为主，保持迁移性。
-13. 工作流可根据任务调整，但分析边界、来源规范、风险提示不能丢。
-14. 回答用户研究问题时必须遵守 `docs/RESPONSE_PROTOCOL.md`：先复述理解和调用能力，再给明确操作建议和阈值，再列输入信息流、book skill 来源、反证不确定性，并用选择题引导下一步。
+Use Chinese for user-facing summaries unless the user asks otherwise.
+
+## Authority
+
+Read these first:
+
+- `goal.md`
+- `local_goal.md`
+- `local_audit.md`
+- `local_suggestion.md`
+- `docs/START_HERE.md`
+- `docs/RESPONSE_PROTOCOL.md`
+
+`goal.md` and the durable final goal in `local_goal.md` define the long-horizon
+target. `Exact Next Task` is the current route hypothesis and priority start,
+not the whole goal. If a route fails, record evidence and optimize the route;
+do not mark the goal complete unless the final acceptance target is achieved.
+
+## Remote Execution
+
+- Long-run toward the final target until `ACHIEVED`, hard `BLOCKED`, user
+  interruption, or `LOCAL_AUDIT_REQUEST`.
+- Remote Codex may make bounded `AUTONOMOUS_DECISION` choices inside the
+  resource, data, credential, and safety limits.
+- Remote Codex may launch subagents for independent audit, code review, signal
+  triage, leakage review, or route pre-exploration. Subagents must read the same
+  authority files, stay within project limits, and report evidence into
+  RUN_STATUS/reports.
+- Do not edit `local_goal.md`, `local_audit.md`, or `local_suggestion.md`
+  during remote execution. Suggest next local updates in RUN_STATUS/reports.
+
+## Financial Safety
+
+- This project is an A-share research assistant, not an auto-trading system.
+- Do not connect to brokers, place orders, automate trading, promise returns,
+  or claim certainty.
+- User-facing outputs may give actions such as buy, trial buy, add, hold,
+  reduce, sell, wait, or collect more data only with evidence,
+  counter-evidence, position/risk limits, invalidation, and review conditions.
+- Future labels such as `return_20d`, `future_*`, `gt_status`, or outcome
+  fields are offline evaluation labels only. They must not enter decision-time
+  evidence, prompts, rules, or user-facing reasoning.
+- Never print, copy, commit, or log API keys, tokens, `.env*`, `ds_api.txt`,
+  `tushare_token.txt`, or other credentials.
+- Authorized public/member/paid/standardized data sources may be used only
+  through ignored local credentials or offline caches, with source type noted.
+
+## Git And Data Hygiene
+
+- Keep generated runs/reports/models/caches and raw/private data out of Git
+  unless explicitly curated as small documentation.
+- Do not delete, reset, clean, or overwrite user data, reports, books, refs, or
+  caches without explicit user instruction.
+- If a data/API source fails, skip or report it; do not let the whole workflow
+  silently collapse.
+
+## Stop And Report
+
+Output `LOCAL_AUDIT_REQUEST` when the route needs local strategy optimization,
+required artifacts are missing, leakage/availability controls are unclear,
+resource or credential boundaries would need to change, or results cannot be
+interpreted without changing the final target.
