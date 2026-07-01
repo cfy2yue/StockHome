@@ -55,6 +55,40 @@ completion. Remote Codex must finish the stage by proposing exactly one next
 bounded stage, a blocker, or a local-audit decision point that still refers back
 to the long-horizon acceptance target.
 
+## Remote Long-Run Operating Rule
+
+When the user starts remote goal mode, remote Codex should treat the durable
+final goal and long-horizon acceptance target as the objective. `Exact Next
+Task` is the current priority stage and starting direction, not a short-job
+completion condition.
+
+Remote Codex should keep progressing until one of these happens:
+
+- `ACHIEVED`: the long-horizon acceptance target is actually met with evidence,
+  metrics, leakage/coverage checks, output paths, and user-facing claim
+  boundaries recorded;
+- `BLOCKED`: a hard blocker requires changing final target, resource boundary,
+  paid/data permission, credential handling, broker/live-trading boundary,
+  destructive operation, or other user-owned decision;
+- `LOCAL_AUDIT_REQUEST`: repeated negative/ambiguous results, suspected leakage
+  or bug, or route drift makes local strategy audit the right next step;
+- user interrupts manually.
+
+Within the written resource and safety boundaries, remote Codex may make
+`AUTONOMOUS_DECISION` route choices, add lightweight controls, run bounded
+diagnostics, and pre-explore the next stage after the current stage completes.
+It may also launch remote subagents for independent read-only/code-review style
+audits when available. Subagents must read the same `goal.md` and
+`local_*.md` files, stay inside the project/resource boundaries, avoid editing
+the three `local_*.md` files, and summarize their evidence in RUN_STATUS or the
+report before the main remote agent continues.
+
+Remote Codex should not stop merely because an inventory, validation report, or
+triage table is written. If the final target is not achieved and there is no
+hard block, it should record the result, choose the next bounded stage inside
+the same final goal, and continue or clearly explain why local audit is
+required.
+
 ## P0/P1/P2 Boundary
 
 - P0 current delivery path: single-stock watch/review with action, position cap,
