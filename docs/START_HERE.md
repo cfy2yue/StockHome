@@ -11,7 +11,8 @@ connect to broker APIs, or promise returns.
 
 - Server directory: `/data/cyx/1030/stock`
 - GitHub target: `https://github.com/cfy2yue/StockHome`
-- SSH entry: `ssh cyx-server-cfy`, then `cd /data/cyx/1030/stock`
+- SSH entry for the user/remote environment: `ssh cyx-server-cfy`, then
+  `cd /data/cyx/1030/stock`
 
 ## Read First
 
@@ -28,6 +29,10 @@ Current manual local-audit workflow:
 9. `docs/PROJECT_ENTRY.md`
 10. `docs/DIRECTORY_MAP.md`
 11. `docs/HANDOFF.md`
+
+The three `local_*.md` files are the current local-audit packet. If
+`local_goal.md` does not contain a filled `Exact Next Task`, remote Codex is not
+in active goal mode yet.
 
 Files under `docs/archive/legacy_auto_coordination_20260701/` are historical
 evidence only. Do not treat them as active instructions.
@@ -53,18 +58,19 @@ best/negative/anomalous results, suspected bottlenecks, at least three
 directions for local audit, and suggested updates to `local_goal.md`,
 `local_audit.md`, and `local_suggestion.md`.
 
-When the user types `本地审计结束`, remote Codex must run `git fetch origin`
-and `git pull --ff-only`, read `goal.md`, `local_goal.md`, `local_audit.md`,
-`local_suggestion.md`, and this file, then summarize the next task, resource
-limits, stop rules, and any document conflicts. It must then wait for the user
-to start or continue goal mode.
+When the user types `本地审计结束`, remote Codex must run `git fetch origin` and
+`git pull --ff-only`, read `README.md`, `docs/START_HERE.md`, `goal.md`,
+`local_goal.md`, `local_audit.md`, and `local_suggestion.md`, then summarize the
+next task, resource limits, stop rules, and any document conflicts. If
+`local_goal.md` still has no filled `Exact Next Task`, remote Codex must wait
+instead of starting goal work.
 
 Manual goal prompt:
 
 ```text
 目标与路线：local_goal.md
-本地审计：local_audit.md（不存在则跳过）
-本地建议：local_suggestion.md（不存在则跳过）
+本地审计：local_audit.md
+本地建议：local_suggestion.md
 资源限制：<fill in this round's limits>
 ```
 

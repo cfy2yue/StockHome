@@ -11,12 +11,18 @@ backtest/label leakage as real decision evidence.
 
 - Server directory: `/data/cyx/1030/stock`
 - GitHub target: `https://github.com/cfy2yue/StockHome`
-- SSH entry: `ssh cyx-server-cfy`, then `cd /data/cyx/1030/stock`
+- SSH entry for the user/remote environment: `ssh cyx-server-cfy`, then
+  `cd /data/cyx/1030/stock`
 
 ## Current Workflow
 
 The active workflow is manual local audit plus manually started remote Codex
 execution.
+
+Local CC/Codex maintains the audit packet in `local_goal.md`,
+`local_audit.md`, and `local_suggestion.md`. Remote Codex is not in active goal
+mode until local audit has filled `local_goal.md` -> `Exact Next Task` with a
+bounded task, resource limits, output paths, and stop rules.
 
 Read these first:
 
@@ -34,6 +40,13 @@ Read these first:
 Legacy auto-coordination files are archived under
 `docs/archive/legacy_auto_coordination_20260701/`. They are historical
 evidence, not active workflow instructions.
+
+Remote coordination triggers:
+
+- `本地审计指令`: remote stops large work and emits `LOCAL_AUDIT_REQUEST`.
+- `本地审计结束`: remote pulls latest GitHub state, reads the local audit
+  packet, summarizes the filled task and limits, and waits if no exact task is
+  filled.
 
 ## Product Boundary
 
