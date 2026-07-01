@@ -214,7 +214,9 @@ checks on `/data/cyx/1030/stock` for server-local metrics and dirty state.
 
 Remote sync/state:
 
-- HEAD: `d9e5e09`.
+- Historical snapshot HEAD when this first-round evidence was pulled:
+  `d9e5e09`. Current remote execution-packet commit after catchup is
+  `1a59862`.
 - Remote dirty state: 21 untracked entries. Key roots/items:
   `4599041`, `anthropic_financial_services/`, `models/`,
   `scripts/run_p0_target60_walkforward.py`,
@@ -243,6 +245,11 @@ Remote evidence verified:
   because using another H2026_1 row would be OOT selection.
 - Earlier P0/Flash `exposure_cards=0` remains a defensive/no-action result,
   not evidence of stock-picking skill.
+- Older docs such as `docs/USER_GUIDE.md`, `docs/HANDOFF.md`, and
+  `docs/PROJECT_ENTRY.md` may still describe earlier P0/P1 capabilities more
+  optimistically. Treat them as historical or superseded for current execution
+  when they conflict with `goal.md`, `local_goal.md`, this audit, or
+  `local_suggestion.md`.
 
 Local subagent review:
 
