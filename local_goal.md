@@ -106,6 +106,20 @@ hard block, it should record the result, choose the next bounded stage inside
 the same final goal, and continue or clearly explain why local audit is
 required.
 
+Gate semantics (collaboration mode): the user's durable target (a 20-day
+positive-return WIN RATE above 60%) must NOT be silently lowered or dropped by the
+remote; local audit changes only how it is honestly measured and pursued (adding
+exposure/after-cost/leakage guards so it cannot be gamed) and the route/strategy,
+not the target itself. The routes and gates here are local SUGGESTIONS/HYPOTHESES,
+not the only path; the remote is expected to have its own problem-solving ability. A
+gate is a quality bar for CLAIMING success, NOT a stop condition: if a route or gate
+does not work out, do NOT declare `BLOCKED` — log the honest negative in
+`remote_decision.md`, find a new in-boundary strategy yourself (new decision-time
+features after an available-at/lag audit, cost-aware construction, regime gating,
+small models), and keep advancing; the recorded decisions are read by the next local
+audit. Reserve hard `BLOCKED` only for genuine user-owned decisions (final
+target/resource/paid-data/credential/broker boundary, or a destructive operation).
+
 ## P0/P1/P2 Boundary
 
 - P0 current delivery path: single-stock watch/review with action, position cap,
