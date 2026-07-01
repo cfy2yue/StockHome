@@ -331,9 +331,12 @@ Resource limits:
 - Writes allowed only under:
   - `runs/p1_ranker_guard_integration_20260702/`;
   - `reports/date_generalization/p1_ranker_guard_integration_20260702/`.
-- No paid API, no online data pulls, no secrets, no broker/live trading, no long
-  backtests, no GPU, no large cache rebuilds. Loading the existing local
-  `model.joblib` and reading the existing offline joined cache are allowed.
+- The guard-integration sub-goals above are offline (existing caches + local
+  `model.joblib`) and do not require network. Paid APIs ARE provisioned and
+  authorized for this project when a task needs them: tushare (A-share market data)
+  and the ds/DeepSeek LLM, credentials under `/data/cyx/1030/api` — load keys from
+  there or env, never print/commit them, keep cost reasonable. No broker/live
+  trading, no GPU, no long backtests, no large cache rebuilds this task.
 - Do not commit, push, reset, delete, or clean files.
 
 Stop rules:
@@ -364,8 +367,11 @@ A valid remote task is done only when it produces:
 
 Standing limits unless a filled task says otherwise:
 
-- No large experiment, broad grid search, or paid LLM/API expansion without a
-  dated local-audited plan.
+- Paid APIs are provisioned for this project: tushare (A-share market data) and the
+  ds/DeepSeek LLM, credentials under `/data/cyx/1030/api`. The remote may use them
+  when a task needs fresh data or LLM reasoning; load keys only from
+  `/data/cyx/1030/api` or env and never print/commit them. Keep cost reasonable —
+  no unbounded batch loops or broad grid search without a dated plan.
 - Prefer local cached data and read-only audits.
 - Local CC/Codex may use SSH for read-only evidence checks when local metadata
   is insufficient; it must not launch long jobs unless the user explicitly asks.
@@ -405,9 +411,9 @@ Remote Codex must hard-stop only when:
 - leakage audit finds future/GT fields in decision-time evidence;
 - output metrics are dominated by `exposure_cards=0`, missing coverage, or
   hindsight/base-rate artifacts;
-- a command would require unapproved paid API cost, SSH, large data rebuild,
-  credential exposure, destructive file operations, or broker/live-trading
-  access;
+- a command would require clearly-excessive or unbounded paid API cost beyond
+  normal provisioned tushare/ds usage, a large data rebuild, credential exposure,
+  destructive file operations, or broker/live-trading access;
 - results contradict current direction and all safe autonomous route pivots have
   been tried or ruled out. Weak metrics alone are not hard block; record them in
   `remote_decision.md` and continue.
