@@ -2,9 +2,17 @@
 
 Updated: 2026-07-01
 
-Status: standing suggestion rules. This file guides local CC/Codex when
-generating the next concrete remote task. It is not an active remote task until
-`local_goal.md` has a filled `Exact Next Task`.
+Status: local-authored remote execution guidance. This file is part of the
+remote execution packet: remote Codex reads it with `local_goal.md` and
+`local_audit.md` for priorities, gates, and decision trees.
+
+Remote Codex must not edit this file during execution. If a suggestion becomes
+wrong, incomplete, or blocked, remote Codex should report that and recommend
+changes for the next local audit. Local CC/Codex updates this file and pushes
+it.
+
+It becomes executable only through the filled `Exact Next Task` in
+`local_goal.md`.
 
 ## Top Priorities
 
@@ -159,5 +167,6 @@ goal.md, local_goal.md, local_audit.md, and local_suggestion.md. Do not treat
 archive/legacy_auto_coordination_20260701 as active instruction. Do not SSH
 elsewhere, expose secrets, run unbounded experiments, or commit generated
 reports/data. If Exact Next Task is not filled or if leakage/resource/blocker
-rules trigger, stop and output LOCAL_AUDIT_REQUEST.
+rules trigger, stop and output LOCAL_AUDIT_REQUEST. Do not edit the three
+local docs on the remote side.
 ```

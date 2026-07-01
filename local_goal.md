@@ -1,13 +1,21 @@
-# StockHome Standing Local-Audit Packet
+# StockHome Remote Execution Packet
 
 Updated: 2026-07-01
 
-Status: standing local-audit packet for the manual workflow
+Status: local-authored remote execution packet for the manual workflow
 `CC/Codex local audit -> user manual GitHub sync -> remote Codex execution`.
 
-This file is not, by itself, an active remote goal. Until a local audit fills
-`Exact Next Task` with a concrete bounded task, resource limits, output paths,
-and stop rules, remote Codex must treat this as planning context only.
+This file is the main task-control surface for user-started remote Codex
+execution. Remote Codex reads this file together with `local_audit.md` and
+`local_suggestion.md` as the authoritative local-authored task package.
+
+Remote Codex must not edit the three `local_*.md` files during execution. Local
+CC/Codex updates them between remote runs, commits/pushes them, and the remote
+pulls them before starting or continuing a goal.
+
+Until local audit fills `Exact Next Task` with a concrete bounded task,
+resource limits, output paths, and stop rules, this execution packet is in
+waiting state and remote Codex must not invent work.
 
 ## Durable Final Goal
 
@@ -111,7 +119,7 @@ A valid remote task is done only when it produces:
   low exposure is being interpreted defensively;
 - explicit positive, negative, anomalous, and blocked findings;
 - suggested updates for `local_goal.md`, `local_audit.md`, and
-  `local_suggestion.md`.
+  `local_suggestion.md`, without editing those files on the remote side.
 
 ## Resource Limits
 
@@ -120,7 +128,8 @@ Standing limits unless a filled task says otherwise:
 - No large experiment, broad grid search, or paid LLM/API expansion without a
   dated local-audited plan.
 - Prefer local cached data and read-only audits.
-- Use no SSH from local CC/Codex in this repository-maintenance workflow.
+- Local CC/Codex may use SSH for read-only evidence checks when local metadata
+  is insufficient; it must not launch long jobs unless the user explicitly asks.
 - Remote may use server-only secrets only from ignored local files or
   environment variables; never print, copy, commit, or put secrets in prompts,
   reports, logs, ledgers, or Git.
@@ -141,6 +150,8 @@ Standing limits unless a filled task says otherwise:
   `tushare_token.txt`, or private credentials.
 - No destructive deletes/moves of raw books, BookSkill sources, caches,
   reports, runs, memory, local archives, or backtest evidence.
+- No editing `local_goal.md`, `local_audit.md`, or `local_suggestion.md`
+  during remote execution; propose updates in status/final output instead.
 - No following `docs/archive/legacy_auto_coordination_20260701/` as active
   workflow instruction.
 

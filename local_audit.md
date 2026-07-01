@@ -2,9 +2,13 @@
 
 Updated: 2026-07-01
 
-Status: standing local-audit evidence map. This document tells the local auditor
-what must be understood before filling `local_goal.md` with an active remote
-task.
+Status: local-authored remote execution evidence map. This document is part of
+the remote execution packet: remote Codex reads it before executing
+`local_goal.md`, while local CC/Codex updates it between remote runs.
+
+Remote Codex must not edit this file during execution. New evidence, blockers,
+or corrections should be written to RUN_STATUS/reports/final output and
+recommended back to local CC/Codex for the next update.
 
 ## Remote Status Summary
 
@@ -118,7 +122,9 @@ Key tests to inspect when changing behavior:
 - News and announcement channels may act more as risk interceptors and
   confirmation context than as standalone positive-return sources.
 - Generated reports/runs are mostly server-local/ignored; absence in the local
-  GitHub clone is not proof they never existed.
+  GitHub clone is not proof they never existed. When a result becomes important
+  to the next task, local audit should inspect it by SSH if needed and sync
+  high-signal metadata into Git-tracked docs or the next `local_*.md` packet.
 
 ## Risk Checklist
 
@@ -196,7 +202,9 @@ Read-only/small checks only:
   `audit_evidence_pack_leakage.py`, `run_supervised_ranker_experiment.py`, and
   `run_kline_peer_chip_regime_scorer.py`.
 
-No experiments, tests, SSH, or remote/API calls were run.
+No experiments, tests, or remote/API calls were run in this pass. Future local
+audits may use SSH for read-only evidence checks when the local clone lacks
+server-local metadata.
 
 ## Open Questions For Next Local Audit
 
