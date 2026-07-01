@@ -82,9 +82,14 @@ Remote Codex should keep progressing until one of these happens:
 - `BLOCKED`: a hard blocker requires changing final target, resource boundary,
   paid/data permission, credential handling, broker/live-trading boundary,
   destructive operation, or other user-owned decision;
-- `LOCAL_AUDIT_REQUEST`: repeated negative/ambiguous results, suspected leakage
-  or bug, or route drift makes local strategy audit the right next step;
 - user interrupts manually.
+
+`LOCAL_AUDIT_REQUEST` is a soft audit marker, not a stop condition. Remote
+Codex may write it in RUN_STATUS/reports/`remote_decision.md` to help future
+local audit, but should not mark the long goal blocked unless all reasonable
+next routes require changing the final target, resource boundary, paid/data
+permission, credential handling, broker/live-trading boundary, or destructive
+operation.
 
 Within the written resource and safety boundaries, remote Codex may make
 `AUTONOMOUS_DECISION` route choices, add lightweight controls, run bounded
@@ -143,7 +148,8 @@ below with:
 - maximum time/tokens/API cost/network/data scope;
 - expected report/status paths;
 - pass/fail/blocked gates;
-- stop rules that force `LOCAL_AUDIT_REQUEST`.
+- hard stop rules and soft pivot rules. Soft pivots should be recorded in
+  `remote_decision.md` and followed by continued safe work.
 
 If this slot is not filled, the remote session is not in active goal mode.
 
@@ -158,10 +164,11 @@ Remote Codex must read these before any execution after the user says
 4. `local_goal.md`
 5. `local_audit.md`
 6. `local_suggestion.md`
-7. `AGENTS.md`
-8. `docs/GIT_AND_COLLABORATION.md`
-9. `docs/GITHUB_FILE_MAP.md`
-10. `docs/DECISIONS.md`
+7. `remote_decision.md`
+8. `AGENTS.md`
+9. `docs/GIT_AND_COLLABORATION.md`
+10. `docs/GITHUB_FILE_MAP.md`
+11. `docs/DECISIONS.md`
 
 Remote may read archived files under
 `docs/archive/legacy_auto_coordination_20260701/` only as historical evidence,
@@ -210,7 +217,8 @@ Allowed commands:
 - CPU-only syntax/AST checks first. Import/test collection checks are allowed
   only if remote can prove they do not touch data caches, network, paid APIs,
   secrets, broker/trading systems, or large rebuilds. If import collection would
-  trigger side effects, stop and record `LOCAL_AUDIT_REQUEST`;
+  trigger side effects, skip that check, record the reason in
+  `remote_decision.md`, and continue with static inspection;
 - write the status/report files below.
 
 Expected outputs:
@@ -241,7 +249,9 @@ DONE criteria:
 - list candidate clean inputs for a future frozen quant score v2 or small
   aggregation network, including why each candidate is or is not decision-time
   safe;
-- propose exactly one next remote goal for local audit, choosing among:
+- propose at least one next remote route and, if it is safe within the written
+  limits, continue into the best route after recording the decision in
+  `remote_decision.md`. Candidate routes include:
   - P1 ranker integration with downgrade/exposure guard;
   - frozen quant score v2 or a small aggregation network with strict OOT
     RankIC/exposure/leakage gates;
@@ -260,10 +270,13 @@ Resource limits:
 
 Stop rules:
 
-- stop and output `LOCAL_AUDIT_REQUEST` if required reports are missing, if
-  untracked scripts require credentials/network to understand, if leakage
-  cannot be bounded, or if the next action would require changing the user goal
-  rather than selecting an implementation route.
+- stop the current subtask, record a `SOFT_BLOCK` or `ROUTE_PIVOT` in
+  `remote_decision.md`, and continue with another safe route if required
+  reports are missing, untracked scripts require credentials/network to
+  understand, or leakage cannot yet be bounded;
+- mark hard `BLOCKED` only if every reasonable next route requires changing the
+  user goal, paid/data permission, credential handling, broker/live-trading
+  boundary, destructive operations, or an unapproved large rebuild.
 
 ## DONE Criteria For Any Filled Remote Task
 
@@ -316,19 +329,21 @@ Standing limits unless a filled task says otherwise:
 
 ## Stop Rules
 
-Remote Codex must stop and output `LOCAL_AUDIT_REQUEST` when:
+Remote Codex must hard-stop only when:
 
 - `Exact Next Task` is empty, ambiguous, or conflicts with `goal.md`;
-- required data/report paths are missing and cannot be safely reconstructed
-  inside the approved resource limit;
+- required data/report paths are missing and all safe reconstruction or
+  alternative diagnostic routes are exhausted inside the approved resource
+  limit;
 - leakage audit finds future/GT fields in decision-time evidence;
 - output metrics are dominated by `exposure_cards=0`, missing coverage, or
   hindsight/base-rate artifacts;
 - a command would require unapproved paid API cost, SSH, large data rebuild,
   credential exposure, destructive file operations, or broker/live-trading
   access;
-- results contradict current direction enough that the next action should be
-  re-scoped locally.
+- results contradict current direction and all safe autonomous route pivots have
+  been tried or ruled out. Weak metrics alone are not hard block; record them in
+  `remote_decision.md` and continue.
 
 ## Expected Output Paths
 

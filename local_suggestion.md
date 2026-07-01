@@ -7,9 +7,10 @@ remote execution packet: remote Codex reads it with `local_goal.md` and
 `local_audit.md` for priorities, gates, and decision trees.
 
 Remote Codex must not edit this file during execution. If a suggestion becomes
-wrong, incomplete, or blocked, remote Codex should report that and recommend
-changes for the next local audit. Local CC/Codex updates this file and pushes
-it.
+wrong, incomplete, or softly blocked, remote Codex should report that in
+RUN_STATUS/reports/`remote_decision.md`, choose a new safe route when possible,
+and recommend changes for the next local audit. Local CC/Codex updates this
+file and pushes it.
 
 It becomes executable only through the filled `Exact Next Task` in
 `local_goal.md`.
@@ -177,10 +178,12 @@ Negative result:
 Blocked result:
 
 - If required data/report paths are missing, credentials are unavailable,
-  resource limits are too small, or instructions conflict, remote must output
-  `LOCAL_AUDIT_REQUEST` with exact blockers and at least three next directions.
-- Local audit then decides whether to regenerate a small artifact, narrow the
-  task, or change direction.
+  resource limits are too small, or instructions conflict, remote must record a
+  `SOFT_BLOCK` or hard-block rationale in `remote_decision.md` with exact
+  blockers and at least three next directions.
+- If at least one next direction is safe inside the current boundaries, remote
+  should continue with that route. Local audit later decides whether to
+  regenerate a small artifact, narrow the task, or change direction.
 
 Ambiguous result:
 
@@ -195,7 +198,8 @@ You are remote Codex for StockHome. Follow README.md, docs/START_HERE.md,
 goal.md, local_goal.md, local_audit.md, and local_suggestion.md. Do not treat
 archive/legacy_auto_coordination_20260701 as active instruction. Do not SSH
 elsewhere, expose secrets, run unbounded experiments, or commit generated
-reports/data. If Exact Next Task is not filled or if leakage/resource/blocker
-rules trigger, stop and output LOCAL_AUDIT_REQUEST. Do not edit the three
-local docs on the remote side.
+reports/data. If Exact Next Task is not filled, wait. If leakage/resource/hard
+blocker rules trigger, stop only the unsafe route, write `remote_decision.md`,
+and continue with a safe route when possible. Do not edit the three local docs
+on the remote side.
 ```

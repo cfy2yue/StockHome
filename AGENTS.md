@@ -10,6 +10,7 @@ Read these first:
 - `local_goal.md`
 - `local_audit.md`
 - `local_suggestion.md`
+- `remote_decision.md`
 - `docs/START_HERE.md`
 - `docs/RESPONSE_PROTOCOL.md`
 
@@ -20,10 +21,13 @@ do not mark the goal complete unless the final acceptance target is achieved.
 
 ## Remote Execution
 
-- Long-run toward the final target until `ACHIEVED`, hard `BLOCKED`, user
-  interruption, or `LOCAL_AUDIT_REQUEST`.
+- Long-run toward the final target until `ACHIEVED`, hard `BLOCKED`, or user
+  interruption. `LOCAL_AUDIT_REQUEST` is a soft audit marker, not a stop reason.
 - Remote Codex may make bounded `AUTONOMOUS_DECISION` choices inside the
   resource, data, credential, and safety limits.
+- If a route fails, metrics miss the target, or a local suggestion does not
+  work, remote Codex should design a new safe route, optionally use subagents,
+  record the decision in `remote_decision.md`, and continue.
 - Remote Codex may launch subagents for independent audit, code review, signal
   triage, leakage review, or route pre-exploration. Subagents must read the same
   authority files, stay within project limits, and report evidence into
@@ -62,3 +66,6 @@ Output `LOCAL_AUDIT_REQUEST` when the route needs local strategy optimization,
 required artifacts are missing, leakage/availability controls are unclear,
 resource or credential boundaries would need to change, or results cannot be
 interpreted without changing the final target.
+Do not mark the long goal blocked for soft strategy issues, weak metrics, or a
+failed suggested route. First record the evidence and route pivot in
+`remote_decision.md`, then continue inside the approved resource/safety limits.
