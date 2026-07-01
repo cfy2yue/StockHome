@@ -20,11 +20,14 @@ It becomes executable only through the filled `Exact Next Task` in
    out-of-time RankIC by block, especially H2026_1.
 2. Add or verify an IC/exposure gate that downgrades or blocks active exposure
    when the score edge collapses.
-3. Keep P0/P1 user-facing action cards honest: action first, evidence and
+3. Keep the user's 20-day positive-return `>60%` ambition as a guarded
+   secondary target: it must be paired with exposure, net spread/return,
+   leakage, base-rate, and OOT checks.
+4. Keep P0/P1 user-facing action cards honest: action first, evidence and
    counter-evidence second, with no future labels and no low-exposure spin.
-4. Preserve credential and generated-evidence hygiene: no secrets in Git,
+5. Preserve credential and generated-evidence hygiene: no secrets in Git,
    prompts, reports, ledgers, or logs.
-5. For the current remote round, prefer P1 ranker integration with
+6. For the current remote round, prefer P1 ranker integration with
    downgrade/exposure guard over continuing to chase target60.
 
 ## Suggestion Generation Rules
@@ -35,6 +38,9 @@ task that answers the current uncertainty. Prefer:
 - read-only audit before code changes;
 - local cached data before paid/API calls;
 - one frozen score and one metric table before multiple model variants;
+- one small aggregation/decision-support network only after inventory proves
+  decision-time-safe inputs, frozen training protocol, OOT RankIC, coverage,
+  and model-card reporting;
 - RankIC/exposure/coverage/leakage gates before user-facing promotion;
 - a status/report artifact over narrative-only claims.
 
@@ -88,6 +94,9 @@ checking current server state.
 - News semantic expansion: useful as a risk interceptor and confirmation
   channel, but must be measured against leakage, timestamp quality, and
   coverage.
+- Small quantitative aggregation network: plausible after the dirty inventory,
+  but only as a P1/P2 decision aid with frozen inputs, no future fields,
+  RankIC/coverage/exposure gates, and a readable model card.
 - Portfolio/backtest optimization: keep as P2; do not let portfolio metrics
   become the user-facing success claim.
 
@@ -151,6 +160,9 @@ Positive result:
 - If leakage passes, H2026_1/OOT RankIC is positive or better than baseline,
   coverage is adequate, and exposure gate behavior is sane, keep the tool as
   `observe` or cautiously `usable_default` depending on existing tests.
+- If positive-rate improves above `60%` but RankIC, net spread/return,
+  exposure, or leakage gates fail, do not promote it; record it as an
+  overfit/base-rate/selection-risk result.
 - Ask local audit to update `local_goal.md` with a next P0/P1 integration or
   small user-facing dry-run task.
 

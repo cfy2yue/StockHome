@@ -41,6 +41,12 @@ The current scientific target is not "prove broad 20d buy signal works." It is
 "freeze a reproducible, leakage-free score/ranker and report honest out-of-time
 ranking accuracy plus an exposure/IC gate."
 
+The user's current alpha preference is still concrete: try to reach a 20-day
+positive-return rate above `60%`, with strategy guidance. Local audit should
+preserve that as the aspirational final target, but never as a standalone gate:
+it must be interpreted with exposure, net return/spread, OOT block choice,
+base-rate comparison, and leakage/available-at checks.
+
 ## Data Flow The Auditor Must Understand
 
 StockHome has four practical input streams:
@@ -177,6 +183,11 @@ judgment: this is the right direction if kept lightweight, deterministic,
 leakage-free, and measured by out-of-time RankIC plus exposure gating. It is
 better than an opaque end-to-end agent judgment or chasing a raw 20d positive
 rate target.
+
+The 20d `>60%` target is useful as an intuitive user-facing ambition, but it is
+too noisy and gameable as the only hard metric. It can pass only when the score
+also has nontrivial exposure/coverage, no final-OOT selection, leakage PASS,
+and at least neutral-to-positive net spread or return behavior.
 
 Complementary ideas:
 

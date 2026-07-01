@@ -45,6 +45,11 @@ Long-horizon acceptance target:
   coverage checks, and a predeclared IC/exposure gate such as ICIR `>=0.30` and
   IC-positive fraction `>=0.55` on the latest OOT block, while reporting when
   top-bottom net spread or exposure makes it only research-reference quality.
+- For the current alpha-assistance track, the user's aspirational final target
+  is 20-day positive-return rate above `60%`. This target is valid only when
+  paired with nontrivial exposure/coverage, positive or at least non-damaging
+  net spread/return evidence, leakage PASS, base-rate comparison, and no
+  selection on the final OOT block.
 - If a future local audit reactivates a target60-style objective, it must meet
   the declared positive-rate/exposure/net-return gates without selecting on the
   final OOT block; local ceiling reports are not final success.
@@ -121,6 +126,12 @@ a unified out-of-time RankIC metric and an IC/exposure gate. The goal is honest,
 auditable score accuracy and automatic exposure downgrade when the edge
 collapses.
 
+Lightweight execution is preferred: first fix one auditable quant score/ranker
+as the agent's decision anchor, then let P0/P1 reasoning use that score with
+evidence, counter-evidence, and downgrade gates. Small quantitative
+information-aggregation or decision-support networks are allowed only after the
+inventory/leakage audit identifies clean decision-time inputs and an OOT gate.
+
 ## Remote Next-Task Filling Rule
 
 Before asking remote Codex to execute, local CC/Codex must fill the task slot
@@ -169,6 +180,10 @@ turn the current dirty remote workspace into a structured evidence map: which
 untracked scripts/tests/models exist, what each claims, which are leakage-safe,
 which are only research-only, and what single next goal should be proposed for
 local audit.
+
+The inventory must explicitly identify which files or feature families could
+become a frozen quant score v2 or a small aggregation/decision-support network,
+and which are unsafe because their available-at/leakage boundary is unclear.
 
 Allowed inputs:
 
@@ -223,8 +238,13 @@ DONE criteria:
 - inventory every untracked signal/model/test file and classify it as
   `ready_to_test`, `needs_leakage_audit`, `research_only`, `duplicate`, or
   `do_not_use`;
+- list candidate clean inputs for a future frozen quant score v2 or small
+  aggregation network, including why each candidate is or is not decision-time
+  safe;
 - propose exactly one next remote goal for local audit, choosing among:
   - P1 ranker integration with downgrade/exposure guard;
+  - frozen quant score v2 or a small aggregation network with strict OOT
+    RankIC/exposure/leakage gates;
   - one pre-registered new low-risk signal family with strict leakage gates;
   - closing target60 under current data and shifting the objective.
 
