@@ -8,6 +8,23 @@ The full pre-slim chronological decision log is preserved server-local at:
 docs/local_archive/20260630_pre_slim/DECISIONS.md
 ```
 
+## 2026-07-01: RESULT (round 2) — P0 Latest NOT Confirmed; Keep MVP + Regime-Drift Caveat
+
+Outcome of the approved bounded Flash confirmation (Codex round-2, P0 default only,
+24x1 Flash, no Pro/ablation): **FAIL — P0 does not confirm on the latest block.**
+Coverage now complete (ok_cards 24/24, coverage 1.000, invalid 0), leakage PASS
+(`future_leak_findings=0`), tokens 279350. P0 metrics: 20d +rate `0.6667` vs frozen
+`0.8434`; avg20 `+0.5563pp` vs frozen `+1.9139pp`. Key caveat: `exposure_cards=0`,
+i.e., the frozen P0 went effectively defensive on the latest block — this can only
+be read as defensive behavior, NOT as stock-picking skill.
+
+Decision: keep P0/P1 at strong-yellow MVP with an EXPLICIT regime-drift caveat; do
+NOT claim P0 still holds on the latest (H2026_1) block. Next stock optimization
+should target the drift itself (fresh as-of block / P0 rework), decided separately.
+
+Evidence: `runs/20260701_p0_p1_latest_revalidation_v1/RUN_STATUS.md`,
+`reports/date_generalization/20260701_p0_p1_latest_revalidation_v1_round2_flash_confirm/validation_summary.md`.
+
 ## 2026-07-01: RESULT — Latest-Block Coverage Insufficient; Bounded Flash Confirmation Approved
 
 Result (Codex, run `20260701_p0_p1_latest_revalidation_v1`): leakage audit PASS,

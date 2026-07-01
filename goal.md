@@ -55,6 +55,11 @@ counter-evidence, position/risk limits, triggers, and review conditions.
   workflow priorities.
 - P2 backtests remain useful for audit and evidence, but not as the only success
   criterion.
+- 2026-07-01 regime-drift finding: on the latest block (H2026_1), the frozen P0
+  did NOT confirm (20d +rate 0.6667 vs 0.8434; exposure_cards=0 = defensive, not
+  skill). Keep the strong-yellow MVP with an explicit regime-drift caveat; do not
+  claim P0 holds on latest. Next: target the drift (fresh as-of block / P0 rework).
+  See `docs/DECISIONS.md`.
 
 ## Next Useful Actions
 
