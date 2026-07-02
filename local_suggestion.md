@@ -1,6 +1,6 @@
 # StockHome Local Suggestions For Next Remote Round
 
-Updated: 2026-07-02 (round 3: hot-rank available-at + after-cost re-audit)
+Updated: 2026-07-02 (round 4: research portfolio with statistical pass/fail gates)
 
 Status: local-authored remote execution guidance. This file is part of the
 remote execution packet: remote Codex reads it with `local_goal.md` and
@@ -15,7 +15,121 @@ file and pushes it.
 It becomes executable only through the filled `Exact Next Task` in
 `local_goal.md`.
 
-## Round-3 Strategy Portfolio (accurate screening + user guidance)
+## Round-4 Research Portfolio (methodology research framing, statistical gates)
+
+RESEARCH FRAMING (binding): StockHome studies whether public-market signals have
+generalizable, statistically significant predictive power under leakage-free,
+cost-inclusive evaluation. Every direction below produces RESEARCH FINDINGS
+(evidence + counter-evidence + uncertainty + failure boundary), never investment
+advice. Negative results are first-class deliverables. All branches are
+"record the result, continue the other directions" — none is a stop.
+
+Round-4 state: remote's own `after_cost_protocol_and_block_assumption_audit_20260702`
+answered round-3 track (c): the 1.5% protocol is conservative but NOT the
+bottleneck; H2026 GROSS edge is already negative across routes. Remote's
+`local_audit_request_after_cost_route_exhaustion_20260702` closed six after-close
+mutation routes. Do NOT redo either. The binding new problems are statistical
+(multiple testing, missing significance protocol) and structural (survivorship/
+label alignment, final-OOT contamination).
+
+### D1. Statistical inference hardening + multiple-testing registry (Track S)
+
+What: registry of every route/config ever scored on H2026_1; Newey-West t-stats
+(lag >= 20) on daily RankIC; moving-block bootstrap CI on after-cost net spread;
+date-clustered binomial/bootstrap CI on win rate vs base rate; BH-FDR (q=0.10)
+across the registry.
+
+Pass (a signal "exists" claim): pre-H2026 pooled daily-IC NW t >= 2.0 AND the
+row survives BH-FDR q=0.10 in the registry AND the after-cost net-spread
+bootstrap 90% CI lower bound is not materially negative (> -0.5pp).
+Fail: publish "no route survives FDR" as the honest headline finding; continue.
+Never gameable by: raw win rate, gross-only spread, single-block IC.
+
+### D2. Point-in-time new-source availability audits (Track A + whitelist queue)
+
+What: hot-rank `ths_hot`/`dc_hot` A-share available-at contract (round-3 track
+(a), still pending — three-number separation, rank_time/D+1 policy); then queue:
+fundamentals-as-of (`ann_date`-anchored), analyst-revision streams, semantic
+evidence-pack feature-spec (after the lag-rule spot-check).
+
+Pass (audit level, per source): available-at policy proven (timestamp or D+1
+anchor), >= 5 pre-H2026 blocks nonempty, decision-universe match rate >= 0.5.
+Only then a SMALL predeclared scout is allowed, judged by D1 gates.
+Fail: verdict D+1-contract or CLOSED, recorded; source stays out of labels.
+
+### D3. Turnover-return trade-off research (cost-curve frontier)
+
+What: study the trade-off, not weaken the gate: net spread as a function of
+cost {0.3%, 0.8%, 1.5%} x cadence {daily, weekly, monthly} x turnover cap, for
+the frozen score and reversal composite, offline labels only.
+
+Pass: some cell shows net >= 0 in >= 4 of 6 pre-H2026 blocks AND gross > 0 on
+the diagnostic block -> that cell becomes a Track-F pre-registration candidate.
+Fail: publish "no cell survives any realistic cost" — a valid research finding.
+Claim gate stays 1.5%; the curve is research information only.
+
+### D4. Scorer as a RANKING RESEARCH TOOL: RankIC time-stability + regime study
+
+What: treat `frozen_quant_score_v1` (observe_only) as an instrument to study
+WHEN cross-sectional ranking information exists: daily RankIC series 2023-2026,
+rolling 60d stability, structural-break scan, interaction with regime variables
+(volatility, breadth, `moneyflow_hsgt` regime context — the one source already
+graded `regime_context_only`).
+
+Pass: a regime-IC interaction with permutation-test p < 0.05 AFTER multiplicity
+correction, fitted on pre-H2026 only, AND favorable-regime ic_pos >= 0.60 OOS
+pre-H2026. H2026_1 is diagnostic only; confirmation defers to Track F.
+Fail: scorer documented as unconditionally observe-only; regime overlay closed.
+Guard: regime-exclusion route already showed the overfit signature (prior
+improves, H2026 worsens) — any regime claim without the permutation gate is
+overfitting by construction.
+
+### D5. Survivorship / universe / label-alignment audit (Track U — new)
+
+What: prove or refute that the decision universe is point-in-time (delisted/ST/
+suspended names present as-of); measure the `return_20d` index-offset label-span
+distribution (suspension gaps stretch the 20d horizon); rerun the frozen-score
+block table on corrected labels if feasible.
+
+Pass: bias quantified; if corrected metrics move materially (RankIC delta >
+0.01 or net spread delta > 0.5pp on any block), every prior conclusion gets a
+caveat and the registry is re-scored. If caches lack delisted names entirely:
+record "universe is survivor-biased; all positive historical metrics are upper
+bounds" as a standing caveat.
+Fail-safe: even a "cannot fully reconstruct PIT membership" outcome is recorded
+as a permanent claim-boundary limitation.
+
+### D6. Freeze-and-forward pre-registration (Track F — the only promotion path)
+
+What: because H2026_1 is semi-contaminated by 20+ diagnostic reads, promotion
+claims may ONLY come from a pre-registered, single-use forward window: declare
+<= 3 frozen candidates now (e.g. scorer-as-ranking-prior in turnover-capped
+monthly selection; low-turnover monthly variant; regime-gated variant), exact
+configs + metrics + gates, hash-logged BEFORE any forward as-of data (post
+2026-06-23 GT boundary) is read.
+
+Pass (on the forward window only): RankIC NW t >= 2.0, exposure-gated win rate
+above base rate with date-clustered CI excluding zero lift, after-cost (1.5%)
+net spread >= 0, leakage PASS, nontrivial exposure. Window is burned once read.
+Fail: candidates recorded as failed; a NEW pre-registration is required for the
+next window; no re-tuning on the burned window.
+
+### D7. Product-value decoupling (always on)
+
+What: the two research questions are decoupled: (A) "honest research-information
+presentation" (evidence + counter-evidence + risk factors + invalidation) and
+(B) "statistically beating cost". (A) ships regardless of (B).
+
+Pass for (A): 100% of cards leakage PASS, coverage >= 0.95 with invalid counts
+reported, all action language gated by guard grades (`active_ok`/`observe_only`/
+`suppress`), zero forbidden-claim hits in the stale-doc guard, low/zero exposure
+always labeled defensive/no-action.
+
+Priority order this round: D1 + D5 first (they re-ground every other number),
+D2 (Track A) next, D6 pre-registration written early (cheap, time-sensitive),
+D3/D4 as capacity allows, D7 always on.
+
+## Round-3 Strategy Portfolio (superseded by Round-4 above; kept as history)
 
 Product goal: find a strategy that delivers ACCURATE stock screening and ACCURATE
 guidance for the user watching stocks. after-cost alpha is the real wall — but a
@@ -51,7 +165,18 @@ strategy, never `BLOCKED`.
 
 ## Top Priorities
 
-Update 2026-07-02 (round 3): the P1 ranker-guard integration is DONE (frozen score
+Update 2026-07-02 (round 4): track (c) is DONE (remote's autonomous protocol
+audit: cost gate fair, gross edge is the wall); six after-close mutation routes
+are CLOSED per the route-exhaustion packet; the closed-route rule extends to
+them (do not rerun target60, the 7 families, frozen-score tuning, direct broker
+selector, fixed-score holding variants, or nearby after-close small-model
+mutations). New top priorities: D1 statistics hardening + registry, D5
+survivorship/label audit, D2/Track-A hot-rank contract (still pending), D6
+pre-registration. Promotion claims ONLY via the Track-F forward window — never
+via H2026_1 alone. The round-3 priority list below stays valid where it does
+not conflict.
+
+Round-3 priorities (historical): the P1 ranker-guard integration is DONE (frozen score
 downgraded to `observe_only`, reversal to `suppress`, both after-cost negative on
 H2026_1). The direct `broker_recommend` sparse selector is CLOSED. So priority
 shifts to (a) a hot-rank A-share available-at contract, (c) an after-cost protocol
@@ -127,11 +252,19 @@ Every report should include a "why not promoted" note when relevant: target60
 failed under pre-OOT selection, frozen ranker net spread is negative, and
 zero/tiny exposure is defensive behavior rather than active skill.
 
-## Recommended Next Remote Task (this round: hot-rank available-at + after-cost re-audit)
+## Recommended Next Remote Task (round 4: stats hardening + PIT sources + pre-registration)
 
-The filled `Exact Next Task` in `local_goal.md` this round is
-`p1_hotrank_availableat_and_aftercost_reaudit_20260702` — a PARALLEL long-running
-stage running tracks (a) and (c) plus continuous product value. Pattern:
+The filled `Exact Next Task` in `local_goal.md` is now
+`p1_round4_stats_hardening_pit_sources_20260702` — a PARALLEL long-running stage
+running Tracks S (statistics/registry), A (hot-rank available-at, carried over),
+U (survivorship/label alignment), F (pre-registration doc), and P (product,
+always on). It ANSWERS the remote's
+`local_audit_request_after_cost_route_exhaustion_20260702` with a portfolio:
+option 1 (new PIT sources, audit-first) + option 3 extended (statistics +
+universe audits; protocol audit accepted as done) + option 2 always-on.
+
+The superseded round-3 pattern is kept below for history; its track (a) spec is
+still the authoritative detail for Track A. Its track (c) is DONE — do not redo.
 
 ```text
 Read README.md, docs/START_HERE.md, goal.md, local_goal.md, local_audit.md,
@@ -285,6 +418,28 @@ Default stop/fail gates:
 - required secrets, paid calls, large rebuild, or SSH not explicitly approved.
 
 ## Decision Tree After Results
+
+Round-4 additions (override where they conflict with the older tree below):
+
+- ANY metric that looks good on H2026_1 -> first check the Track-S registry:
+  if it does not survive BH-FDR q=0.10 with NW t >= 2.0 (pre-H2026 pooled), it
+  is recorded as "not distinguishable from multiple-testing noise" and work
+  CONTINUES on other directions. No promotion from H2026_1 alone, ever.
+- D1/D5 change historical numbers (corrected labels, PIT universe) -> re-score
+  the registry, annotate every affected prior conclusion, continue.
+- D2 source audit passes -> the source enters the whitelist and gets a SMALL
+  predeclared scout judged by D1 gates; audit fails -> D+1/CLOSED verdict,
+  recorded, continue with the next queued source.
+- D3 finds a surviving cost-cadence cell / D4 finds a corrected-significant
+  regime interaction -> it becomes a Track-F pre-registration candidate; it is
+  NOT deployed or claimed on historical data.
+- Track-F forward window read -> window is burned; pass -> a promotion claim
+  with full gates may be drafted for local audit; fail -> candidates closed,
+  new pre-registration required, continue.
+- Every branch ends in "record in `remote_decision.md`, continue the other
+  directions". Hard `BLOCKED` remains reserved for user-owned decisions only.
+
+Older (round <= 3) tree:
 
 Positive result:
 

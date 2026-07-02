@@ -1,6 +1,6 @@
 # StockHome Local Audit Notes
 
-Updated: 2026-07-02 (round 3: hot-rank available-at + after-cost re-audit)
+Updated: 2026-07-02 (round 4: answer to after-cost route exhaustion + methodology deep audit)
 
 Status: local-authored remote execution evidence map. This document is part of
 the remote execution packet: remote Codex reads it before executing
@@ -615,22 +615,182 @@ never nudged to stop on a negative after-cost result.
 - No experiments, training, GPU, paid API, or writes to the remote were run. Some
   deep report bodies (full CSVs) were only head/tail-sampled — flagged below.
 
+## Fourth-Round Local Audit Update - 2026-07-02 (route-exhaustion answer + methodology deep audit)
+
+Context: divergent methodology audit round. Research framing is explicit and
+binding: StockHome is a QUANT-FINANCE METHODOLOGY RESEARCH project. The research
+question is "do certain public-market signals carry generalizable, statistically
+significant predictive power under strictly leakage-free, cost-inclusive
+historical evaluation?" Outputs are research findings with evidence,
+counter-evidence, uncertainty, and failure boundaries — never investment advice,
+never live trading, never a return promise.
+
+### Remote sync/state (verified 2026-07-02, round 4, read-only SSH)
+
+- Remote HEAD = `465ef0d` = local = GitHub. The round-3 packet commits
+  (`a58a62e`, `465ef0d`) landed AFTER remote's overnight autonomous run at
+  `2a5a2d4`, so most overnight outputs predate the round-3 task text.
+- `runs/` now holds 173 dirs, 157 dated 20260702. Server-side
+  `remote_decision.md` is 8085 lines (last entry: broker_recommend direct sparse
+  selector CLOSED). The LOCAL tracked copy of `remote_decision.md` is still the
+  empty template — local docs lag the remote by a full round; each local audit
+  must start from the server-side decision log tail, not the local copy.
+- Remote issued a REAL audit request:
+  `reports/date_generalization/local_audit_request_after_cost_route_exhaustion_20260702/`
+  (with `route_evidence_matrix.csv`). Six after-close routes all fail
+  stability and/or the H2026 diagnostic: cost-aware small model (H2026 net
+  `-1.44`), sticky turnover guard (`-0.47`), turnover stability (failed), regime
+  exclusion (prior net `+0.43`/win `0.67` but H2026 net `-1.17`/win `0.2` — a
+  classic overfit signature), low-frequency execution (H2026 net `-0.93`), score
+  persistence (H2026 net `-0.51`). None promotable.
+- Round-3 track (c) was ALREADY EXECUTED autonomously as
+  `after_cost_protocol_and_block_assumption_audit_20260702`. Verdict (local
+  audit ACCEPTS it): the cost protocol (`net = gross - one_way_turnover*1.5%`,
+  `net_flat = gross - 1.5%`) is conservative but NOT the main bottleneck,
+  because H2026 GROSS top-vs-pool is already negative for additive, logistic,
+  GBDT, and reversal-composite routes. Repeated after-cost failure is primarily
+  strategy/signal failure, not a protocol artifact. Also on record: the current
+  evaluation is a signal/selection diagnostic, NOT a tradable backtest (no
+  limit-up/down fills, suspensions, liquidity, path-dependence, overlapping-label
+  handling) — the limitation cuts both ways.
+- `next_source_boundary_prefilter_20260702`: NO currently inspected source
+  family may proceed straight to modeling; local audit must whitelist a
+  genuinely new source/question with exact fields and stop rules.
+- `p1_semantic_source_lag_audit_20260702`: status
+  `FEATURE_SOURCE_CANDIDATE_WITH_CAVEATS` — 15947 no-label semantic rows, all
+  lag PASS by the remote's own rule (same-day 15:00 cutoff / D+1), 114 fields,
+  7 blocks, richer than the closed event bucket; modeling still NOT allowed.
+- Round-3 track (a) hot-rank: NO dedicated output dir exists yet (grep over
+  `runs/` and `reports/date_generalization/` for hotrank = only the after-cost
+  dirs). Track (a) is still pending and carries over.
+- Product/hygiene work exists and is real: stale-doc claim-boundary guards
+  (goal/README/START_HERE covered), readiness snapshots, user-operation-protocol
+  dry runs with their own leakage audits.
+
+### Round-4 methodology problem list (ranked, with evidence)
+
+- P1 MULTIPLE TESTING / FINAL-OOT CONTAMINATION (top risk). Well over 20
+  route/config families have now been evaluated against the same H2026_1 block
+  "as diagnostic" (7 target60 families, frozen score, reversal, broker, hk_hold,
+  6 after-close mutations, semantic scout, margin detail, regime probes...).
+  There is NO formal multiple-testing control anywhere (no BH/FDR, no deflated
+  Sharpe, no White reality check/SPA). Consequence: H2026_1 is now
+  SEMI-CONTAMINATED for promotion purposes — any future "pass" on it is
+  post-hoc route selection. Mitigation: route-hypothesis registry + FDR
+  correction + a freeze-and-forward pre-registration window on as-of data that
+  accrues after the current GT boundary (2026-06-23).
+- P2 SIGNIFICANCE PROTOCOL MISSING. H2026_1 has only ~38 decision dates;
+  20-day labels overlap (strong autocorrelation) and rows are cross-sectionally
+  correlated, so effective N is the number of decision dates, not the ~18.7k
+  rows. No Newey-West t-stat (lag >= 20) on daily IC, no moving-block bootstrap
+  CI on net spread, no binomial/cluster CI on win rate vs base rate is reported
+  anywhere. Win-rate deltas like `0.6667 vs 0.8434` are currently
+  uninterpretable without these.
+- P3 SURVIVORSHIP / UNIVERSE POINT-IN-TIME GAP (genuinely un-audited).
+  No evidence yet that decision-universe membership is as-of (are later
+  delisted/ST/long-suspended names present at historical decision dates, or is
+  the universe a current-listing snapshot?). Additionally
+  `src/backtest/ground_truth.py` computes `return_20d` by integer index offset
+  `close[idx+20]`, which silently skips suspension gaps and stretches the
+  horizon; the label-span distribution has never been measured. All positive
+  historical metrics are upper bounds until this is audited.
+- P4 COST-MODEL FIDELITY (bounded; mostly answered by remote). Keep 1.5%
+  round-trip as the CLAIM gate. Remaining sub-issues to document, not to
+  litigate: the one-way turnover proxy is holdings-overlap-based; `net_flat`
+  plus turnover-term may double-count in some tables; no slippage/limit/
+  liquidity modeling. A cost-sensitivity curve (0.3%/0.8%/1.5% x daily/weekly/
+  monthly) is legitimate RESEARCH INFORMATION about the turnover-return
+  trade-off, but is not grounds to weaken the claim gate — especially since
+  H2026 gross edge is already negative.
+- P5 REGIME-OVERFIT RISK. Any regime-conditional deployment is being selected
+  on <= 7 half-year blocks; the regime-exclusion route already showed the
+  signature (prior improves, H2026 worsens). Regime claims need permutation
+  tests on pre-H2026 only, multiplicity-corrected, and confirmation deferred to
+  the forward window.
+- P6 DOC/STATE LAG. Local `remote_decision.md` is the template while the server
+  copy is 8085 lines; round-3 task text was partially obsolete at commit time
+  (track (c) already done). Process fix: every local round begins with the
+  server decision-log tail + run-dir diff before writing the packet.
+- P7 SELF-REPORTED LAG AUDITS. The semantic lag PASS (15947/15947) comes from
+  the remote's own audit script; before whitelisting that source for any scout,
+  local audit should spot-check the audit RULE (15:00 cutoff / D+1 anchoring)
+  against a handful of rows.
+- P8 CLAIM-BOUNDARY DRIFT in older docs — largely mitigated by the remote's
+  stale-doc guards; keep them in place.
+
+### Answer to `local_audit_request_after_cost_route_exhaustion_20260702`
+
+Local audit picks a PORTFOLIO instead of a single option (all branches are
+"record the result, continue the others"; none is a stop):
+
+1. Option 1 (new lag-safe PIT sources) — YES, scoped: finish round-3 track (a)
+   hot-rank available-at contract; semantic evidence-pack feature-spec stays a
+   candidate pending the P7 spot-check; fundamentals-as-of (`ann_date`-anchored)
+   PIT availability audit is added to the whitelist queue. Audit-first, no
+   labels/models until the availability contract passes.
+2. Option 3 (methodology) — EXTENDED, not repeated: the protocol audit itself is
+   accepted as done; the NEW methodology work is Track S (statistics hardening +
+   multiple-testing registry) and Track U (survivorship/universe/label-alignment
+   audit), both of which are genuinely missing.
+3. Option 2 (product readiness) — ALWAYS-ON: honest research-information
+   presentation is a separate research deliverable, decoupled from
+   "statistically beating cost".
+
+Promotion rule going forward: NO promotion claim may rest on H2026_1 alone.
+Promotion evidence must come from the pre-registered freeze-and-forward window
+(Track F) evaluated on as-of data accruing after 2026-06-23, single-use.
+
+### Local/remote checks run this round
+
+- Local Read: `goal.md`, three `local_*.md`, `remote_decision.md` (local
+  template), `docs/DECISIONS.md`, directory listings.
+- Read-only SSH (bounded head/tail/grep only, no big cats): git log/status,
+  server `remote_decision.md` section index + tail, `runs/` and
+  `reports/date_generalization/` listings, heads of
+  `local_audit_request_after_cost_route_exhaustion_20260702/validation_summary.md`,
+  `after_cost_protocol_and_block_assumption_audit_20260702/validation_summary.md`,
+  `next_source_boundary_prefilter_20260702/validation_summary.md`,
+  `p1_semantic_source_lag_audit_20260702/validation_summary.md`,
+  `p1_turnover_guard_stability_audit_20260702/RUN_STATUS.md`,
+  `regime_gated_persistence_probe_20260702/RUN_STATUS.md`.
+- No experiments, training, GPU, paid API, writes to remote, or git operations.
+
 ## Open Questions For Next Local Audit
 
-- Should `frozen_quant_score_v1` be relabelled from `usable_in_agent_default=true`
-  to `observe_only`, given its edge lives on a single OOT block and net spread is
-  negative? (Local audit leans yes.)
-- After-cost is the binding constraint: is there ANY decision-time feature family
-  whose net (post-1.5%) top-decile spread is positive on H2026_1? If not, the
-  honest product claim is ranking-reference only, never active-buy.
-- Do the news/event and peer-cohesion families have provable available-at/lag
-  semantics, or must they stay out of decision-time evidence permanently?
-- Should the user's 60% win-rate target be formally re-scoped in `local_goal.md`
-  to "OOT RankIC + after-cost spread + exposure-gated win rate" so remote stops
-  chasing a strict `>0.60` raw rate? (Local audit leans yes; done this round.)
-- Which of the 21 untracked server items should be curated into Git as small
-  source (the `*_v1.py` signal scripts + tests look like real source), and which
-  stay server-local (reports/runs/models/`4599041`/external refs)?
+- Track S registry: after BH-FDR q=0.10 across all routes ever scored on
+  H2026_1, does ANY row survive? (Expect no — a publishable negative.)
+- Track U: is the decision universe point-in-time or a current-listing
+  snapshot? What fraction of `return_20d` labels span >30 trading days because
+  of index-offset suspension skipping, and do corrected labels move any block
+  metric materially (RankIC delta > 0.01 or net spread delta > 0.5pp)?
+- Track A: do `ths_hot`/`dc_hot` pass the A-share filter + rank_time/D+1 +
+  coverage contract, or do they close like broker_recommend?
+- Track F: has the pre-registration doc been written and hash-logged BEFORE any
+  forward as-of data is read? Has anyone touched the forward window for tuning
+  (which burns it)?
+- P7 spot-check: does the semantic lag-audit rule (15:00 cutoff / D+1) hold on
+  a manual sample of rows?
+- Which of the untracked server scripts (`audit_*`, `build_*`,
+  `run_after_close_*`, `*_v1.py` + tests) should be curated into Git as small
+  source vs stay server-local evidence?
+
+## Prior Open Questions (resolved in round 4)
+
+- "Should `frozen_quant_score_v1` be relabelled `observe_only`?" -> DONE
+  remotely in `p1_ranker_guard_integration_20260702` (observe_only; reversal
+  suppress).
+- "Is any family after-cost positive on H2026_1?" -> per the remote's own
+  protocol audit, H2026 GROSS is already negative across routes; the honest
+  product claim is ranking-reference only. The one non-negative row
+  (`quality_momentum_accumulation_v1` net `+1.2098`) stays `not_promoted`
+  pending an available-at audit and Track-S significance.
+- "Is the 1.5% protocol over-strict?" -> answered by
+  `after_cost_protocol_and_block_assumption_audit_20260702`: conservative but
+  not the bottleneck; keep 1.5% as the claim gate, publish sensitivity curves
+  as research information only.
+- "Re-scope the 60% target measurement?" -> done in round 3 and unchanged:
+  win-rate reading, exposure-gated, above base rate, after-cost non-negative,
+  no final-OOT selection; target itself durable.
 
 ## Prior Open Questions (resolved this round)
 

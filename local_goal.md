@@ -1,6 +1,16 @@
 # StockHome Remote Execution Packet
 
-Updated: 2026-07-02 (round 3: hot-rank available-at + after-cost re-audit)
+Updated: 2026-07-02 (round 4: stats hardening + PIT sources + pre-registration)
+
+RESEARCH NATURE (binding): StockHome is a quant-finance METHODOLOGY RESEARCH
+project. The research question is whether certain public-market signals carry
+generalizable, statistically significant predictive power under strictly
+leakage-free, cost-inclusive historical evaluation. All outputs are research
+findings with evidence, counter-evidence, uncertainty, and failure boundaries —
+NOT investment advice, no live trading/orders, no return promises. Negative
+results are first-class deliverables. Standing safety gates: research framing
+only, no broker/live trading, no secret leakage, no future/GT leakage, low/zero
+exposure is never presented as predictive skill.
 
 Status: local-authored remote execution packet for the manual workflow
 `CC/Codex local audit -> user manual GitHub sync -> remote Codex execution`.
@@ -213,9 +223,11 @@ target60 win rate is `0.4444` and it needs an available-at/lag audit before any
 feature reuse. It is `not_promoted` now.
 
 So: do NOT chase a strict raw `>0.60` win rate on the current feature set, do NOT
-re-run target60 / the 7 families / a direct broker selector. Advance instead on
-(a) hot-rank A-share available-at semantics, (c) an after-cost protocol re-audit,
-and keep delivering P0/P1 product value regardless of after-cost alpha.
+re-run target60 / the 7 families / a direct broker selector. [Round-4 note: the
+after-cost protocol re-audit (c) is now DONE remotely and its verdict accepted —
+see "Round-4 State Update" below; the active advance directions are Tracks
+S/A/U/F/P in the round-4 `Exact Next Task`.] Keep delivering P0/P1 product value
+regardless of after-cost alpha.
 
 Re-scope note for the user's 60% target (advisory; `goal.md` body is NOT edited):
 "20 日正收益率 > 60%" means a 20-trading-day forward-return WIN RATE above 60%
@@ -232,6 +244,36 @@ with evidence, counter-evidence, and downgrade gates. Small quantitative
 information-aggregation or decision-support networks stay deferred until an
 available-at/lag audit clears clean decision-time inputs (news/event and
 peer-cohesion families are currently `needs_leakage_audit`).
+
+## Round-4 State Update (2026-07-02, read-only SSH verified at HEAD 465ef0d)
+
+- Remote overnight autonomous run (at `2a5a2d4`, before the round-3 packet
+  landed) produced ~157 dated 20260702 run dirs and an 8085-line
+  `remote_decision.md` (server-side; the tracked local copy lags).
+- Round-3 track (c) is ALREADY DONE autonomously:
+  `after_cost_protocol_and_block_assumption_audit_20260702`. Accepted verdict:
+  the 1.5% cost protocol is conservative but NOT the main bottleneck — H2026
+  GROSS top-vs-pool is already negative for additive/logistic/GBDT/reversal
+  routes; repeated after-cost failure is primarily signal failure. The current
+  evaluation is a signal diagnostic, not a tradable backtest. Keep 1.5% as the
+  claim gate; sensitivity curves are research information only. Do NOT redo.
+- Remote issued `local_audit_request_after_cost_route_exhaustion_20260702`:
+  six after-close mutation routes (cost-aware small model, sticky turnover
+  guard, turnover stability, regime exclusion, low-frequency execution, score
+  persistence) all fail stability and/or H2026 diagnostics. All CLOSED; the
+  closed-route rule covers them.
+- `next_source_boundary_prefilter_20260702`: no inspected source family may
+  proceed to modeling without a local whitelist. The semantic evidence-pack
+  channel is `FEATURE_SOURCE_CANDIDATE_WITH_CAVEATS` (15947 lag-PASS no-label
+  rows, 114 fields) but modeling is NOT allowed yet.
+- Round-3 track (a) hot-rank available-at audit has NO output dir yet — it
+  carries over as Track A of the round-4 task.
+- New binding methodology findings (see `local_audit.md` round 4): H2026_1 is
+  SEMI-CONTAMINATED by 20+ diagnostic reads (multiple-testing risk, no FDR
+  control anywhere); no NW t-stat / bootstrap CI protocol exists; the
+  survivorship/universe/label-alignment question has never been audited.
+  Promotion claims therefore may ONLY come from the pre-registered
+  freeze-and-forward window (Track F), never from H2026_1 alone.
 
 ## Remote Next-Task Filling Rule
 
@@ -271,6 +313,150 @@ Remote may read archived files under
 not as active instructions.
 
 ## Exact Next Task
+
+Date: 2026-07-02 (round 4)
+
+Task ID: `p1_round4_stats_hardening_pit_sources_20260702`.
+
+This is a PARALLEL, LONG-RUNNING stage and the local ANSWER to remote's
+`local_audit_request_after_cost_route_exhaustion_20260702`: local audit chooses
+a PORTFOLIO — option 1 (new lag-safe PIT sources, audit-first) + option 3
+EXTENDED (statistics + universe methodology hardening; the protocol audit
+itself is accepted as done) + option 2 always-on (product value). It supersedes
+`p1_hotrank_availableat_and_aftercost_reaudit_20260702` (its track (c) is done;
+its track (a) carries over as Track A below — the full track (a) spec in the
+superseded section further down REMAINS the authoritative detail). All closed
+routes stay closed. A negative result in any track is logged in
+`remote_decision.md` and work continues on the others; after-cost or gate
+failure is NEVER `BLOCKED`.
+
+Hypothesis chain (from `local_audit.md` round 4): the binding risks are now
+(1) multiple-testing contamination of H2026_1 (~20+ diagnostic reads, no FDR
+control), (2) a missing significance protocol (overlapping 20d labels,
+date-clustered effective N, no NW t / bootstrap CI), (3) an un-audited
+survivorship/universe/label-alignment question, and (4) availability contracts
+for new PIT sources. Fixing (1)-(3) re-grounds every number the project has;
+(4) is the only sanctioned path to new signal families.
+
+### Track S: statistical inference hardening + multiple-testing registry
+
+CPU/offline only, labels offline-eval only.
+
+1. Build `route_hypothesis_registry.csv`: one row per route/family/config ever
+   evaluated against H2026_1 (7 target60 families, frozen score, reversal,
+   broker, hk_hold, 6 after-close mutations, semantic scout, margin detail,
+   regime probes, ...). Columns: family, selection protocol, headline metric,
+   H2026_1 usage (diagnostic/promotion), evidence path. Source: server
+   `remote_decision.md` + run/report dirs.
+2. Recompute honest significance for `frozen_quant_score_v1` and
+   `reversal_composite`: daily RankIC series -> Newey-West t-stat (lag >= 20)
+   per block and pooled pre-H2026; moving-block bootstrap 90% CI for after-cost
+   net spread; win rate vs block base rate with date-clustered binomial/
+   bootstrap CI (effective N = decision dates, not rows).
+3. Apply BH-FDR q=0.10 across the registry headline metrics; report survivors
+   (expect ~zero — that is itself the publishable finding).
+4. Write into the report: H2026_1 is SEMI-CONTAMINATED for promotion; all
+   future promotion claims route through Track F.
+
+Gates: a "signal exists" research claim requires pre-H2026 pooled NW t >= 2.0
+AND BH-FDR survival AND after-cost bootstrap CI lower bound > -0.5pp. Anything
+less is recorded as noise-compatible.
+
+### Track A: hot-rank A-share available-at audit (carried over, NO label/model)
+
+Execute the round-3 track (a) spec exactly (see superseded section below):
+A-share filter with THREE-number separation (raw endpoint rows / A-share
+joinable rows / decision-universe match rate) per block, rank_time vs decision
+close with D+1 anchoring, `available_at_policy` + `coverage_by_block` +
+`source_semantic_contract`, verdict usable / D+1-contract / CLOSED per source.
+Gate to become a later label candidate: availability proven AND >= 5 nonempty
+pre-H2026 blocks AND decision-universe match rate >= 0.5.
+
+### Track U: survivorship / universe / label-alignment audit (new)
+
+1. Determine whether decision-universe membership is point-in-time: are names
+   later delisted/ST/long-suspended present at historical decision dates, or is
+   the universe a current-listing snapshot? Quantify affected name counts per
+   block.
+2. Audit `src/backtest/ground_truth.py` index-offset labels: `close[idx+20]`
+   skips suspension gaps and stretches the horizon. Measure the calendar/
+   trading-day span distribution of all labels; report the fraction spanning
+   > 30 trading days.
+3. If feasible offline, rerun the frozen-score block accuracy table on
+   span-corrected labels and report deltas.
+
+Gates: bias quantified; material shift = RankIC delta > 0.01 or net spread
+delta > 0.5pp on any block -> annotate all prior conclusions + re-score the
+Track-S registry. If PIT membership cannot be reconstructed, record "universe
+is survivor-biased; positive historical metrics are upper bounds" as a standing
+claim boundary.
+
+### Track F: freeze-and-forward pre-registration (write-only now, no evaluation)
+
+Write `reports/date_generalization/preregistration_h2026_forward_v1.md`
+declaring AT MOST 3 frozen candidates with exact configs, e.g.:
+
+- frozen scorer as a RANKING PRIOR inside a turnover-capped monthly selection;
+- a low-turnover / monthly-rebalance netting variant;
+- a regime-gated variant using `moneyflow_hsgt` regime context (only if D4-style
+  permutation evidence exists pre-H2026).
+
+Declare metrics and gates verbatim: forward-window RankIC NW t >= 2.0;
+exposure-gated win rate above base rate with date-clustered CI excluding zero;
+after-cost (1.5%) net spread >= 0; leakage PASS; nontrivial exposure. The
+window = as-of data accruing AFTER the current GT boundary (2026-06-23), is
+SINGLE-USE, and is burned once read; log the doc hash + date in
+`remote_decision.md`. NO forward evaluation in this stage.
+
+### Track P: product-value track (always on, unchanged from round 3)
+
+Keep shipping the honest P0/P1 research assistant independent of after-cost
+alpha: action cards with evidence, counter-evidence, position/risk limits,
+triggers, review conditions; guard grades gate all action language; low/zero
+exposure explicitly defensive. Research question "honest information
+presentation" stays decoupled from "statistically beating cost".
+
+### Round-4 allowed inputs / commands / limits
+
+Same envelope as round 3 (see superseded section): read-mostly CPU work over
+offline caches; bounded tushare pulls ONLY for Track A metadata/coverage;
+ds/DeepSeek only for Track P reasoning; keys only from `/data/cyx/1030/api` or
+env, never printed/committed; writes only under the dated run/report dirs and
+`remote_decision.md`; no commit/push/reset/clean; no GPU; no large rebuilds.
+
+Expected outputs:
+
+- `runs/p1_round4_stats_hardening_pit_sources_20260702/RUN_STATUS.md`;
+- `reports/date_generalization/p1_round4_stats_hardening_pit_sources_20260702/validation_summary.md`;
+- Track S: `route_hypothesis_registry.csv`, `ic_newey_west_by_block.csv`,
+  `net_spread_bootstrap_ci.csv`, `multiple_testing_fdr_summary.md`;
+- Track A: the round-3 track (a) tables (`hotrank_ashare_available_at_policy.csv`,
+  `hotrank_coverage_by_block.csv`, `hotrank_source_semantic_contract.md`);
+- Track U: `universe_survivorship_audit.md`, `label_alignment_distribution.csv`,
+  optional `frozen_score_corrected_label_deltas.csv`;
+- Track F: `preregistration_h2026_forward_v1.md` (hash-logged);
+- Track P: optional `p1_candidate_dryrun.csv` (guarded, no future/GT fields).
+
+DONE criteria (stage ends by proposing exactly one next bounded stage):
+
+- branch/HEAD/dirty state reported; no `local_*.md` edits;
+- Track S: registry + NW/bootstrap tables + FDR survivor count + the H2026_1
+  contamination statement written;
+- Track A: three-number tables + available_at_policy + usable/D+1/CLOSED
+  verdict per source;
+- Track U: PIT verdict + label-span distribution + (if run) corrected deltas;
+- Track F: pre-registration doc exists and is hash-logged BEFORE any forward
+  read; confirm the forward window untouched;
+- leakage PASS (hits=0) for anything decision-time; low/zero exposure labeled
+  defensive; every negative logged-and-continued in `remote_decision.md`;
+- exactly one proposed next stage tied back to the durable 60% win-rate target
+  (measured honestly) and to the Track-F promotion path.
+
+Stop rules: unchanged from round 3 — soft `ROUTE_PIVOT`/`SOFT_BLOCK` with
+continued safe work for missing caches/unboundable subtasks; hard `BLOCKED`
+only for user-owned decisions (target/resource/credential/broker/destructive).
+
+## Superseded Round-3 Task (evidence only — do NOT execute as written; Track (a) spec below is still referenced by Track A above)
 
 Date: 2026-07-02 (round 3)
 
