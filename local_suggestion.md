@@ -15,6 +15,50 @@ file and pushes it.
 It becomes executable only through the filled `Exact Next Task` in
 `local_goal.md`.
 
+## Round-5 Product Output Spec (standardized / professional / decision-oriented) — GOVERNING for Track-P
+
+User priority (2026-07-02): make the P0/P1 user-facing output standardized, professional,
+decision-oriented — clear recommendations, TABLES, operational thresholds, explicit
+judgment criteria — and REUSE all backtest-learned strategies as the honest analytical lens
+for assisting the user. Research framing + safety gates are non-negotiable: guard grades
+gate action language; no future/GT fields; no return promise; low/zero exposure = defensive.
+
+STANDARDIZED ACTION CARD (P0 single-stock; P1 = a ranked table of these), 7 blocks:
+
+1. Header: ticker | name | as-of decision date | decision-time price snapshot (NO future
+   data) | data-coverage & leakage-PASS status | overall confidence {high/med/low}.
+2. Stance (guard-gated; NEVER a naked order or return promise), DERIVED by the rule in
+   block 6, not asserted: `active_ok` -> "研究性积极关注" | `observe_only` -> "仅观察/中性"
+   | `suppress` -> "回避/证据不足".
+3. Evidence table (one row per factor; REUSE the backtest families):
+   | factor | decision-time value | honest stat (pre-H2026 RankIC / NW-t / after-cost sign)
+   | regime dependence | interpretation ("so what") |
+   factors: reversal_composite, frozen_quant_score_v1 (observe_only), margin/CYQ context,
+   hot-rank (only if available-at cleared), moneyflow_hsgt regime context, valuation,
+   liquidity. Each carries its OWN honest verdict so nothing reads as a proven edge.
+4. Counter-evidence / risk table: | risk factor | current reading | invalidation condition |.
+5. Operational thresholds table (RESEARCH REFERENCE, context not orders):
+   | item | value / rule |
+   research max position-weight reference (regime/exposure-gated); add / reduce condition
+   zones (price- or factor-condition-based); stop / invalidation level; review-by date /
+   re-evaluate trigger; regime gate (drop stance to observe/suppress in adverse regime).
+6. Judgment criteria (EXPLICIT reproducible rule mapping evidence -> stance): e.g.
+   `active_ok` requires >= N favorable factors AND no hard risk flag AND regime favorable
+   AND leakage PASS; any after-cost-negative-only basis caps stance at `observe_only`;
+   unknown-mask names get a CAVEAT, never a silent veto (per M2). State the rule so the card
+   is auditable, not vibes.
+7. Provenance & uncertainty: which signals are context-only vs gated; what is unknown; the
+   standing survivor-bias / coverage caveats.
+
+Principle: backtest-learned strategies that FAILED as pure selectors are NOT wasted — they
+become the honest analytical LENS (context + counter-evidence + regime flags), with the
+failure explicitly reported. The card helps the user WATCH stocks with a professional,
+threshold-driven, evidence-based frame; it does not promise returns or place orders.
+
+Track-P pass: 100% cards leakage PASS; every stance guard-gated AND rule-derived; all
+threshold rows present; zero forbidden-claim hits. Ship a worked example
+`action_card_example.md` as the acceptance artifact; implement in `src/agent_training`.
+
 ## Round-4 Research Portfolio (methodology research framing, statistical gates)
 
 RESEARCH FRAMING (binding): StockHome studies whether public-market signals have

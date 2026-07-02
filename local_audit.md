@@ -755,6 +755,48 @@ Promotion evidence must come from the pre-registered freeze-and-forward window
   `regime_gated_persistence_probe_20260702/RUN_STATUS.md`.
 - No experiments, training, GPU, paid API, writes to remote, or git operations.
 
+## Fifth-Round Local Audit Update - 2026-07-02 (measurement foundation + product output)
+
+Remote executed the round-4 portfolio (Tracks S/A/U/F/P) and returned a
+`p1_round4_local_audit_request`. All in-universe routes are NEGATIVE after-cost: pairwise
+baseline `liquid_large_top100/low_pb_value` weak-positive statistically (pre RankIC 0.071)
+but economically negative (pre top 20d 0.428, net -0.073); margin/CYQ strict pre BH-FDR
+survivors = 0; industry static residual diagnostic-only; risk-veto not alpha. These four
+are CLOSED — do NOT re-tune (registry).
+
+Verdicts on the remote's 5 audit questions:
+- q1 metric/cost units: REAL RISK. pre net `-0.073` vs H2026 net `-2.90` is a ~40x scale
+  gap = almost certainly a fraction-vs-pp or aggregation mismatch. Must produce ONE
+  canonical spec and re-express the registry (round-5 M1) before trusting any number.
+- q2 mask-v2 semantics: REAL RISK, possibly result-changing. `not_claim_safe_v2` = 0.587,
+  mostly `unknown_namechange` 0.565 — a CLAIM caveat, not tradability. Using it as a hard
+  alpha veto could be destroying signal. Decompose into hard-exclusion / claim-caveat /
+  soft-missingness; re-run best candidates with ONLY hard-exclusion (round-5 M2). This can
+  REVIVE a weak signal or confirm the negative.
+- q3 financial-PIT cache expansion: DEFER (coverage 0.458 < 0.50; quarterly fundamentals
+  low-EV for 20d after-cost alpha). No-label coverage audit first if ever revisited.
+- q4 H2026/Track-F boundary: KEEP H2026 diagnostic-only, forward window unread; Track-F
+  pre-registration is the ONLY promotion path (round-5 M3).
+- q5 negative-methods pivot: YES but framed as MEASUREMENT-FOUNDATION + negative-methods,
+  NOT pure give-up — because M1/M2 fixes may change the conclusion. If nothing survives
+  clean measurement, the negative-methods / failure-map report IS the deliverable and the
+  durable 60% target is honestly reported as unreached in the current feature universe
+  (NOT dropped).
+
+Decision: round-5 = ONE focused route `p1_round5_measurement_foundation_and_negative_methods`
+(honors remote's "one route, no churn"): M1 metric-unit spec, M2 mask decomposition + re-run,
+M3 boundary lock, M4 negative-methods deliverable, then choose exactly one next route
+(revived candidate -> Track-F | named new independent source -> available-at audit | else
+consolidate on negative-methods + product value).
+
+User priority added (2026-07-02): the P0/P1 PRODUCT OUTPUT must be standardized,
+professional, decision-oriented — table-based action cards with operational thresholds +
+explicit judgment criteria, REUSING all backtest-learned strategies as the honest analytical
+lens for assisting the user (failed selectors become context / counter-evidence / regime
+flags, not buy triggers). This is round-5 M5 / Track-P (always-on); the exact card template +
+threshold table + evidence->stance judgment rule are in `local_suggestion.md` "Round-5
+Product Output Spec". Safety unchanged: guard-gated stance, no future/GT, no return promise.
+
 ## Open Questions For Next Local Audit
 
 - Track S registry: after BH-FDR q=0.10 across all routes ever scored on

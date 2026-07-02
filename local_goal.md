@@ -314,6 +314,100 @@ not as active instructions.
 
 ## Exact Next Task
 
+Date: 2026-07-02 (round 5) — CONTINUE the running StockHome session with this route.
+
+Task ID: `p1_round5_measurement_foundation_and_negative_methods_20260702`.
+
+ONE focused route this round (no parallel weak scouts — honoring the multiple-testing
+churn risk the remote flagged). It answers the remote's round-4 audit questions (metric
+units, mask-v2 semantics, coverage, H2026/Track-F boundary, negative-methods pivot) and
+SETTLES THE MEASUREMENT FOUNDATION before any further signal search — because two of the
+remote's own findings mean the current negatives may be partly ARTIFACTUAL and must be
+resolved first: (i) a metric/cost UNIT inconsistency (pre top-vs-pool net `-0.0734` vs
+H2026 diagnostic net `-2.90` is a ~40x scale gap — one is almost certainly a fraction and
+the other percentage points, or an aggregation/annualization mismatch), and (ii) mask-v2
+may be misused as a HARD alpha veto (`not_claim_safe_v2` pre rate `0.587`, mostly
+`unknown_namechange_active_interval 0.565`) when most of it is a CLAIM caveat, not a
+tradability exclusion — excluding ~56% of names as "unknown" could be destroying signal.
+Fixing these can REVIVE a weak candidate or firmly confirm the negative; either way it
+re-grounds every number. A negative after-cost result is NEVER `BLOCKED`; log and
+continue. CPU/offline only; bounded tushare only for metadata; keys from
+`/data/cyx/1030/api`, never printed/committed; research findings only, never advice.
+
+Round-4 results this route builds on (all NEGATIVE after-cost — CLOSED, do NOT re-tune):
+pairwise baseline `liquid_large_top100/low_pb_value` weak-positive statistically (pre
+RankIC 0.071) but economically NEGATIVE (pre top 20d rate 0.428, top-vs-pool net -0.073);
+margin/CYQ strict pre BH-FDR survivors = 0; industry static residual = diagnostic-only (no
+PIT membership); risk-veto = not alpha. Register these as closed; do not re-tune.
+
+- M1 metric/cost-unit reconciliation (audit q1): produce ONE canonical accounting spec
+  (units = percentage points; explicit turnover-cost convention) for RankIC, pairwise
+  accuracy, turnover, top-vs-pool net, `return_20d`/`fwd_ret_20d`. Reconcile the -0.073 vs
+  -2.90 scale gap and re-express the Track-S registry numbers in canonical units; every
+  later report MUST cite this spec.
+- M2 mask-v2 semantics decomposition (audit q2): split `not_claim_safe_v2` into disjoint
+  (a) HARD execution exclusion (suspended / limit-locked / delisted at decision date),
+  (b) CLAIM caveat (report-level uncertainty, e.g. unknown_namechange — KEEP in selection,
+  flag in reporting), (c) SOFT missingness (impute/handle). Re-run the best pre-H2026
+  candidates using ONLY (a) as an exclusion; measure whether after-cost results MATERIALLY
+  change (RankIC delta > 0.01 or net delta > 0.5pp). This can revive a weak signal or
+  confirm the negative.
+- M3 H2026 / Track-F contamination lock (audit q4): confirm H2026 stays diagnostic-only
+  and the forward window (post 2026-06-23) unread; Track-F pre-registration remains the
+  ONLY promotion path; registry marks H2026_1 semi-contaminated.
+- M4 negative-methods / guardrail deliverable (audit q5): with corrected M1/M2 numbers,
+  write the honest methodology finding — under leakage-safe, cost-inclusive, BH-FDR-
+  corrected, PIT/survivorship-audited evaluation, do these signal families carry tradeable
+  A-share 20d alpha? If NOTHING survives -> that IS the publishable negative-methods /
+  failure-map result (a legitimate methodology contribution; the durable 60% target is NOT
+  dropped, it is honestly reported as unreached in the current feature universe). If M1/M2
+  REVIVE a candidate -> route it to Track-F pre-registration; do NOT claim on H2026.
+
+- M5 Track-P product-output standardization (ALWAYS-ON, parallel; explicit user priority
+  2026-07-02): make the P0/P1 user-facing output STANDARDIZED, PROFESSIONAL, and
+  DECISION-ORIENTED — a clear action card built from TABLES with explicit OPERATIONAL
+  THRESHOLDS and JUDGMENT CRITERIA, and REUSE everything the backtest workflow learned
+  (reversal, frozen score, margin/CYQ, hot-rank, regime context, mask/PIT hygiene) as
+  HONEST EVIDENCE inputs, not as buy triggers. Every signal is reported with its honest
+  verdict (pre-H2026 RankIC / NW-t / after-cost sign / regime dependence) so the user sees
+  WHY. Backtest strategies that FAILED as pure selectors are NOT wasted — they become the
+  analytical LENS (context + counter-evidence + regime flags) with their failure reported.
+  Safety boundary unchanged: guard grades gate ALL action language, no future/GT fields, no
+  return promise, low/zero exposure = defensive. The exact card template + threshold table +
+  evidence->stance judgment rule are in `local_suggestion.md` "Round-5 Product Output Spec";
+  implement in `src/agent_training` card/decision builders and ship a worked, leakage-PASS
+  example `reports/date_generalization/p1_round5_measurement_foundation_20260702/action_card_example.md`.
+
+Deferred (audit q3): financial-PIT cache expansion — DEFER (best `fina_indicator` coverage
+0.458 < 0.50; quarterly fundamentals are low-EV for 20d after-cost alpha). Revisit only
+with a specific fundamental-momentum hypothesis, and then a no-label coverage audit FIRST
+(never a direct label scout).
+
+Decision output (exactly ONE next route, tied to the durable target + Track-F path):
+- if M2 correction revives a candidate above the significance gate -> next route = write
+  it into Track-F forward pre-registration (single-use forward window);
+- elif a GENUINELY NEW independent source family is identified (name ONE with a plausible
+  decision-time-available mechanism, e.g. northbound HSGT holdings-change flow, block-trade
+  / large-order flow, shareholder-count change, or index-membership rebalancing events) ->
+  next route = that source's available-at / no-label coverage audit;
+- else -> consolidate on the negative-methods report + Track-P product value as the
+  standing deliverable; keep the forward window reserved for a future candidate.
+
+Expected outputs:
+- `runs/p1_round5_measurement_foundation_20260702/RUN_STATUS.md`;
+- `reports/date_generalization/p1_round5_measurement_foundation_20260702/`:
+  `canonical_metric_cost_spec.md`, `registry_recomputed_canonical_units.csv`,
+  `mask_v2_semantics_decomposition.csv`, `mask_corrected_candidate_deltas.csv`,
+  `negative_methods_findings.md`, `next_route_decision.md`;
+- append the decision + any revived candidate to `remote_decision.md`.
+
+DONE: metric spec written + registry re-expressed in canonical units; mask-v2 decomposed +
+corrected deltas measured; H2026/forward boundary confirmed intact; negative-methods
+finding written; exactly ONE next route chosen and logged. Leakage PASS; research framing;
+every negative logged-and-continued in `remote_decision.md`.
+
+## Superseded Round-4 Task (executed 2026-07-02; all tracks negative after-cost — do NOT re-run; kept for Track A/F spec reference)
+
 Date: 2026-07-02 (round 4)
 
 Task ID: `p1_round4_stats_hardening_pit_sources_20260702`.
