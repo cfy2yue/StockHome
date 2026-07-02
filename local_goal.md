@@ -15,9 +15,16 @@ These override any narrower wording below if they ever conflict.
    subagents to audit and OPTIMIZE the project route, switch strategy, and keep
    going. Record every route/decision point in `remote_decision.md`. Do not bounce
    back to local for help on anything you can decide inside the boundaries.
-2. Hard `BLOCKED` is reserved ONLY for genuine user-owned decisions: changing the
-   final goal/threshold, new credentials/permissions, destructive operations, or
-   connecting to a broker / live trading.
+2. There is NO predefined hard-block condition, and this CANCELS every `BLOCKED` /
+   "hard block" / "hard-stop" statement elsewhere in this file. The goal pauses ONLY
+   when (a) the remote ITSELF concludes it is genuinely blocked after exhausting the
+   in-boundary routes it can think of, recording the full reasoning in
+   `remote_decision.md`, or (b) the user manually interrupts for local audit. "Needs
+   more data / a new source / more compute / a user-owned decision" is NOT an
+   auto-stop — pursue it yourself (authorized tushare/ds data + small-model training)
+   and, if you truly think the user is needed, keep doing everything else meanwhile
+   and just note it. Only broker / live-trading remains a genuine hard safety line.
+   Do not stop and wait.
 3. No unfounded resource limits. tushare (A-share market data) and the ds/DeepSeek
    LLM are ALREADY provisioned and authorized under `/data/cyx/1030/api` (read keys
    only from there or env, never print/commit, keep cost reasonable). Any data pull
