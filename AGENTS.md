@@ -11,6 +11,7 @@ Read these first:
 - `local_audit.md`
 - `local_suggestion.md`
 - `remote_decision.md`
+- `LOCAL_AUDIT_REQUEST.md`
 - `docs/START_HERE.md`
 - `docs/RESPONSE_PROTOCOL.md`
 
@@ -66,6 +67,10 @@ Output `LOCAL_AUDIT_REQUEST` when the route needs local strategy optimization,
 required artifacts are missing, leakage/availability controls are unclear,
 resource or credential boundaries would need to change, or results cannot be
 interpreted without changing the final target.
+When the user types `本地审计指令`, overwrite project-root
+`LOCAL_AUDIT_REQUEST.md` with the structured current audit request, then reply
+briefly with `AUDIT_REQUEST_READY: LOCAL_AUDIT_REQUEST.md`. Do not require the
+user to copy a long response.
 Do not mark the long goal blocked for soft strategy issues, weak metrics, or a
 failed suggested route. First record the evidence and route pivot in
 `remote_decision.md`, then continue inside the approved resource/safety limits.
