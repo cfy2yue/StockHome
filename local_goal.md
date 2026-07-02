@@ -1,9 +1,34 @@
 # StockHome Remote Execution Packet
 
-Updated: 2026-07-02
+Updated: 2026-07-02 (round 3: hot-rank available-at + after-cost re-audit)
 
 Status: local-authored remote execution packet for the manual workflow
 `CC/Codex local audit -> user manual GitHub sync -> remote Codex execution`.
+
+## Highest-Priority Operating Principles (READ FIRST, this round)
+
+These override any narrower wording below if they ever conflict.
+
+1. Remote's #1 priority is to KEEP ADVANCING the durable final goal. A failing
+   strategy, an unmet gate, or a dead data source is NOT `BLOCKED`. Remote is
+   expected to exercise initiative: think for itself, launch read-only/code-review
+   subagents to audit and OPTIMIZE the project route, switch strategy, and keep
+   going. Record every route/decision point in `remote_decision.md`. Do not bounce
+   back to local for help on anything you can decide inside the boundaries.
+2. Hard `BLOCKED` is reserved ONLY for genuine user-owned decisions: changing the
+   final goal/threshold, new credentials/permissions, destructive operations, or
+   connecting to a broker / live trading.
+3. No unfounded resource limits. tushare (A-share market data) and the ds/DeepSeek
+   LLM are ALREADY provisioned and authorized under `/data/cyx/1030/api` (read keys
+   only from there or env, never print/commit, keep cost reasonable). Any data pull
+   or small-model training genuinely needed to reach the goal may be pursued
+   autonomously. Standing safety gates remain: no broker/live trading, no
+   future/GT leakage, low/zero exposure is never stock-picking skill, no secret
+   leakage.
+4. The durable final goal and its threshold are DURABLE. A gate is the bar for
+   CLAIMING success, NOT a stop condition. After-cost net spread is the current
+   real bottleneck, but a negative after-cost result does NOT mean stop — log it,
+   pick a new in-boundary strategy, and continue.
 
 This file is the main task-control surface for user-started remote Codex
 execution. Remote Codex reads this file together with `local_audit.md` and
@@ -139,24 +164,51 @@ caveat. The latest H2026_1 block did not confirm the frozen P0: 20d positive
 rate was `0.6667` versus frozen `0.8434`, and `exposure_cards=0` means the
 result is defensive behavior, not stock-picking skill.
 
-State update (2026-07-02 local audit, verified by SSH): the prior stage — the
-signal inventory — is DONE remotely (server-local `runs/stock_signal_inventory_20260701/`
-+ `reports/date_generalization/stock_signal_inventory_20260701/`). Remote then
-autonomously pre-registered and evaluated 7 new signal families; ALL failed
-strict target60 (best H2026_1 win rate ties at `0.6000` with negative net decile
-spread). The `frozen_quant_score_v1` model already exists, is leakage PASS, but
-is weak and single-block-dependent (only H2026_1 is clearly positive; H2024_2 and
-H2025_2 RankIC are negative) and its after-cost top-bottom decile spread is
-NEGATIVE. Root cause (from `feature_rank_ic_audit.csv` and
-`supervised_ranker_experiment_v2.md`): the project's implicit alpha is
-cross-sectional reversal, which collapsed to ~zero RankIC on H2026_1, and after a
-1.5% round-trip cost essentially no model has a positive top-decile net spread.
+State update (2026-07-02 round 3 local audit, verified by SSH at HEAD `2a5a2d4`):
+the P1 ranker-guard integration stage is DONE remotely
+(`runs/p1_ranker_guard_integration_20260702/` +
+`reports/date_generalization/p1_ranker_guard_integration_20260702/`). Outcome:
+frozen score downgraded to `observe_only`, `reversal_composite` to `suppress`;
+both stay after-cost NEGATIVE on H2026_1 (frozen top-vs-pool net `-1.209`,
+top-bottom net `-1.703`; reversal `-1.837` / `-2.596`). Prior stages also confirmed
+done: signal inventory, 7-family target60 (all failed, ceiling `0.6000` w/ negative
+net spread), `frozen_quant_score_v1` leakage PASS but weak/single-block.
 
-So the frozen-one-score goal is effectively already delivered at v1; what remains
-is NOT training more models but: relabel the frozen score honestly as an
-observe-grade P1 rank aid, wire it as the agent's ranking anchor behind a
-downgrade/exposure guard, and stop chasing a strict raw `>0.60` win rate that the
-current feature set cannot reach after costs without selection tricks.
+New-source exploration this round (all no-label / no-model, tushare authorized):
+
+- `broker_recommend`: sparse contract READY (36 pre-H2026 months, 6 blocks) but
+  CLOSED as a direct sparse selector — PRE_H2026 active positive `0.4552` vs base
+  `0.4827`, after-cost spread `-2.29pp`; H2026_1 `0.4000` vs `0.4713`, after-cost
+  `-4.03pp`. Auxiliary-context only (`remote_decision.md` 2026-07-02 decision).
+- `hk_hold`: NOT a clean close — D+1 no-label join audit
+  (`p1_hk_hold_d1_join_quality_audit_20260702`) shows source_rows `41326` ->
+  feature_rows `11312` -> mean overall match rate `0.3916`, but
+  min_block_match_rate `0.0` and sparse_blocks `['H2024_2','H2025_2']`. Partially
+  joinable, coverage too holey for modeling now (`modeling_allowed_now=False`).
+- Hot-rank (`ths_hot`, `dc_hot`): from `p1_tushare_specialty_lag_coverage_20260702`
+  they DO carry `has_rank_time=True` (an available-at timestamp exists), but
+  `coverage_ok_for_next_cache_design=False` — only 3-4 pre-H2026 blocks sampled
+  nonempty (dc_hot: H2024_2/H2025_1/H2025_2; ths_hot: H2024_1/H2024_2/H2025_1/
+  H2025_2). They also mix A-share / HK / US / concept-board rows, so a
+  market/`data_type`/`ts_code`-suffix filter plus rank_time/D+1 audit is required
+  before any label use.
+- `moneyflow_hsgt`: `has_stock_identifier=False` -> `regime_context_only`, not a
+  stock selector. Useful as a regime/timing overlay signal, not for cross-section.
+
+COMMON FAILURE MODE (the real bottleneck): after-cost net spread is NEGATIVE
+across the frozen score, reversal baseline, broker sparse selector, and most
+blocks — multiple new sources / small models / sparse selectors all go negative
+once the 1.5% round-trip cost is subtracted. This is the true wall.
+
+ONE non-negative row to keep on radar (not yet promotable): the guard scan found
+`quality_momentum_accumulation_v1` H2026 net spread `+1.2098`, but its direct
+target60 win rate is `0.4444` and it needs an available-at/lag audit before any
+feature reuse. It is `not_promoted` now.
+
+So: do NOT chase a strict raw `>0.60` win rate on the current feature set, do NOT
+re-run target60 / the 7 families / a direct broker selector. Advance instead on
+(a) hot-rank A-share available-at semantics, (c) an after-cost protocol re-audit,
+and keep delivering P0/P1 product value regardless of after-cost alpha.
 
 Re-scope note for the user's 60% target (advisory; `goal.md` body is NOT edited):
 "20 日正收益率 > 60%" means a 20-trading-day forward-return WIN RATE above 60%
@@ -213,140 +265,171 @@ not as active instructions.
 
 ## Exact Next Task
 
-Date: 2026-07-02
+Date: 2026-07-02 (round 3)
 
-Route: P1 frozen-ranker integration with an honest downgrade/exposure guard, plus
-an after-cost reality check. This supersedes the completed signal-inventory task
-(done remotely as `stock_signal_inventory_20260701`) and the completed 7-family
-target60 search (done as `p0_target60_new_signal_family_20260701`, all failed).
-Do NOT re-run the inventory or start another new signal family this round.
+Task ID: `p1_hotrank_availableat_and_aftercost_reaudit_20260702`.
 
-Prior-stage results confirmed by local audit (do not redo, just build on):
-`frozen_quant_score_v1` is leakage PASS but weak/single-block (H2026_1 RankIC
-`0.0327`, ICIR `0.4233`, ic_pos `0.6316`; H2024_2 and H2025_2 RankIC negative) and
-its top-bottom decile NET spread is negative (`-2.5158pp`). target60 and all 7
-autonomous families failed strict `>0.60` (ceiling ties at `0.6000` with negative
-net spread). Root cause: implicit reversal alpha collapsed on H2026_1 and after a
-1.5% round-trip cost no model has a positive top-decile net spread
-(`supervised_ranker_experiment_v2.md`).
+This is a PARALLEL, LONG-RUNNING stage, not a short job. It supersedes the
+completed `p1_ranker_guard_integration_20260702` (frozen score already downgraded
+to `observe_only`) and all completed inventory / 7-family / direct-broker-selector
+routes. Do NOT re-run any of those. Under the highest-priority principles above,
+remote runs tracks (a) and (c) in parallel and keeps P0/P1 product value moving,
+exercising initiative and pulling subagents as needed. after-cost NOT passing is
+NOT `BLOCKED` — log it, switch strategy, continue.
 
-Hypothesis: the frozen ranker can be a useful P1 candidate-comparison ANCHOR only
-if a downgrade guard automatically suppresses active-buy / high-exposure language
-whenever any of {H2026_1 (or latest-block) RankIC, ICIR, coverage, after-cost
-net decile spread} weakens. The deliverable is a guarded, honest ranking aid, not
-a return promise and not a strict-`>0.60` chaser.
+Prior-stage facts confirmed by local audit (build on, do not redo): frozen score
+`observe_only`, reversal `suppress`, both after-cost NEGATIVE on H2026_1; broker
+sparse selector CLOSED (after-cost `-2.29pp` / `-4.03pp`); hk_hold partially
+joinable (mean match `0.3916`, min-block `0.0`); hot-rank `ths_hot`/`dc_hot` have
+`has_rank_time=True` but thin coverage and mixed markets; `moneyflow_hsgt` is
+`regime_context_only`; `quality_momentum_accumulation_v1` is the ONE non-negative
+H2026 net-spread row (`+1.2098`) but `not_promoted` pending an available-at/lag
+audit.
 
-Sub-goals (all read/CPU-only, offline caches only):
+### Track (a): hot-rank A-share available-at audit (NO label, NO model)
 
-1. After-cost reality check: for the frozen score AND the reversal_composite
-   baseline, recompute per-block (esp. H2026_1) top-decile and top-minus-bottom
-   NET decile spread at round-trip cost 1.5% (and a conservative flat 1.5% floor),
-   using existing offline `return_20d` labels for evaluation only. Confirm or
-   refute the negative-net-spread finding and report whether ANY decision-time
-   feature family reaches a non-negative H2026_1 net top-decile spread.
-2. Downgrade guard spec + wiring: define/verify a deterministic guard that maps
-   {latest-block RankIC, ICIR, coverage, net-spread sign, active_exposure} to a
-   tool grade in {`active_ok`, `observe_only`, `suppress`} and to user-facing
-   language (no active-buy / no high-exposure wording when suppressed). Wire the
-   frozen score through `src/agent_training/quant_tool_context.py` (sanitize) and
-   `date_regime_gate.py` (exposure) so the agent's P1 comparison consumes only the
-   guarded, sanitized score summary (no future/GT fields).
-3. Honest relabel proposal: recommend changing
-   `models/frozen/quant_score_v1/model_card.md` `usable_in_agent_default` from
-   `true` to `observe_only`/`limited_rank_reference` given the negative net spread
-   and single-block edge (propose in report; do not edit local_*.md).
-4. Optional (only if 1-3 done and time remains): one small candidate-set P1 dry
-   run on a user-style handful of stocks showing the guarded ranking output with
-   evidence, counter-evidence, exposure downgrade, and coverage — NO paid LLM/Pro
-   unless a later local task explicitly authorizes it.
+For `ths_hot` and `dc_hot` (source dir already probed under
+`p1_tushare_specialty_lag_coverage_20260702`), produce a decision-time-safety
+contract WITHOUT building labels or models:
+
+1. Filter to A-share only: partition rows by `data_type`/market and by `ts_code`
+   suffix (`.SH`/`.SZ`/`.BJ` A-share vs `.HK`/US/concept-board), and report the
+   drop at each stage. Explicitly separate THREE numbers per block: raw endpoint
+   rows -> A-share joinable rows (after suffix/market filter, joined to the
+   decision universe) -> decision-universe match rate. These three are NOT the
+   same and must never be conflated.
+2. rank_time / D+1 audit: using the existing `has_rank_time=True` timestamp,
+   verify whether the rank is available strictly BEFORE the decision close. If the
+   timestamp is intraday/after-close, anchor availability to D+1 (next natural
+   trading day) and report `coverage_by_block` under that D+1 anchor.
+3. Emit: an `available_at_policy` (per source: usable same-day vs D+1 vs closed),
+   `coverage_by_block` (A-share joinable, by H2023_1..H2026_1), and a
+   `source_semantic_contract` (what each row means, market mix, rank semantics).
+4. Decision rule: if A-share coverage is too thin OR rank_time is later than the
+   trade decision -> mark D+1-contract or CLOSED and do NOT admit into labels.
+   Only if a source passes filter + rank_time + coverage does it become a
+   `needs_leakage_audit -> ready_to_test` label candidate for a LATER stage.
+
+### Track (c): after-cost protocol RE-AUDIT (is the cost model over-strict?)
+
+The current protocol subtracts a flat 1.5% round-trip cost every rebalance
+(`net = gross - turnover*1.5%`) and a flat 1.5% floor. Re-audit whether this
+wording is CONSISTENT with the product's real holding period and cost, or whether
+it artificially kills strategies:
+
+1. Turnover/exposure accounting: check how turnover is measured (per-rebalance
+   vs annualized), whether the flat-1.5% floor double-counts a cost already in the
+   turnover term, and whether the rebalance cadence assumed matches a realistic
+   product cadence.
+2. Holding-period sensitivity: recompute the frozen score's after-cost net spread
+   under LOWER-turnover / MONTHLY-rebalance / netting assumptions (offline labels
+   for eval only). The user's likely intent is a lower-churn, monthly-rebalanced
+   product; report whether monthly netting flips any block from negative to
+   non-negative after cost.
+3. Verdict: state clearly whether the 1.5%-every-rebalance protocol is
+   "pinning strategies dead" vs a fair floor, and recommend the cost/turnover/
+   holding-period convention that should be the accepted after-cost gate going
+   forward. Do not silently weaken the gate — propose the change with evidence.
+
+### Product-value track (always on, independent of after-cost alpha)
+
+Keep advancing the honest P0/P1 research-assistant deliverable (single-stock
+watch action card + small candidate-set guarded ranking with evidence,
+counter-evidence, exposure downgrade, coverage) EVEN IF no after-cost alpha
+exists yet. Product value (a useful, honest research assistant) is DECOUPLED from
+"a selector that beats cost". Deliver product value regardless.
+
+### Autonomous strategy exploration (remote is expected to think, not just execute)
+
+Local audit proposes these as PARALLEL hypotheses (see `local_suggestion.md` for
+detail); remote should pick, adapt, or replace them and record choices in
+`remote_decision.md`:
+
+- low-turnover / monthly rebalance + netting to survive cost;
+- use the frozen scorer as a RANKING PRIOR inside a cost-aware, exposure-gated
+  selection, not as a direct selector;
+- regime-conditional / timing overlay (reversal alpha died in H2026 — gate it by
+  regime; `moneyflow_hsgt` is available as a regime-context signal);
+- decouple product value from beating cost (ship the honest research assistant).
 
 Allowed inputs:
 
 - the active first-read files listed above;
-- server-local context:
-  - `models/frozen/quant_score_v1/model_card.md`, `feature_list.json`,
-    `train_blocks.json`, `model.joblib`;
-  - `reports/date_generalization/frozen_quant_score_v1_accuracy.md` (+ `.csv`);
-  - `reports/date_generalization/supervised_ranker_experiment_v2.md` (+ its
-    step/variant/aggregate CSVs);
-  - `reports/date_generalization/feature_rank_ic_audit.csv`;
-  - `reports/date_generalization/stock_signal_inventory_20260701/REPORT.md`,
-    `signal_family_triage.csv`, `recommended_next_goal.json`;
-  - `reports/date_generalization/p0_target60_new_signal_family_20260701/rolling_autonomy_summary_20260701.md`;
-  - `reports/date_generalization/20260701_p0_p1_latest_revalidation_v1_round2_flash_confirm/validation_summary.md`;
-  - the joined offline cache
-    `data/date_generalization_cache/market_5000/joined_ground_truth_combined_news.csv`
-    (read-only, for the after-cost recompute; labels are offline-eval only);
-  - modules `src/agent_training/quant_tool_context.py`, `date_regime_gate.py`,
-    `evidence_pack.py`, `decision_card.py`; `scripts/audit_feature_rank_ic.py`,
-    `scripts/run_supervised_ranker_experiment.py`,
-    `scripts/audit_kline_peer_chip_turnover_cost.py`.
+- server-local context (read-only): the frozen model card/joblib and its accuracy
+  report; `supervised_ranker_experiment_v2.md`; `feature_rank_ic_audit.csv`; the
+  ranker-guard report dir `p1_ranker_guard_integration_20260702/`; the specialty
+  probe dirs `p1_tushare_specialty_lag_coverage_20260702/` and
+  `p1_tushare_specialty_endpoint_inventory_20260702/`; the hk_hold audit dirs; the
+  broker gate dir; the offline joined ground-truth cache under
+  `data/date_generalization_cache/` (labels offline-eval only);
+- tushare specialty endpoints under `/data/cyx/1030/api` MAY be pulled for the
+  hot-rank source-boundary audit (metadata/coverage only — no label persistence in
+  track (a)); ds/DeepSeek MAY be used for P0/P1 product-value reasoning. Load keys
+  only from `/data/cyx/1030/api` or env; never print/commit.
 
 Allowed commands:
 
 - read-only inspection, `git status --short`, `git diff --stat`, file metadata;
-- CPU-only pandas/sklearn recompute over the offline joined cache for the
-  after-cost spread and guard-grade tables; loading the frozen `model.joblib` for
-  scoring is allowed (it is a local artifact, no network);
-- CPU-only syntax/AST checks; running the existing `tests/test_date_regime_gate_exposure_guard.py`,
-  `tests/test_quant_agent_tools.py`, `tests/test_evidence_pack_leakage_audit.py`
-  is allowed only if it provably touches no network/paid API/secrets/large rebuild;
-  if a test would trigger side effects, skip it and record why in `remote_decision.md`;
+- CPU-only pandas recompute over offline caches for the after-cost re-audit and
+  the hot-rank coverage matrix; loading the local `model.joblib` is allowed;
+- bounded tushare specialty pulls for track (a) source-boundary audit (small,
+  metadata/coverage only, no unbounded loops);
+- CPU-only syntax/AST checks; existing tests only if they provably touch no
+  network/paid API/secret/large rebuild, else skip and record why;
+- launching remote read-only/code-review subagents for route audit/optimization;
 - write the status/report files below.
 
-Expected outputs:
+Expected outputs (create the dated dirs as needed):
 
-- `runs/p1_ranker_guard_integration_20260702/RUN_STATUS.md`;
-- `reports/date_generalization/p1_ranker_guard_integration_20260702/validation_summary.md`;
-- small tables under that report dir:
-  - `after_cost_net_spread_by_block.csv`;
-  - `ranker_guard_grade_table.csv`;
-  - optional `p1_candidate_dryrun.csv` (only if sub-goal 4 runs).
+- `runs/p1_hotrank_availableat_and_aftercost_reaudit_20260702/RUN_STATUS.md`;
+- `reports/date_generalization/p1_hotrank_availableat_and_aftercost_reaudit_20260702/validation_summary.md`;
+- track (a) tables: `hotrank_ashare_available_at_policy.csv`,
+  `hotrank_coverage_by_block.csv`, `hotrank_source_semantic_contract.md`;
+- track (c) tables: `after_cost_protocol_reaudit.md`,
+  `after_cost_sensitivity_by_holding_period.csv`;
+- optional product-value artifact: `p1_candidate_dryrun.csv` (guarded ranking on
+  a user-style handful; no future/GT fields).
 
-DONE criteria:
+DONE criteria for this stage (it ends by proposing exactly one next stage, not by
+declaring the project done):
 
 - report branch/HEAD/dirty state and confirm no `local_*.md` edits;
-- after-cost net decile spread reported per block incl. H2026_1 for frozen score
-  and reversal_composite, with an explicit yes/no on whether any decision-time
-  family clears a non-negative H2026_1 net top-decile spread;
-- a deterministic downgrade-guard grade table mapping metrics -> {active_ok,
-  observe_only, suppress} and the corresponding user-facing language rule;
-- proof (leakage audit `PASS`, hits=0) that the guarded score summary passed to
-  the agent contains NO future/GT fields (return_5/10/20d, future_*, gt_status,
-  positive_20d);
-- coverage/exposure reported; any low/zero exposure explicitly called
-  defensive/no-action, never stock-picking skill;
-- a "why not promoted" section: negative after-cost net spread, single-block
-  frozen-score edge, target60/7-family failure, P0 `exposure_cards=0`;
-- a recommendation on relabeling the model card to `observe_only` (proposed, not
-  applied to local_*.md);
-- exactly one proposed next stage (e.g. available-at/lag audit of the
-  `needs_leakage_audit` news/peer families, OR a small decision-support network
-  only after that audit, OR formally closing strict target60), tied back to the
-  long-horizon acceptance target.
+- track (a): the THREE-number separation (raw rows / A-share joinable / match
+  rate) per source per block, an available_at_policy, coverage_by_block, and a
+  source_semantic_contract; an explicit usable / D+1 / CLOSED verdict per source;
+- track (c): a written verdict on whether the 1.5%-every-rebalance protocol is
+  over-strict, a monthly/low-turnover after-cost sensitivity table, and a
+  recommended accepted cost/holding-period convention;
+- at least one product-value or strategy-exploration result logged in
+  `remote_decision.md` (e.g. ranking-prior-in-cost-aware-selection, regime
+  overlay, or the shipped honest assistant), even if after-cost alpha is still
+  absent;
+- leakage PASS (hits=0) for any decision-time output; low/zero exposure explicitly
+  called defensive/no-action;
+- exactly one proposed next bounded stage tied back to the durable 60% win-rate
+  target and after-cost reality.
 
 Resource limits:
 
-- CPU/read-mostly, target 75 minutes, hard stop 120 minutes.
-- Writes allowed only under:
-  - `runs/p1_ranker_guard_integration_20260702/`;
-  - `reports/date_generalization/p1_ranker_guard_integration_20260702/`.
-- The guard-integration sub-goals above are offline (existing caches + local
-  `model.joblib`) and do not require network. Paid APIs ARE provisioned and
-  authorized for this project when a task needs them: tushare (A-share market data)
-  and the ds/DeepSeek LLM, credentials under `/data/cyx/1030/api` — load keys from
-  there or env, never print/commit them, keep cost reasonable. No broker/live
-  trading, no GPU, no long backtests, no large cache rebuilds this task.
+- CPU/read-mostly; this is a long-running parallel stage, so pace it — target one
+  full (a)+(c) pass per session, then continue. No single unbounded loop.
+- Writes allowed under the two dated dirs above and `remote_decision.md`.
+- Paid APIs ARE provisioned and authorized: tushare (A-share market data) and
+  ds/DeepSeek LLM, credentials under `/data/cyx/1030/api` — bounded pulls for the
+  source-boundary audit and product-value reasoning are allowed; load keys only
+  from there or env, never print/commit, keep cost reasonable. No broker/live
+  trading, no GPU, no large cache rebuilds without a dated plan.
 - Do not commit, push, reset, delete, or clean files.
 
 Stop rules:
 
-- stop the current subtask, record a `SOFT_BLOCK` or `ROUTE_PIVOT` in
-  `remote_decision.md`, and continue with another safe sub-goal if a required
-  report/cache is missing or a leakage boundary cannot be bounded;
-- mark hard `BLOCKED` only if every reasonable next route requires changing the
-  user goal, paid/data permission, credential handling, broker/live-trading
-  boundary, destructive operations, or an unapproved large rebuild.
+- soft: stop the current subtask, record a `SOFT_BLOCK` or `ROUTE_PIVOT` in
+  `remote_decision.md`, and continue another safe sub-goal / strategy if a report
+  or cache is missing or a boundary cannot be bounded. after-cost failing is a
+  soft pivot, NEVER a hard block;
+- hard `BLOCKED` only for genuine user-owned decisions: changing the final
+  goal/threshold, new credentials/permissions, destructive operations, or
+  broker/live trading.
 
 ## DONE Criteria For Any Filled Remote Task
 

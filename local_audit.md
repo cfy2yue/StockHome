@@ -1,6 +1,6 @@
 # StockHome Local Audit Notes
 
-Updated: 2026-07-02
+Updated: 2026-07-02 (round 3: hot-rank available-at + after-cost re-audit)
 
 Status: local-authored remote execution evidence map. This document is part of
 the remote execution packet: remote Codex reads it before executing
@@ -12,9 +12,13 @@ recommended back to local CC/Codex for the next update.
 
 ## Remote Status Summary
 
-No new remote `LOCAL_AUDIT_REQUEST` was provided for this documentation pass.
-This pass used current repository docs and source/report indexes only. The
-latest recorded remote-result facts are from `goal.md` and `docs/DECISIONS.md`:
+Round 3 (2026-07-02): a real remote `LOCAL_AUDIT_REQUEST` WAS provided. The
+authoritative round-3 facts (ranker-guard done, broker closed, hk_hold partial,
+hot-rank source-boundary, after-cost as the binding bottleneck) are in the
+"Third-Round Local Audit Update" section below with exact SSH-verified paths. The
+older summary here is retained as historical baseline:
+
+The latest recorded remote-result facts are from `goal.md` and `docs/DECISIONS.md`:
 
 - H2026_1 latest-block P0 revalidation did not confirm the frozen P0.
 - Round-2 Flash confirmation had full card coverage (`ok_cards=24/24`) and
@@ -468,6 +472,148 @@ P1 rank aid, not training more models.
   head of `feature_rank_ic_audit.csv`; `scripts/train_frozen_quant_score_v1.py` head;
   `remote_decision.md`.
 - No experiments, training, GPU, paid API, or writes to the remote were run.
+
+## Third-Round Local Audit Update - 2026-07-02 (hot-rank available-at + after-cost re-audit)
+
+Context: remote provided a real `LOCAL_AUDIT_REQUEST` this round. Local audit did
+read-only SSH verification at HEAD `2a5a2d4` (in sync with local; large dirty
+overnight worktree present, NOT pulled). User decision: run tracks (a) hot-rank
+A-share available-at audit + (c) after-cost protocol re-audit in parallel, and
+local audit must also propose stronger strategies.
+
+### Remote sync/state (verified 2026-07-02, round 3)
+
+- Remote HEAD = `2a5a2d4` = local HEAD. In sync with GitHub tracked tree.
+- Remote dirty worktree is LARGE (overnight autonomous work). Tracked modifications:
+  `README.md`, `docs/HANDOFF.md`/`PROJECT_ENTRY.md`/`PROJECT_REVIEW.md`/`START_HERE.md`/
+  `USER_GUIDE.md`, `goal.md`, `remote_decision.md`, `scripts/build_tushare_cache.py`,
+  `scripts/run_agent_strategy_training_rounds.py`, `scripts/run_full_channel_ablation_round.py`,
+  and ~10 `src/agent_training/*.py` modules + ~12 `tests/test_*.py`.
+- Many NEW untracked scripts this round (all round-3 audit/build/run families):
+  `scripts/audit_broker_recommend_full_month_coverage.py`,
+  `scripts/audit_candidate_family_available_at_lag.py`,
+  `scripts/audit_hk_hold_availability_cadence.py`,
+  `scripts/audit_tushare_specialty_lag_coverage.py`,
+  `scripts/inventory_tushare_specialty_endpoints.py`,
+  `scripts/build_broker_recommend_conservative_join_audit.py`,
+  `scripts/build_hk_hold_d1_join_quality_audit.py`,
+  `scripts/build_hk_hold_nonempty_calendar_join_rerun.py`,
+  `scripts/build_live_tushare_feature_matrix_{plan,preview}.py`,
+  `scripts/build_live_tushare_lag_preflight.py`,
+  `scripts/run_after_close_cost_aware_small_model_scout.py`,
+  `scripts/run_after_close_low_frequency_mutation.py`,
+  `scripts/run_after_close_regime_exclusion_mutation.py`,
+  `scripts/run_after_close_turnover_guard_mutation.py`,
+  `scripts/run_after_close_score_persistence_family.py`, plus many `audit_*`/`build_*`
+  scripts and untracked `models/`, `anthropic_financial_services/`, `4599041`.
+
+### Dirty worktree ownership judgment (round 3)
+
+- The new `audit_*`/`build_*`/`run_after_close_*` scripts + matching `tests/test_*`
+  are ACTIVE SOURCE for live source-boundary audits (broker/hk_hold/hot-rank) and
+  after-close cost/turnover/regime mutations. They should eventually be curated
+  into Git as small source (they are the round-3 experiment machinery). Do NOT
+  discard them; they are the record of the autonomous exploration.
+- `models/`, generated `reports/`/`runs/`, `anthropic_financial_services/`, and
+  `4599041` remain SERVER-LOCAL evidence (git-ignored); their absence in the local
+  clone is not proof they never existed. Register them, do not deep-read.
+- The tracked-file modifications to docs + `goal.md` + `remote_decision.md` +
+  `src/agent_training/*` are remote's own in-flight edits; local audit treats them
+  as evidence of active work, does NOT pull/reset, and keeps `goal.md` (durable)
+  and the three `local_*.md` as the authoritative local-owned surfaces.
+
+### New-source result matrix (exact paths, verified by SSH)
+
+THREE numbers must be audited SEPARATELY and never conflated: raw endpoint rows
+!= A-share joinable rows (after suffix/market filter + universe join) != decision-
+universe match rate. Every source below is reported in those terms.
+
+- P1 ranker-guard integration (DONE) —
+  `reports/date_generalization/p1_ranker_guard_integration_20260702/validation_summary.md`:
+  - frozen_quant_score_v1 H2026_1 RankIC `0.0327`, ICIR `0.4290`, ic_pos `0.6316`,
+    top-vs-pool net turnover `-1.2092`, top-bottom net `-1.7033`, guard `observe_only`.
+  - reversal_composite H2026_1 RankIC `0.0054`, ICIR `0.0545`, ic_pos `0.5263`,
+    top-vs-pool net `-1.8370`, top-bottom net `-2.5959`, guard `suppress`.
+  - ONE non-negative row in the family scan: `quality_momentum_accumulation_v1`
+    H2026 net `+1.2098`, but `not_promoted` (direct target60 `0.4444`, needs
+    available-at/lag audit before feature reuse).
+  - Exposure guard summary: H2026_1 mean exposure scale `0.3404` (25 abstain /
+    12 half / 10 deploy) — research-only, does NOT override the negative after-cost
+    guard. Leakage audit: forbidden future/result fields in sanitized output = 0.
+  - Metric-protocol addendum: historical rows in `after_cost_net_spread_by_block.csv`
+    use the serialized final model per block, while `frozen_quant_score_v1_accuracy.csv`
+    is the authoritative walk-forward protocol (historical_mismatch_count `3`,
+    H2026 `protocol_consistent`). Do NOT cite optimistic serialized-model history as
+    promotion evidence.
+- broker_recommend (CLOSED as direct sparse selector) —
+  `reports/date_generalization/p1_broker_recommend_sparse_label_gate_20260702/` +
+  `remote_decision.md` (2026-07-02 AUTONOMOUS_DECISION):
+  - PRE_H2026: universe 16950, active 547 (rate `0.0323`), active positive `0.4552`
+    vs base `0.4827` (lift `-0.0274`), after-cost spread `-2.2895pp`, gate FALSE.
+  - H2026_1: universe 2455, active 60 (rate `0.0244`), active positive `0.4000` vs
+    base `0.4713`, after-cost spread `-4.0266pp`, diagnostic gate FALSE.
+  - by_block: after-cost spread negative in 6 of 7 blocks (only H2024_1 `+1.44`).
+  - Status `BROKER_RECOMMEND_SPARSE_LABEL_GATE_NOT_PROMOTED`; auxiliary-context
+    feature only. Useful NEGATIVE evidence.
+- hk_hold (NOT a clean close; partially joinable, coverage too holey now) —
+  `reports/date_generalization/p1_hk_hold_d1_join_quality_audit_20260702/`:
+  - source_rows `41326` -> feature_rows `11312` -> mean overall match rate `0.3916`;
+    min_block_match_rate `0.0`; contains_labels `False`; modeling_allowed_now `False`.
+  - cadence probe (`p1_hk_hold_availability_cadence_20260702`): probe_dates 15,
+    nonempty 13, sparse_blocks `['H2024_2','H2025_2']`. Zero coverage was snapshot
+    cadence, not pure code mapping. Still not modelable yet.
+- hot-rank ths_hot / dc_hot (source-boundary only; the target of track (a)) —
+  `reports/date_generalization/p1_tushare_specialty_lag_coverage_20260702/`
+  (`specialty_lag_coverage_by_endpoint.csv`):
+  - `ths_hot`: has_stock_identifier True, `has_rank_time=True`, nonempty blocks
+    H2024_1/H2024_2/H2025_1/H2025_2 (4), `coverage_ok_for_next_cache_design=False`,
+    decision `insufficient_sample_coverage_for_next_cache_design`.
+  - `dc_hot`: has_stock_identifier True, `has_rank_time=True`, nonempty blocks
+    H2024_2/H2025_1/H2025_2 (3), `coverage_ok=False`, same insufficient-coverage
+    decision.
+  - Both mix A-share / HK / US / concept-board rows -> a market/`data_type`/
+    `ts_code`-suffix filter + rank_time/D+1 audit is required before any label use.
+    No dedicated ths_hot/dc_hot report dir yet — track (a) is exactly that audit.
+- moneyflow_hsgt — same by_endpoint CSV: `has_stock_identifier=False` ->
+  `regime_context_only_not_stock_selector`. Not a cross-sectional selector; usable
+  as a REGIME/TIMING overlay signal (supports the regime-gating strategy).
+- broker_recommend / hk_hold in that probe: `has_rank_time=False` -> need an
+  explicit release-time policy before modeling.
+
+### COMMON FAILURE MODE (the real bottleneck this round)
+
+After-cost net spread is the FIRST bottleneck and it is negative across the frozen
+score, the reversal baseline, the broker sparse selector, and most blocks. Every
+newly explored source / small model / sparse selector goes negative once the 1.5%
+round-trip cost is subtracted. Gross-only comfort is misleading. This is why the
+user asked to re-audit the after-cost protocol (track c): confirm whether the cost
+convention is fair or artificially pinning strategies dead, and whether a lower-
+turnover / monthly-rebalance / netting convention flips any block non-negative.
+
+### Remote's Coordination Note to local CC (must be acted on)
+
+The ranker-guard `validation_summary.md` contains an explicit note: remote will not
+mechanically follow the three local docs when new evidence shows a route conflict;
+it owns independent decision space, logs divergences in `remote_decision.md`, and
+asks local CC for "concise systemic feedback when near-end audit patterns repeatedly
+miss exposure, after-cost, availability/lag, or promotion-boundary issues." Local
+audit ACCEPTS this: this round the packet foregrounds (1) the three-number
+availability separation, (2) after-cost as the binding gate, (3) explicit
+promotion-boundary language, and (4) anti-stop / initiative principles so remote is
+never nudged to stop on a negative after-cost result.
+
+### Local/remote checks run this round
+
+- Read locally: `goal.md`, all three `local_*.md` (pre-round-3 versions).
+- SSH read-only on `/data/cyx/1030/stock`: HEAD/status (large dirty worktree);
+  `remote_decision.md` tail (broker close decision); ranker-guard
+  `validation_summary.md` + `RUN_STATUS.md`; broker gate `summary_gates.csv` +
+  `by_block.csv`; hk_hold `p1_hk_hold_d1_join_quality_audit_20260702/validation_summary.md`
+  + `p1_hk_hold_availability_cadence_20260702/validation_summary.md`; specialty
+  `p1_tushare_specialty_lag_coverage_20260702/validation_summary.md` +
+  `specialty_lag_coverage_by_endpoint.csv`; script/report inventory greps.
+- No experiments, training, GPU, paid API, or writes to the remote were run. Some
+  deep report bodies (full CSVs) were only head/tail-sampled — flagged below.
 
 ## Open Questions For Next Local Audit
 
