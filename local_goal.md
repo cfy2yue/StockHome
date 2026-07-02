@@ -1,6 +1,6 @@
 # StockHome Remote Execution Packet
 
-Updated: 2026-07-03 (round 6: stk_holdertrade preregistration + tiny scout on the PASS source-aggregate matrix; gross-edge meta-finding elevated)
+Updated: 2026-07-03 (round 7: STRATEGIC PIVOT to new signal classes — event-driven PEAD first; cross-sectional price/volume factor-source family CLOSED for new additions; methodology discipline unchanged)
 
 RESEARCH NATURE (binding): StockHome is a quant-finance METHODOLOGY RESEARCH
 project. The research question is whether certain public-market signals carry
@@ -313,6 +313,174 @@ Remote may read archived files under
 not as active instructions.
 
 ## Exact Next Task
+
+Date: 2026-07-03 (round 7) — CONTINUE the running StockHome session with this route.
+
+Task ID: `p1_round7_event_signal_pivot_pead_availability_audit_20260703`.
+
+### Round-7 STRATEGIC PIVOT (user decision, binding)
+
+The user has decided: the exhausted routes are all the SAME FLAVOR of
+cross-sectional price/volume/chip/factor sources (reversal, value/PB, margin,
+CYQ, index_weight, industry, pledge, hot-rank, broker_recommend,
+stk_holdertrade, ...). Their common wall — confirmed by M1/M2 as a genuine
+result, not a cost/unit/mask artifact — is that the GROSS edge itself is weak
+or negative. Therefore:
+
+1. NO NEW same-flavor cross-sectional price/volume/chip/factor sources may be
+   added as scout candidates. The closed-route list is generalized to the whole
+   family flavor. (Finishing the already-preregistration-approved
+   `stk_holdertrade` scout per round-6 spec is allowed as closure work — it is
+   itself an ann_date event source and its clean positive/negative verdict is
+   wanted either way.)
+2. The project pivots to NEW SIGNAL CLASSES with genuinely different
+   information content, starting with EVENT-DRIVEN signals (PEAD /
+   earnings-surprise drift) — ranked and justified in `local_audit.md`
+   round 7 and `local_suggestion.md` "Round-7 New-Signal-Class Portfolio".
+3. Methodology discipline is UNCHANGED and non-negotiable: PIT available-at
+   audit first, no-label-first (no scout before a PASS availability/coverage
+   audit + preregistration), BH-FDR multiple-testing control, after-cost claim
+   gate @1.5pp round-trip, H2026 diagnostic-only, promotion ONLY via Track-F
+   pre-registered single-use forward window, negative results first-class.
+4. The gross-edge meta-finding stays a binding claim boundary and is every new
+   scout's prior.
+
+### Round-7 state baseline (SSH-verified 2026-07-03 at remote HEAD `3131411`)
+
+- Round-6 route (`p1_round6_stk_holdertrade_prereg_tiny_scout_20260703`) was
+  issued; if the remote has not yet completed it, FINISH IT FIRST exactly as
+  specified in the superseded round-6 section below (prereg -> in_de taxonomy
+  audit -> tiny scout -> admission -> close-or-Track-S-candidate). It is
+  bounded and cheap; its verdict feeds the event-class portfolio.
+- Data-availability facts verified by local read-only SSH (2026-07-03):
+  - `data/date_generalization_cache/tushare_pro/tables/` holds 21 cached
+    endpoint dirs incl. `forecast`, `express`, `anns_d`.
+  - `forecast` fields confirmed: `ts_code, ann_date, end_date, type,
+    p_change_min, p_change_max, net_profit_min, net_profit_max,
+    last_parent_net, first_ann_date, summary, change_reason, update_flag` —
+    a native `ann_date` PIT anchor AND a self-contained surprise definition
+    (forecast midpoint vs `last_parent_net`) that needs NO analyst consensus.
+  - `express` fields confirmed: `ann_date` + yoy fundamentals
+    (`yoy_net_profit`, `diluted_eps`, `yoy_sales`, ...) — same anchor.
+  - CAVEAT: the local forecast/express caches are THIN (a 200-code probe;
+    sampled per-code CSVs are header-only; the round-5 live probe observed
+    0 rows in its window). A bounded ann_date-window backfill is required
+    and is authorized below.
+  - `anns_d` (announcement list) is ALREADY CACHED LARGE: 737 daily files,
+    2023-01-01 -> 2026-01-09, ~420MB, fields `ann_date, ts_code, name,
+    title, url` — raw material for a title-level event taxonomy and a later
+    LLM extraction pipeline (ds/DeepSeek authorized).
+  - Analyst-revision endpoints (`report_rc` or similar) appear in NO
+    inventory and NO script — availability UNVERIFIED (possible credit-tier
+    gate); needs a single bounded probe.
+  - `/data/cyx/1030/api` confirmed to hold `tushare_token.txt`, `ds_api.txt`
+    (keys never printed/committed).
+
+### Round-7 route (event-signal pivot: PEAD availability audit + two bounded probes)
+
+A negative result is NEVER `BLOCKED`; log and continue. CPU/offline preferred;
+bounded tushare pulls authorized as scoped below; keys from
+`/data/cyx/1030/api`, never printed/committed; research findings only.
+
+0. FINISH ROUND-6 stk_holdertrade first if not already done (see superseded
+   spec below). Record its admission verdict in the registry either way.
+1. PEAD no-label available-at/coverage audit (the ranked #1 new class; SAME
+   rigorous pipeline shape as stk_holdertrade: available-at -> no-label
+   contract -> matrix preview -> audit -> prereg -> tiny pre-H2026 scout ->
+   admission; NO label join and NO scout inside this round):
+   a. Bounded backfill of `forecast` + `express` by ann_date windows covering
+      2023-01 -> 2026-06 (full A-share market; these are small event tables —
+      expected tens of thousands of rows total; no unbounded loops; cache
+      under the existing tushare_pro cache convention).
+   b. Available-at policy audit: `ann_date` is the ONLY anchor; audit
+      `first_ann_date` vs `ann_date` semantics and `update_flag` (revisions
+      must use their OWN later ann_date, never the first announcement's);
+      after-close disclosure -> D+1 anchoring per the standing 15:00 rule;
+      `end_date` is report-period, NEVER availability.
+   c. Type taxonomy value audit (the in_de lesson): audit raw `type` values
+      (预增/预减/扭亏/续盈/略增/略减/首亏/续亏...) on a small sample BEFORE
+      trusting any direction feature; record the mapping.
+   d. Three-number separation per block (raw event rows / A-share joinable
+      rows / decision-universe match rate), event counts + unique codes per
+      block, >= 5 pre-H2026 nonempty blocks required.
+   e. No-label feature contract + matrix preview + audit: candidate features
+      are event-anchored `_d1` aggregates, e.g. surprise magnitude
+      (net_profit midpoint vs last_parent_net), p_change midpoint, type
+      direction class, express yoy deltas, days-since-event; text fields
+      (`summary`, `change_reason`, `perf_summary`) are EXCLUDED from features
+      in this round (they belong to the later LLM route).
+2. Parallel bounded probe (2a) anns_d title taxonomy (no-label, no-model):
+   sample the cached daily files (e.g. 2 days/month across the range), build a
+   keyword/rule first-pass event-type frequency table (解禁/回购/增持减持/中标
+   合同/重组并购/问询函/诉讼/股权激励/业绩类...) with per-block coverage;
+   OPTIONALLY spot-check <= 500 titles with ds/DeepSeek classification
+   (temperature 0, prompt text archived in the report, output = category
+   only, bounded cost) to measure rule-vs-LLM agreement. Output = a taxonomy
+   + frequency + coverage report that decides whether the LLM event-extraction
+   pipeline (ranked #2) is chartered next round. No label joins.
+3. Parallel bounded probe (2b) analyst-revision availability: ONE bounded
+   probe of the analyst endpoints (`report_rc` or the current tushare
+   equivalent) — does the token tier return rows? Fields? An
+   ann-date/report-date availability proxy? Verdict: `available ->
+   queue_for_availability_audit` or `closed_credit_tier` /
+   `closed_no_timestamp`. No backfill this round.
+4. Event-study evaluation-framework spec (document only, no big refactor):
+   write `event_study_framework_spec.md` defining event-aligned CAR(0,20)
+   vs a matched benchmark (pool mean and/or size-matched), event-clustered
+   standard errors, overlap handling, and how the existing selected-vs-pool
+   admission gates map onto sparse event signals (the broker_recommend lesson:
+   sparse events are DILUTED in daily cross-sectional ranking; event-aligned
+   measurement is the native metric, and BOTH views must be reported at
+   admission). This spec becomes part of the PEAD scout preregistration next
+   round.
+5. Close: choose exactly ONE next route and log it — expected default:
+   (a) PEAD audit PASS -> next round = PEAD scout preregistration + tiny
+   pre-H2026 scout under the event-study spec; (b) PEAD audit FAIL -> close
+   it, queue the next event source (share_float 解禁 / dividend / 
+   stk_holdernumber / block_trade from the existing admission queue) for its
+   availability audit; (c) taxonomy probe strong + PEAD weak -> charter the
+   LLM title-extraction pipeline audit instead. M5 standardized action-card
+   output stays ALWAYS-ON.
+
+Gates (pass/fail for THIS round's audits; claim bars, not stop conditions):
+
+- PEAD availability audit PASS = ann_date policy proven (incl. update_flag /
+  first_ann_date semantics + D+1 anchor) AND >= 5 pre-H2026 nonempty blocks
+  AND decision-universe match rate >= 0.5 AND type taxonomy audited AND
+  no-label matrix audit failed-checks = []. Only then is a preregistered tiny
+  scout allowed NEXT round.
+- Probe verdicts are recorded either way; a closed probe is a result.
+- NO label join, NO model, NO H2026/forward read anywhere in this round;
+  Track-F stays 0.
+
+Resource limits (this round): same envelope as round 6, plus (i) bounded
+tushare backfill of forecast/express by ann_date window (event tables only;
+no minute/tick data; no unbounded loops), (ii) ds/DeepSeek <= 500 title
+classifications at temperature 0 with archived prompt and bounded cost,
+(iii) ONE analyst-endpoint probe call family. No GPU, no model training,
+no new cross-sectional factor sources.
+
+Expected outputs:
+
+- `runs/p1_round7_event_signal_pivot_20260703/RUN_STATUS.md`;
+- `reports/date_generalization/p1_pead_forecast_express_availability_audit_20260703/`
+  (available_at_policy, type taxonomy audit, three-number coverage tables,
+  no-label feature contract + matrix preview + audit);
+- `reports/date_generalization/p1_anns_d_title_taxonomy_probe_20260703/`
+  (taxonomy, frequency/coverage tables, optional ds agreement spot-check,
+  archived prompt);
+- `reports/date_generalization/p1_analyst_endpoint_availability_probe_20260703/`;
+- `reports/date_generalization/event_study_framework_spec_20260703.md`;
+- registry + `remote_decision.md` appended (pivot acknowledgment, round-6
+  closure verdict, probe verdicts, ONE chosen next route).
+
+DONE: round-6 stk_holdertrade verdict recorded; PEAD availability audit
+complete with explicit PASS/FAIL against the gates above; both probes
+verdicted; event-study spec written; exactly ONE next route chosen and
+logged; leakage PASS; Track-F 0; forward unread; H2026 untouched; no label
+joins anywhere.
+
+## Superseded Round-6 Task (finish first if incomplete; otherwise evidence only)
 
 Date: 2026-07-03 (round 6) — CONTINUE the running StockHome session with this route.
 

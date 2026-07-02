@@ -1,6 +1,6 @@
 # StockHome Local Suggestions For Next Remote Round
 
-Updated: 2026-07-03 (round 6: stk_holdertrade prereg + tiny scout focus; no new models; negative-methods consolidation as the fallback)
+Updated: 2026-07-03 (round 7: strategic pivot to new signal classes — event-driven PEAD first, LLM title-taxonomy probe second; cross-sectional factor-source flavor closed for new additions; methodology discipline unchanged)
 
 Status: local-authored remote execution guidance. This file is part of the
 remote execution packet: remote Codex reads it with `local_goal.md` and
@@ -15,7 +15,96 @@ file and pushes it.
 It becomes executable only through the filled `Exact Next Task` in
 `local_goal.md`.
 
-## Round-6 Focus (GOVERNING this round; narrower than everything below)
+## Round-7 New-Signal-Class Portfolio (GOVERNING this round)
+
+USER STRATEGIC DECISION (binding): stop adding same-flavor cross-sectional
+price/volume/chip/factor sources — their shared wall (gross edge weak or
+negative, confirmed genuine by M1/M2) makes one-more-source swaps near-zero
+EV. Pivot to signal classes with genuinely different information content.
+UNCHANGED discipline (non-negotiable, applies to every class below): PIT
+available-at audit FIRST, no-label-first (no scout before availability audit
+PASS + preregistration), BH-FDR multiple-testing control, after-cost claim
+gate @1.5pp round-trip, H2026 diagnostic-only, promotion ONLY via the Track-F
+pre-registered single-use forward window, negative results first-class, gross-
+edge meta-finding is every scout's prior.
+
+Portfolio ranking (evaluation table + SSH availability evidence in
+`local_audit.md` round 7):
+
+1. EVENT-DRIVEN PEAD (`forecast` 业绩预告 + `express` 业绩快报) — START NOW.
+   - Why #1: strongest literature + mechanism (mandatory-disclosure earnings
+     surprise -> multi-week underreaction drift), native `ann_date` PIT
+     anchor, sparse events -> low turnover (one round trip per event, fits
+     the 1.5pp gate), self-contained surprise definition (forecast midpoint
+     vs `last_parent_net` — no consensus data needed), lowest incremental
+     effort (reuses the stk_holdertrade audit pipeline shape end-to-end).
+   - Round-7 deliverable: no-label availability/coverage audit ONLY (see
+     `local_goal.md` Exact Next Task). PASS gate: ann_date policy proven
+     (incl. `update_flag`/`first_ann_date` revision semantics + D+1
+     after-close anchor) AND >= 5 nonempty pre-H2026 blocks AND
+     decision-universe match >= 0.5 AND `type` taxonomy value-audited AND
+     matrix audit failed-checks = []. FAIL -> close, queue next event source.
+   - Scout (NEXT round, only after PASS + preregistration): tiny pre-H2026
+     event-aligned scout; admission = selected-vs-pool win-rate lift AND
+     event-CAR(0,20) vs benchmark with event-clustered errors AND after-cost
+     net @1.5pp non-negative AND Track-S significance (NW t, BH-FDR).
+2. LLM-EXTRACTED STRUCTURED EVENTS (`anns_d` titles + ds/DeepSeek) — PROBE NOW,
+   CHARTER CONDITIONALLY.
+   - Why #2: genuinely new information class AND an architecture-level
+     addition (LLM-in-the-loop extraction pipeline); raw material already
+     cached (737 daily files 2023-01→2026-01, title-level).
+   - Round-7 deliverable: title taxonomy probe (rules first; <= 500-title ds
+     spot-check at temperature 0, archived prompt, bounded cost; no label
+     joins). Charter gate for the full pipeline: >= 2 event types with
+     per-block frequency high enough for a scout AND rule-vs-LLM agreement
+     reasonable AND a written no-future-knowledge task design.
+   - Pipeline discipline if chartered: temp 0, prompt frozen + hashed before
+     any label work, outputs cached to disk, cost budget declared, input =
+     title + date only.
+3. ANALYST EXPECTATION REVISIONS — ONE bounded availability probe only
+   (`report_rc`-family; unverified, possible credit-tier gate). Verdict
+   `available -> queue` or `closed`, nothing else this round.
+4. OTHER DISCLOSURE EVENTS (解禁 share_float, dividend, 股权激励, 并购;
+   queued stk_holdernumber / block_trade) — BACKLOG behind the same
+   event-study framework; each gets the same audit-first treatment when its
+   turn comes. share_float is especially PIT-clean (schedules known in
+   advance).
+5. NORTHBOUND `hk_hold` stock-level flow — PARKED (audited: min-block match
+   0.0, sparse blocks). Reopen only with a cadence backfill plan that fixes
+   block coverage.
+6. MICROSTRUCTURE/INTRADAY — NOT NOW: horizon/cost-frame mismatch (short-
+   lived signals vs 20d @1.5pp claim gate) + unverified minute-data access.
+   Revisit only with an explicit holding-period-framework change proposal.
+
+Architecture changes recommended with the pivot:
+
+- EVENT-STUDY EVALUATION FRAME: event-aligned CAR(0,20) vs matched benchmark,
+  event-clustered standard errors, overlap handling — reported ALONGSIDE the
+  existing selected-vs-pool view at every event-source admission (sparse
+  events are diluted in daily cross-sections; measure them natively). Round-7
+  writes the spec; implementation lands with the PEAD scout prereg.
+- Holding-period (5/10/20d event windows) is a research dimension; the claim
+  gate stays 20d after-cost @1.5pp.
+- M5 standardized action cards stay ALWAYS-ON; event evidence enters cards as
+  honest context with its own verdict, like every other family.
+
+Decision tree (round 7):
+
+- PEAD audit PASS -> next round = PEAD scout preregistration (event-study
+  spec + verbatim gates) + tiny pre-H2026 scout; H2026/forward untouched.
+- PEAD audit FAIL -> close it (mirror index_weight closure shape), start the
+  availability audit of the next event source in the backlog (share_float
+  first), continue — never `BLOCKED`.
+- Taxonomy probe strong + PEAD weak -> charter the LLM title-extraction
+  pipeline audit as the next route instead.
+- Analyst probe available -> queue behind PEAD; closed -> record and move on.
+- ANY scout positive, ever -> Track-S registry candidate only; promotion
+  still requires Track-F forward preregistration; no claim from pre-H2026 or
+  H2026 alone.
+- Round-6 stk_holdertrade (if still open) finishes FIRST under its own spec;
+  its verdict is recorded either way and does not gate the pivot.
+
+## Round-6 Focus (superseded by Round-7 above; finish stk_holdertrade closure under this spec if still open)
 
 Short-term focus is ONE route: `stk_holdertrade` tiny pre-H2026 scout
 PREREGISTRATION first, then the scout, then admission — on the ALREADY-PASS

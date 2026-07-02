@@ -1,6 +1,6 @@
 # StockHome Local Audit Notes
 
-Updated: 2026-07-03 (round 6: round-5 M1-M5 verified DONE; stk_holdertrade aggregate matrix PASS; index_weight/pledge_stat closures confirmed; gross-edge meta-finding elevated)
+Updated: 2026-07-03 (round 7: strategic pivot to new signal classes; event-driven PEAD ranked #1; data-availability SSH verification of forecast/express/anns_d; cross-sectional factor-source flavor closed for new additions)
 
 Status: local-authored remote execution evidence map. This document is part of
 the remote execution packet: remote Codex reads it before executing
@@ -940,7 +940,141 @@ Verified directly from artifact columns, not narrative:
   `remote_decision.md` tail; REVIEW_OR_EMPTY residue grep (zero hits).
 - No experiments, training, GPU, paid API, writes to remote, or git operations.
 
+## Seventh-Round Local Audit Update - 2026-07-03 (strategic pivot to new signal classes)
+
+Context: the USER made the strategic decision this round (binding). Rationale
+accepted by local audit: every exhausted route belongs to the SAME FLAVOR of
+cross-sectional price/volume/chip/factor sources (reversal, value/PB,
+margin/CYQ, index_weight, industry residual, pledge, hot-rank,
+broker_recommend, stk_holdertrade, target60 families, after-close mutations).
+Their common wall is now a hardened result, not a suspicion: the GROSS edge is
+weak or negative (M1 confirmed no unit artifact; M2 confirmed no mask-veto
+artifact; the protocol audit confirmed cost is not the binding constraint on
+H2026 because gross is already negative). Continuing to swap in one more
+same-flavor source has near-zero expected value. The pivot is to signal
+classes with genuinely DIFFERENT information content. The methodology
+discipline (PIT available-at, no-label-first, BH-FDR, after-cost @1.5pp,
+H2026 diagnostic-only, Track-F-only promotion, negatives first-class) is
+explicitly UNCHANGED — that discipline is the project's core deliverable.
+
+### Why event-driven is the right first family (mechanism argument)
+
+The failed sources are all DENSE daily cross-sectional states (every stock has
+a value every day); in a crowded, high-cost, weakly-trending A-share regime
+their cross-sectional ordering carries little forward information. Event
+signals are SPARSE and information-dense: a disclosure changes the firm's
+value distribution at a known timestamp, and the documented A-share anomaly is
+post-event DRIFT over weeks — mechanically matched to the project's 20d
+horizon and to a low-turnover (one round trip per event) cost profile. They
+also have native PIT anchors (`ann_date`), which the whole audit pipeline is
+already built around (stk_holdertrade proved the pipeline shape end-to-end).
+One honest counterpoint is carried as the prior: stk_holdertrade,
+broker_recommend, repurchase, index_weight are ALSO event-ish sources and have
+not shown edge — but none of them is an EARNINGS-INFORMATION event, and none
+was measured in an event-aligned frame (sparse signals were diluted into daily
+cross-sections; the broker_recommend lesson). PEAD is the strongest-literature,
+strongest-mechanism member of the family and the correct first test, evaluated
+BOTH event-aligned and selected-vs-pool.
+
+### Candidate new-signal-class evaluation table (round-7 ranking)
+
+| rank | class | mechanism (why it might survive 20d after-cost) | PIT anchor / data source | cost/capacity sensitivity | effort | availability verdict (SSH-verified) |
+|---|---|---|---|---|---|---|
+| 1 | Event-driven PEAD: 业绩预告 `forecast` + 业绩快报 `express` | mandatory-disclosure earnings surprise -> underreaction drift over 20-60d; sparse events -> low turnover (one round trip per event); self-contained surprise (forecast midpoint vs `last_parent_net`), no consensus needed | `ann_date` (+ `first_ann_date`/`update_flag` semantics audit); D+1 after-close rule | LOW sensitivity: 20d hold, one entry/exit per event | LOW-MED: reuses the exact stk_holdertrade pipeline shape | CONFIRMED: endpoints cached + fields verified; local cache THIN (200-code probe, header-only samples) -> bounded ann_date-window backfill required |
+| 2 | LLM-extracted structured events/sentiment from announcements (`anns_d` titles first, ds/DeepSeek) | genuinely NEW information class; title-level taxonomy (解禁/回购/增持/中标/重组/问询函/诉讼/激励...) + direction; event-sparse -> low turnover | `ann_date` per announcement; D+1 rule | LOW-MED (event-sparse) | MED-HIGH: new architecture component (LLM-in-the-loop pipeline: temp-0, prompt freeze/hash, output cache, cost budget, no-future-knowledge task design) | CONFIRMED raw material: 737 daily files 2023-01-01→2026-01-09, ~420MB, `ann_date, ts_code, name, title, url`; ds key present at `/data/cyx/1030/api/ds_api.txt` |
+| 3 | Analyst expectation revisions (EPS/rating/target-price breadth+magnitude) | forward-looking information; revision drift is a strong literature effect | report/rating date fields (must audit); tushare `report_rc`-family | LOW-MED | MED | UNVERIFIED: appears in NO inventory/script; possible credit-tier gate -> needs ONE bounded probe before any planning |
+| 4 | Other disclosure events: 解禁 `share_float`, 分红 `dividend`, 股权激励, 并购重组; plus queued `stk_holdernumber`, `block_trade` | clear mechanisms (supply shock at unlock; payout signaling); share_float dates are known IN ADVANCE (excellent PIT) | ann_date / pre-published schedules | LOW | LOW-MED each, SHARED event-study framework | share_float/dividend NOT yet probed (standard endpoints, likely fine); stk_holdernumber/block_trade already in the round-5 admission queue with available-at proxies |
+| 5 | Northbound HSGT stock-level flow (`hk_hold`), fund/institution quarterly holdings | smart-money flow, daily disclosure | disclosure date (D+1) | MED | MED | already audited: mean match 0.3916 but min-block 0.0, sparse blocks -> `modeling_allowed_now=False`; PARKED unless a cadence backfill fixes coverage |
+| 6 | Microstructure/intraday (auction imbalance, overnight-vs-intraday, VWAP deviation) | real effects exist but horizon-mismatched: short-lived signals vs 20d after-cost@1.5pp claim frame; capacity/cost most sensitive | needs minute/tick: tushare minute = credit-gated (unverified); mootdx/pytdx depth/PIT-snapshot integrity unproven | HIGH (worst fit to the cost gate) | HIGH | NOT RECOMMENDED now: framework mismatch; revisit only with an explicit holding-period-framework change |
+
+Recommendation: start classes 1 and 2 — PEAD as the full audit-first route,
+anns_d title taxonomy as a cheap parallel probe that decides whether the LLM
+pipeline gets chartered. Class 3 gets a one-call availability probe only.
+Class 4 is the natural backlog behind the SAME event-study framework. 5
+parked, 6 explicitly not now.
+
+### Data-availability SSH verification (read-only, bounded, 2026-07-03)
+
+Commands were `ls`/`head`/`wc`/`grep` only; no big cats, no writes, no keys read.
+
+- `/data/cyx/1030/api`: `tushare_token.txt`, `ds_api.txt`, `github_token.txt`
+  present (names only; contents never read).
+- `data/date_generalization_cache/tushare_pro/tables/`: 21 cached endpoint
+  dirs: adj_factor, anns_d, balancesheet, cashflow, cyq_perf, daily,
+  daily_basic, express, fina_audit, fina_indicator, forecast, income,
+  margin_detail, moneyflow, namechange, stk_limit, stock_basic, suspend_d,
+  trade_cal (+ 2 anns_d probe dirs).
+- `forecast` header verified: `ts_code, ann_date, end_date, type,
+  p_change_min, p_change_max, net_profit_min, net_profit_max,
+  last_parent_net, first_ann_date, summary, change_reason, update_flag`.
+  Cache breadth: 200 per-code files; sampled file is header-only ->
+  cache is a thin probe, NOT a usable event history -> backfill needed.
+- `express` header verified: `ann_date` + yoy fundamentals + `perf_summary`.
+  Cache 812K, same thinness caveat.
+- `anns_d`: 737 daily files spanning 20230101 -> 20260109, ~420MB total,
+  fields `ann_date, ts_code, name, title, url`. Large enough for the title
+  taxonomy probe WITHOUT new pulls (coverage ends 2026-01-09; extension is a
+  bounded pull if ever needed).
+- Round-5 live endpoint inventory
+  (`p1_live_tushare_endpoint_inventory_round5_20260702/tushare_endpoint_inventory.csv`)
+  already classifies `forecast` = `financial_forecast_event`, availability
+  policy "ann_date is available_at proxy; text fields require sanitization",
+  and `express` = `financial_express_event` likewise — the remote's own
+  inventory agrees with the local PIT reading.
+- `p1_next_independent_tushare_source_inventory_20260702`: admission queue
+  already holds `stk_holdernumber, top10_holders, top10_floatholders,
+  pledge_stat, repurchase, block_trade, limit_list_d, index_weight` with
+  8/10 endpoints having available-at proxies — the event-family backlog can
+  draw from this queue without new inventory work.
+- Analyst endpoints (`report_rc` etc.): zero hits in inventories and scripts
+  (one incidental script name match only) -> genuinely unprobed.
+
+### Architecture/strategy findings (recommended, written into the packet)
+
+1. EVENT-STUDY EVALUATION FRAME (new): sparse event signals must be measured
+   event-aligned — CAR(0,20) vs matched benchmark, event-clustered standard
+   errors, overlap handling — IN ADDITION to the existing selected-vs-pool
+   admission view. Rationale: diluting sparse events into daily cross-sections
+   is exactly how broker_recommend-style sources go blurry. Round-7 only
+   writes the spec; implementation lands with the PEAD scout preregistration.
+2. LLM-IN-THE-LOOP EXTRACTION PIPELINE (chartered conditionally): title-first
+   (cheap, cached), full-text later only if titles carry signal; temperature 0,
+   archived/hashed prompts, cached outputs, cost budgets, and a task design
+   that cannot leak future knowledge (input = title + date only; output =
+   category/direction). This is an architecture-level addition, not a factor
+   swap.
+3. HOLDING-PERIOD as a research dimension (5/10/20d event windows) is
+   research information; the CLAIM gate stays 20d after-cost @1.5pp.
+4. Regime overlay stays available as documented (moneyflow_hsgt =
+   regime_context_only) but is NOT part of the round-7 critical path.
+
+### Round-7 checks run
+
+- Local Read: three `local_*.md` (round-6 versions, full).
+- Read-only SSH (bounded ls/head/wc/grep): api dir listing; tushare_pro
+  tables listing; forecast/express/anns_d headers + sizes + date range;
+  round-5 endpoint inventory head; next-independent-source inventory
+  validation_summary head + admission queue; specialty endpoint inventory
+  head; grep for report_rc/share_float/dividend/hsgt_top10/stk_min across
+  scripts and inventory CSVs.
+- No experiments, no training, no paid API calls, no writes to remote, no git.
+
 ## Open Questions For Next Local Audit
+
+- Round-6 stk_holdertrade: what was the admission verdict (clean negative
+  closure like index_weight, or a Track-S candidate)? Was the in_de taxonomy
+  audit done inside the prereg?
+- PEAD: does the forecast/express backfill confirm >= 5 nonempty pre-H2026
+  blocks and decision-universe match >= 0.5? What does the `type` taxonomy
+  audit show (预增/预减/扭亏/... mapping)? How are revision announcements
+  (`update_flag`, `first_ann_date`) distributed — do revisions materially
+  shift available-at timing?
+- anns_d taxonomy probe: which event types are frequent enough per block to
+  support a later scout; and does rule-vs-LLM classification agree enough to
+  justify the LLM pipeline charter?
+- Analyst endpoint probe: available at the current token tier or closed?
+
+## Prior Open Questions (carried from round 6)
 
 - Track S registry: after BH-FDR q=0.10 across all routes ever scored on
   H2026_1, does ANY row survive? (Expect no — a publishable negative.)
