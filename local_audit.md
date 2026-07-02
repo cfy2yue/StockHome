@@ -1,6 +1,6 @@
 # StockHome Local Audit Notes
 
-Updated: 2026-07-02 (round 4: answer to after-cost route exhaustion + methodology deep audit)
+Updated: 2026-07-03 (round 6: round-5 M1-M5 verified DONE; stk_holdertrade aggregate matrix PASS; index_weight/pledge_stat closures confirmed; gross-edge meta-finding elevated)
 
 Status: local-authored remote execution evidence map. This document is part of
 the remote execution packet: remote Codex reads it before executing
@@ -796,6 +796,149 @@ lens for assisting the user (failed selectors become context / counter-evidence 
 flags, not buy triggers). This is round-5 M5 / Track-P (always-on); the exact card template +
 threshold table + evidence->stance judgment rule are in `local_suggestion.md` "Round-5
 Product Output Spec". Safety unchanged: guard-gated stance, no future/GT, no return promise.
+
+## Sixth-Round Local Audit Update - 2026-07-03 (round-5 verification + stk_holdertrade admission)
+
+Context: remote executed Round-5 (measurement foundation + material PIT-safe
+source pipeline + M5 action card) and issued a `LOCAL_AUDIT_REQUEST`. Local
+audit did bounded read-only SSH verification (head/grep only, no big cats) at
+remote HEAD `3131411` (local HEAD `46bdc77`; remote has large uncommitted
+round-5 machinery — registered, NOT pulled/reset).
+
+### M1/M2 verification (the round-5 measurement-foundation question) — RESOLVED
+
+- M1 (canonical metric/cost units) DONE:
+  `reports/date_generalization/p1_round5_measurement_foundation_20260702/`
+  contains `canonical_metric_cost_spec.md` + `registry_recomputed_canonical_
+  units.csv` (86 rows). Remote verdict, ACCEPTED: the round-4 pre `-0.073` vs
+  H2026 `-2.90` scale gap is NOT a unit-conversion bug — both are pp under the
+  canonical convention (returns/spreads pp; turnover unitless; cost =
+  `turnover * 1.5pp`). Local round-5 hypothesis "40x gap = fraction-vs-pp bug"
+  is therefore WITHDRAWN; the gap is a real magnitude difference between
+  protocols, now documented in one spec.
+- M2 (mask-v2 semantics) DONE: `mask_v2_semantics_decomposition.csv` +
+  `mask_corrected_candidate_deltas.csv`; 2 best pre-H2026 candidates re-run
+  using ONLY hard execution exclusion; `revived_candidate = False`. The
+  claim-caveat-vs-alpha-veto concern is answered: removing the caveat-driven
+  veto does NOT revive any candidate. Negatives are genuine.
+- M3 boundary lock intact: `h2026_forward_boundary_lock.json`, H2026
+  diagnostic-only/semi-contaminated, `forward window read: false`.
+- M4 `negative_methods_findings.md` written; `next_route_decision.md` chose
+  `negative_methods_plus_track_p_product_value`.
+- M5 implemented in `src/agent_training/decision_card.py` +
+  `action_card_example.md/.json`.
+- CONSEQUENCE (binding): with M1+M2 closed, the remote's meta-finding stands
+  on hardened ground — repeated route failure is GROSS-EDGE failure, not a
+  cost/unit/mask measurement artifact. This is elevated to a standing claim
+  boundary in `local_goal.md` round-6.
+
+### Round-5 source pipeline verdicts (all SSH-verified paths)
+
+- `index_weight` CLOSED negative scout — CONFIRMED.
+  `p1_index_weight_tiny_scout_admission_20260703/validation_summary.md`:
+  status `INDEX_WEIGHT_SOURCE_CLOSED_NEGATIVE_SCOUT`, selected positive rate
+  `0.4550` vs pool `0.4951` (lift `-0.0400`), after-cost net @1.5pp
+  `-2.0617`, track_s_registry_candidate False, Track-F 0. PIT caveat
+  (index effective_date vs actual publication timestamp) is REAL but
+  immaterial to the closure: the leak-optimistic variant is already negative,
+  so an honest-availability variant can only be worse. Closure is robust;
+  record the caveat, do not reopen.
+- `pledge_stat` CLOSED fail-closed on availability — CONFIRMED CORRECT.
+  `p1_pledge_stat_no_label_coverage_20260703/validation_summary.md`: status
+  `PLEDGE_STAT_NO_LABEL_COVERAGE_REVIEW_AVAILABILITY_BLOCK`; only period-end
+  `end_date` exists (no disclosure timestamp), availability hard execution
+  exclusion True, feature contract allowed False, next stage `close_pledge_
+  stat_until_disclosure_timestamp_or_named_audit_bug`. This is exactly the
+  right fail-closed behavior: period-end stamps are not decision-time
+  availability and would leak.
+- `stk_holdertrade` — frontier, and FURTHER ALONG than the audit request text:
+  - coverage `STK_HOLDERTRADE_NO_LABEL_COVERAGE_READY` (probe 48, usable prior
+    event 35, numeric metric 35, errors 0);
+  - contract `..._FEATURE_CONTRACT_READY_NO_LABELS`, on-disk summary json =
+    `feature_rows 8 / gate_rows 5` (csv line counts 9/6 incl. headers) —
+    consistent with the matrix; NO 7/4 artifact residue on disk;
+  - detail-only matrix audit `..._MATRIX_AUDIT_PASS_REBUILD_REQUIRED_NO_MODEL`
+    (`detail_only_rebuild_required=True`, preregistration allowed False);
+  - the required rebuild is ALREADY DONE: `p1_stk_holdertrade_source_aggregate_
+    matrix_preview_20260703` status `..._PREVIEW_READY` (48 rows, 35
+    feature-ready, 6 pre-H2026 blocks, 37 codes, source rows read-not-
+    persisted 352, H2026 rows 0) and `p1_stk_holdertrade_source_aggregate_
+    matrix_audit_20260703` status `..._AUDIT_PASS_NO_MODEL`, failed checks
+    `[]`, `preregistration allowed next: True`, next stage
+    `write_stk_holdertrade_tiny_pre_h2026_scout_preregistration_or_close`.
+- M5 action card: `p1_round5_next_stage_action_card_20260702/next_stage_
+  action_card_summary.json` status `ROUND5_NEXT_STAGE_ACTION_CARD_READY`,
+  cards `74`, closed_or_not_promoted 13, Track-F 0, proposed next stage =
+  the stk_holdertrade preregistration stage (consistent with local decision).
+- Handoff: `REMOTE_HANDOFF_INTEGRITY_GUARD_PASS`, artifact rows 11 / review
+  rows 0 (`remote_decision.md` tail + guard dir).
+
+### stk_holdertrade PIT availability audit (local verification of the anchor)
+
+Verified directly from artifact columns, not narrative:
+
+- Matrix preview csv header: 8 features all suffixed `_d1` (D+1 anchoring on
+  `ann_date`), plus `available_at_policy`, `hard_exclude`, `claim_caveat`,
+  `label_join_allowed`, `model_training_allowed_now`, `track_f_candidate_now`
+  governance columns. Feature contract `source_fields` = ann_date, in_de,
+  change_vol, change_ratio, after_ratio, avg_price ONLY.
+- `holder_name` is NOT persisted anywhere in the aggregate artifacts; audit
+  check `raw_holder_not_persisted = True (raw=False; names=False)`.
+- `begin_date`/`close_date` (transaction period) are NOT used as availability
+  anchors and do not appear in features. Local judgment CONFIRMED and already
+  implemented remotely: `ann_date` is the only available-at anchor;
+  begin/close are transaction-period fields and must never be anchors;
+  holder_name stays out of features/reports (privacy + no-PIT-value).
+- Standing caveat carried into the next stage: contract row caveat
+  `in_de_taxonomy_requires_value_audit` — the increase/decrease direction
+  features depend on the raw `in_de` value coding; a small-sample value audit
+  must happen inside the preregistration before those features are trusted.
+
+### Hygiene items (recorded, none blocks the route)
+
+- stdout-vs-disk inconsistency (`..._REVIEW_OR_EMPTY` in captured stdout vs
+  `..._READY` on disk): grep over stk_holdertrade run/report dirs finds ZERO
+  on-disk REVIEW_OR_EMPTY residue. Verdict: stale stdout (rerun/concurrent
+  invocation), disk summary/RUN_STATUS is authoritative. Ask remote to note
+  the root cause in `remote_decision.md` and to re-read disk artifacts rather
+  than trust captured stdout in gate logic.
+- contract 7/4 vs 8/5: on-disk artifacts are uniformly 8/5, BUT the
+  `remote_decision.md` tail narrative still cites `feature rows 7; gate rows
+  4`. Residue is narrative-only. Fix = append a dated correction entry (no
+  history rewrite) naming the authoritative artifact paths.
+- cards 72 vs 74: disk summary says 74; earlier 72 was stale stdout. Same
+  disk-is-authoritative rule.
+
+### Verdicts on the five local pre-judgments for this round
+
+1. stk_holdertrade PIT anchor (ann_date only; begin/close never; holder_name
+   excluded) — HELD, and verified as already implemented in the artifacts.
+2. source-aggregate rebuild direction — HELD, and already EXECUTED remotely
+   with audit PASS; local next-task therefore ADVANCES to preregistration +
+   tiny scout instead of re-requesting the rebuild.
+3. index_weight closure robust despite effective_date caveat — HELD.
+4. pledge_stat fail-closed — HELD; reopen only on a disclosure-timestamp
+   source or named audit bug.
+5. disk-summary-authoritative for stdout mismatches + contract residue check —
+   HELD with one addition: the 7/4 residue lives in the `remote_decision.md`
+   narrative (needs a correction entry); artifacts are clean. Card count is
+   74, not 72.
+
+### Local/remote checks run this round
+
+- Local Read: three `local_*.md` (round-5 versions).
+- Read-only SSH (bounded): `git log -1`; ls of round5/index_weight/pledge_stat/
+  stk_holdertrade run+report dirs; heads of `p1_round5_measurement_foundation_
+  20260702/{validation_summary.md,next_route_decision.md}`,
+  `p1_index_weight_tiny_scout_admission_20260703/validation_summary.md`,
+  `p1_pledge_stat_no_label_coverage_20260703/validation_summary.md`,
+  `p1_stk_holdertrade_{no_label_coverage,no_label_feature_contract,
+  matrix_preview_audit,source_aggregate_matrix_preview,
+  source_aggregate_matrix_audit}_20260703/validation_summary.md`;
+  aggregate matrix csv header; aggregate audit checks csv; contract csv
+  head + summary json field grep; action-card summary json grep;
+  `remote_decision.md` tail; REVIEW_OR_EMPTY residue grep (zero hits).
+- No experiments, training, GPU, paid API, writes to remote, or git operations.
 
 ## Open Questions For Next Local Audit
 

@@ -1,6 +1,6 @@
 # StockHome Remote Execution Packet
 
-Updated: 2026-07-02 (round 4: stats hardening + PIT sources + pre-registration)
+Updated: 2026-07-03 (round 6: stk_holdertrade preregistration + tiny scout on the PASS source-aggregate matrix; gross-edge meta-finding elevated)
 
 RESEARCH NATURE (binding): StockHome is a quant-finance METHODOLOGY RESEARCH
 project. The research question is whether certain public-market signals carry
@@ -313,6 +313,128 @@ Remote may read archived files under
 not as active instructions.
 
 ## Exact Next Task
+
+Date: 2026-07-03 (round 6) — CONTINUE the running StockHome session with this route.
+
+Task ID: `p1_round6_stk_holdertrade_prereg_tiny_scout_20260703`.
+
+### Round-6 state baseline (SSH-verified 2026-07-03 at remote HEAD `3131411`)
+
+Round-5 is DONE and its results are ACCEPTED by local audit:
+
+- M1-M5 measurement foundation COMPLETE (`ROUND5_MEASUREMENT_FOUNDATION_DONE`,
+  `reports/date_generalization/p1_round5_measurement_foundation_20260702/`).
+  M1 verdict: the round-4 pre/H2026 scale gap is NOT a unit-conversion bug —
+  both are pp under the canonical convention (`canonical_metric_cost_spec.md`,
+  86-row registry re-expressed). M2 verdict: mask-v2 decomposed; 2 best
+  candidates re-run with ONLY hard execution exclusion; `revived = False`.
+  Together M1+M2 CONFIRM the negatives are genuine: not cost/unit artifacts,
+  not mask-veto artifacts. M3: H2026 stays diagnostic-only, forward window
+  UNREAD. M4: `negative_methods_findings.md` written; chosen route =
+  `negative_methods_plus_track_p_product_value`. M5: standardized action card
+  implemented in `src/agent_training/decision_card.py` + example artifacts.
+- `index_weight`: CLOSED as negative scout (`INDEX_WEIGHT_SOURCE_CLOSED_
+  NEGATIVE_SCOUT`; selected 0.4550 vs pool 0.4951, lift -0.0400, after-cost
+  net @1.5pp `-2.06`; Track-F 0). Closure CONFIRMED. The effective_date-vs-
+  publication PIT caveat is real but immaterial: the leak-optimistic version is
+  already negative, so the honest version can only be worse. Do NOT reopen.
+- `pledge_stat`: CLOSED fail-closed on availability (`..._REVIEW_AVAILABILITY_
+  BLOCK`; only period-end `end_date`, no disclosure timestamp -> not decision-
+  time available). CONFIRMED correct. Reopen ONLY if an ann_date-style
+  disclosure-timestamp source is found or a named audit bug is identified.
+- `stk_holdertrade` (current frontier): the remote ALREADY completed the
+  detail-only rebuild the round-5 audit required — source-aggregate no-label
+  matrix preview (`..._SOURCE_AGGREGATE_MATRIX_PREVIEW_READY`, 48 rows, 35
+  feature-ready, 6 pre-H2026 blocks, source rows read-not-persisted 352,
+  errors 0, H2026 rows 0) AND its audit (`..._AUDIT_PASS_NO_MODEL`, failed
+  checks `[]`, `preregistration allowed next: True`). PIT hygiene verified by
+  local audit: all 8 features are `_d1`-anchored on `ann_date`; no
+  `holder_name` persisted (audit check `raw_holder_not_persisted=True`); no
+  `begin_date`/`close_date` in features; contract on disk = 8 features /
+  5 gates, consistent with the matrix.
+- M5 action card: `ROUND5_NEXT_STAGE_ACTION_CARD_READY`, cards `74`
+  (disk-authoritative; an earlier `72` was stale stdout), Track-F 0; handoff
+  `REMOTE_HANDOFF_INTEGRITY_GUARD_PASS` (artifact rows 11 / review rows 0).
+- Closed families stay closed (do NOT re-tune): pairwise baseline, raw
+  margin/CYQ, industry static residual, risk-veto, limit_list_d, index_weight,
+  pledge_stat current alpha route, plus all earlier closures.
+
+### ELEVATED META-FINDING (now a binding claim boundary)
+
+Across MANY independent PIT-safe source families (pairwise, margin/CYQ,
+broker_recommend, cyq chips, repurchase, index_weight, frozen score, reversal,
+6 after-close mutations, live-tushare tiny scouts), the dominant failure mode
+is that the GROSS edge itself is unstable or negative — NOT that cost eats a
+real edge, NOT unit bugs (M1), NOT mask vetoes (M2). This is the project's
+central methodology result so far and strengthens the negative-methods
+deliverable (M4): under leakage-free, cost-inclusive, FDR-corrected,
+PIT-audited evaluation, none of the inspected public-source families has shown
+tradeable A-share 20d alpha. Every new scout inherits this as its prior; a
+single-source positive must clear Track-S significance + Track-F forward
+confirmation before any claim.
+
+### Round-6 single focused route (stk_holdertrade preregistration + tiny scout)
+
+A negative result is NEVER `BLOCKED`; log and continue. CPU/offline; bounded
+tushare only per existing envelope; keys from `/data/cyx/1030/api`, never
+printed/committed; research findings only.
+
+1. PREREGISTRATION FIRST (before any label join): write
+   `stk_holdertrade_tiny_pre_h2026_scout_preregistration` declaring the exact
+   8 aggregate `_d1` features (ann_date-anchored; no holder_name; no
+   begin_date/close_date; no duplicate counting; no H2026/forward), the scout
+   universe/blocks (the 6 pre-H2026 blocks of the PASS aggregate matrix), and
+   verbatim admission gates: selected-vs-pool win-rate lift, RankIC, after-cost
+   net spread @1.5pp non-negative, Track-S registry entry + significance
+   language. Resolve the standing contract caveat
+   `in_de_taxonomy_requires_value_audit` INSIDE the preregistration: audit the
+   raw `in_de` value taxonomy (增持/减持 coding) on a small sample BEFORE
+   trusting the increase/decrease direction features; record the mapping.
+2. Run the tiny pre-H2026 scout exactly as preregistered (offline labels
+   eval-only; H2026 rows 0; forward unread; Track-F stays 0).
+3. Admission audit against the preregistered gates (same shape as
+   `p1_index_weight_tiny_scout_admission_20260703`).
+4. If gates FAIL -> close `stk_holdertrade` as a negative scout (mirror the
+   index_weight closure), append to the registry and `remote_decision.md`,
+   and continue — NOT blocked. If gates PASS -> it becomes a Track-S registry
+   candidate ONLY; promotion still requires Track-F forward preregistration;
+   no claim from pre-H2026 or H2026 alone.
+5. Then choose exactly ONE next route and log it: (a) name ONE genuinely new
+   independent PIT source with a plausible ann_date-style available-at
+   mechanism and run its no-label available-at/coverage audit; or (b)
+   consolidate the negative-methods report (M4, now including the elevated
+   meta-finding) + M5/Track-P product value as the standing deliverable.
+   M5 standardized action-card output stays ALWAYS-ON.
+
+Hygiene sub-items (bounded, report-only):
+
+- remote_decision.md narrative still cites the OLD contract shape `7 features /
+  4 gates` while the on-disk rewritten artifacts are `8 / 5`: append a dated
+  CORRECTION entry to `remote_decision.md` (do not rewrite history) stating the
+  authoritative artifact paths.
+- stdout-vs-disk status mismatches (`..._REVIEW_OR_EMPTY` seen in stdout vs
+  `..._READY` on disk; cards 72 vs 74): grep confirmed NO on-disk
+  REVIEW_OR_EMPTY residue in the stk_holdertrade dirs — treat disk
+  summary/RUN_STATUS as authoritative, note the stale-stdout root cause (rerun/
+  concurrency) in the decision log, and prefer re-reading disk artifacts over
+  trusting captured stdout in future stages.
+
+Expected outputs:
+
+- `runs/p1_round6_stk_holdertrade_prereg_tiny_scout_20260703/RUN_STATUS.md`;
+- `reports/date_generalization/p1_stk_holdertrade_tiny_scout_preregistration_20260703/`
+  (prereg doc + in_de taxonomy audit), `.../p1_stk_holdertrade_tiny_pre_h2026_scout_20260703/`,
+  `.../p1_stk_holdertrade_tiny_scout_admission_20260703/`;
+- registry + `remote_decision.md` appended (decision, correction entry, one
+  chosen next route).
+
+DONE: prereg written BEFORE label join; in_de taxonomy audited; scout run as
+preregistered; admission verdict recorded (pass -> Track-S candidate only /
+fail -> closed negative); exactly ONE next route chosen and logged; hygiene
+correction entry appended; leakage PASS; Track-F 0; forward unread; H2026
+untouched.
+
+## Superseded Round-5 Task (executed 2026-07-02/03; M1-M5 DONE, results accepted — kept for spec reference)
 
 Date: 2026-07-02 (round 5) — CONTINUE the running StockHome session with this route.
 

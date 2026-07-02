@@ -1,6 +1,6 @@
 # StockHome Local Suggestions For Next Remote Round
 
-Updated: 2026-07-02 (round 4: research portfolio with statistical pass/fail gates)
+Updated: 2026-07-03 (round 6: stk_holdertrade prereg + tiny scout focus; no new models; negative-methods consolidation as the fallback)
 
 Status: local-authored remote execution guidance. This file is part of the
 remote execution packet: remote Codex reads it with `local_goal.md` and
@@ -14,6 +14,44 @@ file and pushes it.
 
 It becomes executable only through the filled `Exact Next Task` in
 `local_goal.md`.
+
+## Round-6 Focus (GOVERNING this round; narrower than everything below)
+
+Short-term focus is ONE route: `stk_holdertrade` tiny pre-H2026 scout
+PREREGISTRATION first, then the scout, then admission — on the ALREADY-PASS
+source-aggregate matrix (`p1_stk_holdertrade_source_aggregate_matrix_audit_
+20260703`, failed checks `[]`, preregistration allowed). Do NOT rebuild the
+matrix again; do NOT open any new model family; do NOT re-tune any closed
+route (pairwise, raw margin/CYQ, industry static residual, risk-veto,
+limit_list_d, index_weight, pledge_stat alpha, target60/7-families, broker,
+after-close mutations). M5 standardized action-card output stays always-on.
+
+Route discipline:
+
+- Preregister BEFORE any label join; the prereg must pin the 8 `_d1`
+  ann_date-anchored aggregate features, resolve the `in_de_taxonomy_requires_
+  value_audit` caveat with a small-sample value audit, and declare verbatim
+  admission gates (win-rate lift vs pool, RankIC, after-cost net @1.5pp,
+  Track-S significance language). No holder_name, no begin/close_date, no
+  H2026/forward reads, Track-F stays 0.
+- Prior expectation is honest: the elevated meta-finding (gross edge weak or
+  negative across many independent PIT-safe sources; M1/M2 confirmed this is
+  not a cost/unit/mask artifact) makes a negative scout the LIKELY outcome.
+  A clean negative closure equals success for this stage — mirror the
+  index_weight closure shape and continue.
+- If the aggregate matrix turns out to be UNSUITABLE for preregistration after
+  all (e.g. the in_de value audit invalidates the direction features, or
+  feature-ready coverage proves too thin for the declared gates): do NOT force
+  the scout. Fall back to exactly one of: (a) name ONE new independent PIT
+  source with an ann_date-style disclosure timestamp and run its no-label
+  available-at/coverage audit; or (b) name the specific audit bug and fix it
+  report-only; or (c) consolidate the negative-methods (M4, incl. the
+  meta-finding) + M5/Track-P product deliverable. Log the choice in
+  `remote_decision.md`; never `BLOCKED`.
+- Hygiene (report-only, bounded): append a dated correction entry to
+  `remote_decision.md` for the 7/4-vs-8/5 contract narrative residue; note the
+  stale-stdout root cause (REVIEW_OR_EMPTY vs READY; cards 72 vs 74) and adopt
+  "disk summary/RUN_STATUS is authoritative" in gate logic.
 
 ## Round-5 Product Output Spec (standardized / professional / decision-oriented) — GOVERNING for Track-P
 
